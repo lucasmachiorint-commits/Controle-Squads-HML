@@ -137,14 +137,14 @@ const app = {
     
     const hasSession = await this.checkSession();
     if (!hasSession) {
-      console.log('[APP INIT] Nenhuma sessão Supabase Auth prévia. Entrando em modo Visitante (Consulta).');
-      this.authUserId = 'guest';
-      this.userEmail = 'visitante@squads.local';
+      console.log('[APP INIT] Nenhuma sessão ativa aprovada. Acesso bloqueado - Exibindo autenticação.');
+      this.authUserId = null;
+      this.userEmail = '';
       this.userName = 'Visitante';
       this.userRole = 'consulta';
-      this.userStatus = 'ATIVO';
-      this.hideAuthOverlay();
-      this.updateUserBadgeUI();
+      this.userStatus = null;
+      this.showAuthOverlay();
+      return;
     }
 
     this.loadLocalState();
@@ -201,8 +201,8 @@ const app = {
     try {
       const { data: { session } } = await supabaseClient.auth.getSession();
       if (session && session.user) {
-        await this.setupUserSession(session.user);
-        return true;
+        const isApproved = await this.setupUserSession(session.user);
+        return isApproved === true;
       }
     } catch (e) {
       console.warn('Erro ao verificar sessão:', e);
@@ -528,7 +528,7 @@ const app = {
   // SUPABASE DATABASE - PERSISTÊNCIA CENTRALIZADA
   // ============================================================
   async saveStateToSupabase() {
-    if (!supabaseClient) return;
+    if (!supabaseClient || !this.authUserId || this.authUserId === 'guest') return;
     _lastSelfSaveTime = Date.now();
     const payload = {
       id: 'default',
@@ -809,6 +809,11 @@ const app = {
 
   // Alternar View Ativa
   navigate(viewId) {
+    if (!this.authUserId || this.authUserId === 'guest' || (this.userStatus !== 'ATIVO' && this.userStatus !== 'ACTIVE')) {
+      console.warn('[AUTH GUARD] Tentativa de navegação sem autenticação ativa. Exibindo tela de login.');
+      this.showAuthOverlay();
+      return;
+    }
     this.activeView = viewId;
 
     // Atualizar links da sidebar

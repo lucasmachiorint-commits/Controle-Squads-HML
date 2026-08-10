@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Controle de Squads - Enterprise Board [HML] v6.52.0-hml</title>
+    <title>Controle de Squads - Enterprise Board [HML] v6.53.0-hml</title>
     
     <script>
       (function() {
@@ -20,11 +20,11 @@
             for (let name of names) { caches.delete(name); }
           });
         }
-        const TARGET_RELEASE = 'v6.52.0-hml';
+        const TARGET_RELEASE = 'v6.53.0-hml';
         const currentLock = localStorage.getItem('cs_deployed_release_lock_hml');
-        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.52.0-hml')) {
+        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.53.0-hml')) {
           localStorage.setItem('cs_deployed_release_lock_hml', TARGET_RELEASE);
-          window.location.href = window.location.pathname + '?v=6.52.0-hml&t=' + Date.now();
+          window.location.href = window.location.pathname + '?v=6.53.0-hml&t=' + Date.now();
         }
       })();
     </script>
@@ -56,14 +56,9 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     
     <!-- Custom Theme Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=20260809_v6.51.0">
+    <link rel="stylesheet" href="style.css?v=20260810_v6.53.0-hml">
 </head>
 <body>
-
-<!-- BANNER AMBIENTE DE HOMOLOGAÇÃO (HML) -->
-<div class="w-full bg-amber-500/20 border-b border-amber-500/40 text-amber-300 py-1.5 px-4 text-center text-xs font-extrabold flex items-center justify-center gap-2 z-[99999]">
-  <i class="fa-solid fa-vial-circle-check text-amber-400"></i> 🧪 AMBIENTE DE HOMOLOGAÇÃO (HML) — VERSÃO DE TESTES E VALIDAÇÕES DE NOVAS REGRAS
-</div>
 
 <div class="app-container">
 
@@ -1266,7 +1261,7 @@
 
     <form onsubmit="app.saveJiraConfigModal(event)">
       <div class="form-group mb-3">
-        <label class="form-label text-xs text-slate-300 font-bold">URL da API / Servidor Proxy HTTPS</label>
+        <label class="form-label text-xs text-slate-300 bold">URL da API / Servidor Proxy HTTPS</label>
         <input type="text" class="form-control text-xs py-2.5 font-mono" id="jira-cfg-custom-url" placeholder="https://emana-squads-jira-platform.onrender.com/api/jira/consultar-cards-jira" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
         <span class="text-[10px] text-slate-400 block mt-1">Insira a URL HTTPS do servidor Proxy ou deixe em branco para usar o endpoint padrão.</span>
       </div>
@@ -1467,10 +1462,10 @@
 </div>
 
 <!-- JIRA ENGINE MODULE & CORE APP LOGIC -->
-<script src="jira-sync.js?v=20260809_v6.52.0-hml"></script>
-<script src="app.js?v=20260809_v6.52.0-hml"></script>
+<script src="jira-sync.js?v=20260809_v6.51.0"></script>
+<script src="app.js?v=20260809_v6.51.0"></script>
 <!-- MÓDULO AUTÔNOMO ISOLADO DA SQUAD RPA -->
-<script src="rpa-pendencies.js?v=20260809_v6.52.0-hml"></script>
+<script src="rpa-pendencies.js?v=20260809_v6.51.0"></script>
 
 </body>
 </html>
