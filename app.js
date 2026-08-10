@@ -651,6 +651,7 @@ const app = {
           if (clean.length > 0) {
             window.RpaPendenciesModule.pendencies = clean;
             window.RpaPendenciesModule.saveLocal();
+            if (window.RpaPendenciesModule.renderView) window.RpaPendenciesModule.renderView();
           }
         }
       } else if (window.RpaPendenciesModule && Array.isArray(window.RpaPendenciesModule.pendencies) && window.RpaPendenciesModule.pendencies.length > 0) {

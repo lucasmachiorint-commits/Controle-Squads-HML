@@ -467,8 +467,6 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
 
     // Auto-Verificação e Leitura no Supabase via REST Client
     async fetchPendencies() {
-      this.loadLocal();
-
       try {
         if (window.supabaseClient) {
           // 1. Tentar ler da tabela centralizada cs_board_state (acesso universal garantido para todos os usuários)
@@ -519,6 +517,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         console.warn('[RPA Pendencies] Modo de operação resiliente ativado:', err);
       }
 
+      this.loadLocal();
       this.renderView();
     },
 
