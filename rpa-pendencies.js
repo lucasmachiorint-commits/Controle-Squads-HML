@@ -118,7 +118,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         },
         {
           id: 'rpa-item-7',
-          robo_name: 'ID16 - Cancelamento Jira',
+          robo_name: 'ID16 - Pendência Recompra',
           title: 'EMA-62 Mapeamento de Tipo de Item para o Fluxo de Cancelamento JIRA',
           responsible: 'Redesign',
           severity: 'MEDIA',
@@ -178,7 +178,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         },
         {
           id: 'rpa-item-12',
-          robo_name: 'ID16 - Cancelamento Jira',
+          robo_name: 'ID16 - Pendência Recompra',
           title: 'ID 16 Desenvolvimento em 70% da atualização Jira (Documentação aprovada); cronograma de término, HML interna e HML com a área',
           responsible: 'Caio',
           severity: 'MEDIA',
