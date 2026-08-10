@@ -449,12 +449,80 @@ const app = {
     if (btnSignup) { btnSignup.disabled = true; btnSignup.textContent = 'Criando conta...'; }
 
     try {
+      // 1. Verificar se o e-mail já possui cadastro/solicitação prévia
+      const emailLower = email.toLowerCase();
+      let existingProfile = null;
+
+      try {
+        let { data } = await supabaseClient
+          .from('squads_profiles')
+          .select('status, role, perfil, email')
+          .ilike('email', emailLower)
+          .maybeSingle();
+
+        if (!data) {
+          const res2 = await supabaseClient
+            .from('cs_profiles')
+            .select('status, role, perfil, email')
+            .ilike('email', emailLower)
+            .maybeSingle();
+          data = res2.data;
+        }
+        existingProfile = data;
+      } catch (_) {}
+
+      if (existingProfile) {
+        const st = (existingProfile.status || 'PENDING').toString().toUpperCase();
+        if (st === 'PENDING' || st === 'PENDENTE') {
+          if (infoEl) {
+            infoEl.innerHTML = `
+              <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 10px 14px; border-radius: 8px; color: #fbbf24; font-size: 0.82rem; line-height: 1.4; margin-top: 8px;">
+                <strong>⏳ Solicitação Já Cadastrada!</strong><br>
+                O e-mail <code>${emailLower}</code> já possui uma solicitação de acesso <strong>PENDENTE</strong> de aprovação pelo Administrador. Não é necessário solicitar novamente.
+              </div>`;
+            infoEl.style.display = 'block';
+          }
+          if (errorEl) errorEl.style.display = 'none';
+          return;
+        } else if (st === 'ACTIVE' || st === 'ATIVO') {
+          if (infoEl) {
+            infoEl.innerHTML = `
+              <div style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 10px 14px; border-radius: 8px; color: #34d399; font-size: 0.82rem; line-height: 1.4; margin-top: 8px;">
+                <strong>💡 Cadastro Aprovado!</strong><br>
+                O e-mail <code>${emailLower}</code> já possui cadastro <strong>APROVADO</strong> no sistema. Por favor, preencha sua senha e utilize o botão <strong>"Entrar"</strong>.
+              </div>`;
+            infoEl.style.display = 'block';
+          }
+          if (errorEl) errorEl.style.display = 'none';
+          return;
+        } else if (st === 'BLOCKED' || st === 'BLOQUEADO' || st === 'REJECTED') {
+          if (errorEl) {
+            errorEl.innerHTML = `⛔ O acesso para o e-mail <strong>${emailLower}</strong> está suspenso. Entre em contato com o Administrador.`;
+            errorEl.style.display = 'block';
+          }
+          return;
+        }
+      }
+
       const { data, error } = await supabaseClient.auth.signUp({
         email, password,
         options: { data: { perfil: 'CONSULTA', status: 'PENDENTE', nome: email.split('@')[0] } }
       });
       if (error) {
-        if (errorEl) { errorEl.textContent = error.message; errorEl.style.display = 'block'; }
+        let msg = error.message;
+        if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already exists')) {
+          if (infoEl) {
+            infoEl.innerHTML = `
+              <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); padding: 10px 14px; border-radius: 8px; color: #fbbf24; font-size: 0.82rem; line-height: 1.4; margin-top: 8px;">
+                <strong>⏳ Solicitação Já Cadastrada!</strong><br>
+                Este e-mail já foi registrado no sistema e está <strong>PENDENTE</strong> de aprovação do Administrador.
+              </div>`;
+            infoEl.style.display = 'block';
+          }
+          if (errorEl) errorEl.style.display = 'none';
+          return;
+        }
+        if (errorEl) { errorEl.textContent = msg; errorEl.style.display = 'block'; }
       } else {
         const user = data?.session?.user || data?.user;
         if (user) {
