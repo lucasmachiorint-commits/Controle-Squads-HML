@@ -443,13 +443,6 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
 
     loadLocal() {
       try {
-        const forceReset = localStorage.getItem('cs_rpa_master_v26_applied_v7');
-        if (!forceReset) {
-          localStorage.setItem('cs_rpa_master_v26_applied_v7', 'true');
-          this.seedDefaultIfEmpty();
-          return;
-        }
-
         const saved = localStorage.getItem('cs_rpa_pendencies_v2');
         if (saved) {
           const parsed = JSON.parse(saved);
@@ -459,10 +452,6 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         }
       } catch (_) {
         this.pendencies = [];
-      }
-
-      if (!Array.isArray(this.pendencies) || this.pendencies.length === 0) {
-        this.seedDefaultIfEmpty();
       }
     },
 
