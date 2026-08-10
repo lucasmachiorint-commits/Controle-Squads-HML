@@ -1,0 +1,14 @@
+{
+  "name": "controle-squads",
+  "version": "1.0.0",
+  "private": true,
+  "description": "EmanaPay / Natura - Controle de Squads & Governança Jira (Padrão Painel-OPS)",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2"
+  }
+}

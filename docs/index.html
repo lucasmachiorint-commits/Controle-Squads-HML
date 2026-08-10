@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Controle de Squads - Enterprise Board [HML] v6.52.0-hml</title>
+    
+    <script>
+      (function() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(function(regs) {
+            for (let reg of regs) { reg.unregister(); }
+          });
+        }
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (let name of names) { caches.delete(name); }
+          });
+        }
+        const TARGET_RELEASE = 'v6.52.0-hml';
+        const currentLock = localStorage.getItem('cs_deployed_release_lock_hml');
+        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.52.0-hml')) {
+          localStorage.setItem('cs_deployed_release_lock_hml', TARGET_RELEASE);
+          window.location.href = window.location.pathname + '?v=6.52.0-hml&t=' + Date.now();
+        }
+      })();
+    </script>
+    
+    <!-- Google Fonts (Outfit & Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Supabase SDK v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- SheetJS (Excel Upload/Export) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+    
+    <!-- Custom Theme Stylesheet -->
+    <link rel="stylesheet" href="style.css?v=20260809_v6.51.0">
+</head>
+<body>
+
+<!-- BANNER AMBIENTE DE HOMOLOGAÇÃO (HML) -->
+<div class="w-full bg-amber-500/20 border-b border-amber-500/40 text-amber-300 py-1.5 px-4 text-center text-xs font-extrabold flex items-center justify-center gap-2 z-[99999]">
+  <i class="fa-solid fa-vial-circle-check text-amber-400"></i> 🧪 AMBIENTE DE HOMOLOGAÇÃO (HML) — VERSÃO DE TESTES E VALIDAÇÕES DE NOVAS REGRAS
+</div>
+
+<div class="app-container">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-badge">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div>
+        <div class="brand-title">EmanaPay</div>
+        <div class="brand-subtitle">Gestão de Squads & Jira</div>
+      </div>
+    </div>
+
+    <!-- MAIN NAVIGATION LINKS -->
+    <nav class="sidebar-nav">
+      <!-- 1. MESA DE TRIAGEM -->
+      <a class="nav-item active" id="nav-triagem" onclick="app.navigate('triagem')">
+        <i class="fa-solid fa-inbox"></i>
+        <span>Mesa de Triagem</span>
+        <span class="nav-badge" id="badge-triage-count">0</span>
+      </a>
+
+      <!-- 2. SQUADS -->
+      <div class="sidebar-section-title">SQUADS</div>
+      <a class="nav-item" id="nav-squad-dados" onclick="app.selectSquadAndView('dados', 'board')">
+        <i class="fa-solid fa-database text-emerald-400"></i>
+        <span>Squad de Dados</span>
+      </a>
+      <a class="nav-item" id="nav-squad-operacoes" onclick="app.selectSquadAndView('operacoes', 'board')">
+        <i class="fa-solid fa-gears text-orange-400"></i>
+        <span>Squad de Operações</span>
+      </a>
+      <a class="nav-item" id="nav-squad-rpa" onclick="app.selectSquadAndView('rpa', 'board')">
+        <i class="fa-solid fa-robot text-pink-400"></i>
+        <span>Squad de RPA</span>
+      </a>
+
+      <!-- 3. DASHBOARD CONSOLIDADO -->
+      <div class="sidebar-section-title mt-2">DASHBOARD</div>
+      <a class="nav-item" id="nav-dashboard" onclick="app.navigate('dashboard')">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard Consolidado</span>
+      </a>
+
+      <!-- 4. GESTÃO DE ACESSOS E SEGURANÇA -->
+      <div class="sidebar-section-title mt-2">CONFIGURAÇÕES</div>
+      <a class="nav-item" id="nav-gestao-acessos" onclick="app.navigate('gestao-acessos')">
+        <i class="fa-solid fa-user-gear text-purple-400"></i>
+        <span>Gestão de Acessos</span>
+      </a>
+    </nav>
+
+    <!-- 5. APARÊNCIA E TEMA (EXTREMIDADE INFERIOR DA SIDEBAR) -->
+    <div class="sidebar-footer">
+      <button type="button" class="theme-toggle-icon-btn" id="btn-theme-toggle" onclick="app.toggleTheme()" title="Alternar Aparência (Claro / Escuro)">
+        <i class="fa-solid fa-sun text-amber-400 text-lg" id="theme-toggle-icon"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="main-wrapper">
+    
+    <!-- TOP HEADER BAR -->
+    <header class="top-header">
+      <!-- 1. ESQUERDA: TÍTULO DA PÁGINA -->
+      <div class="header-title-area">
+        <button class="btn btn-secondary lg:hidden" onclick="app.toggleMobileSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h1 class="header-title" id="page-title">Mesa de Triagem & Governança Jira</h1>
+      </div>
+
+      <!-- 2. CENTRO: BOTÕES DE AÇÃO CENTRALIZADOS NO MENU SUPERIOR -->
+      <div class="header-center-actions flex items-center justify-center gap-2.5 flex-nowrap">
+        <button class="btn btn-secondary text-xs py-2 px-3.5 border-rose-500/30 hover:bg-rose-500/20 text-rose-300 admin-only whitespace-nowrap" id="btn-clear-cards" onclick="app.clearAllCards()">
+          <i class="fa-solid fa-trash-can me-1.5 text-rose-400"></i>
+          <span>Limpar Cards</span>
+        </button>
+        <button class="btn btn-primary text-xs py-2 px-3.5 admin-only whitespace-nowrap" id="btn-sync-jira" onclick="app.triggerJiraSync()">
+          <i class="fa-solid fa-arrows-rotate me-1.5" id="icon-spin-jira"></i>
+          <span>Sincronizar com Jira</span>
+        </button>
+        <button class="btn btn-secondary text-xs py-2 px-2.5 text-slate-300 admin-only" id="btn-jira-config" onclick="app.openJiraConfigModal()" title="Configurações da API Jira Cloud em Tempo Real">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+
+      <!-- 3. EXTREMA DIREITA: USUÁRIO ADMIN & BOTÃO SAIR -->
+      <div class="header-right-user flex items-center justify-end">
+        <div class="user-chip-container" id="user-profile-badge" title="Usuário autenticado via Supabase">
+          <i class="fa-solid fa-circle-user user-chip-icon" id="user-role-icon"></i>
+          <span id="user-display-info" class="user-chip-name">Carregando...</span>
+          <button type="button" onclick="app.handleLogout()" title="Sair do sistema" class="btn-user-logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>Sair</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- VIEW 1: MESA DE TRIAGEM -->
+    <div class="view-container active-view" id="view-triagem">
+      
+      <!-- BANNER DE STATUS DE SINCRONIZAÇÃO DA INTEGRAÇÃO JIRA -->
+      <div class="triage-banner-panel">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="badge badge-medium mb-3">
+              <i class="fa-solid fa-bolt text-emerald-400"></i> Integração Jira
+            </div>
+            <h2 class="text-xl md:text-2xl font-extrabold text-white tracking-tight">Mesa de Triagem</h2>
+            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+              Solicitações sincronizadas com o Jira
+            </p>
+          </div>
+          <div class="text-left md:text-right shrink-0 mt-2 md:mt-0">
+            <span class="text-xs text-slate-300 font-semibold inline-block bg-white/5 px-3 py-1.5 rounded-lg border border-white/10" id="sync-last-time">Última atualização: Pendente de sincronização</span>
+          </div>
+        </div>
+
+        <!-- STATUS DA ÚLTIMA ATUALIZAÇÃO (QUADROS DE MÉTRICAS UNIFORMES E COMPACTOS) -->
+        <div class="mt-4 pt-3.5 border-t border-white/10" id="sync-status-details-box">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Status da Atualização:</span>
+          <div class="sync-metrics-grid-row">
+            <!-- 1. NOVOS CRIADOS -->
+            <div class="mini-metric-card metric-box-emerald">
+              <div>
+                <span class="mini-metric-lbl text-emerald-400">NOVOS CRIADOS</span>
+                <div class="mini-metric-val text-emerald-400" id="sync-count-new">0</div>
+              </div>
+            </div>
+
+            <!-- 2. ATUALIZADOS -->
+            <div class="mini-metric-card metric-box-amber">
+              <div>
+                <span class="mini-metric-lbl text-amber-500">ATUALIZADOS</span>
+                <div class="mini-metric-val text-amber-400" id="sync-count-updated">0</div>
+              </div>
+            </div>
+
+            <!-- 3. CONCLUÍDOS -->
+            <div class="mini-metric-card metric-box-blue">
+              <div>
+                <span class="mini-metric-lbl text-blue-400">CONCLUÍDOS</span>
+                <div class="mini-metric-val text-blue-400" id="sync-count-completed">0</div>
+              </div>
+            </div>
+
+            <!-- 4. INALTERADOS -->
+            <div class="mini-metric-card metric-box-slate">
+              <div>
+                <span class="mini-metric-lbl text-slate-400">INALTERADOS</span>
+                <div class="mini-metric-val text-slate-300" id="sync-count-unchanged">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRÊS QUADROS DE MÉTRICAS DA MESA DE TRIAGEM (SEM ÍCONES CONFORME SOLICITADO) -->
+      <div class="triage-metrics-row">
+        <!-- 1. AGUARDANDO TRIAGEM -->
+        <div class="metric-box-card metric-box-amber cursor-pointer active" id="card-filter-pending" onclick="app.setTriageFilter('pending')">
+          <div>
+            <span class="metric-box-lbl text-amber-500">AGUARDANDO TRIAGEM</span>
+            <div class="metric-box-val text-amber-400" id="metric-triage-pending">0 cards</div>
+          </div>
+        </div>
+
+        <!-- 2. TRIADOS & ATRIBUÍDOS -->
+        <div class="metric-box-card metric-box-emerald cursor-pointer" id="card-filter-triaged" onclick="app.setTriageFilter('triaged')">
+          <div>
+            <span class="metric-box-lbl text-emerald-400">TRIADOS & ATRIBUÍDOS</span>
+            <div class="metric-box-val text-emerald-400" id="metric-triage-triaged">0 cards</div>
+          </div>
+        </div>
+
+        <!-- 3. REJEITADOS / ARQUIVADOS -->
+        <div class="metric-box-card metric-box-slate cursor-pointer" id="card-filter-rejected" onclick="app.setTriageFilter('rejected')">
+          <div>
+            <span class="metric-box-lbl text-slate-400">REJEITADOS / ARQUIVADOS</span>
+            <div class="metric-box-val text-slate-300" id="metric-triage-rejected">0 cards</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABELA DE SOLICITAÇÕES DA MESA DE TRIAGEM (COM PADDING E BORDAS AMPLAS) -->
+      <div class="triage-table-panel">
+        <div class="table-header-box mb-6">
+          <div class="search-box w-full">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="search" name="search_query_filter_no_autocomplete" class="input-field py-3 text-xs" id="search-triage" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderTriageView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th style="width: 45px; white-space: nowrap;">#</th>
+                <th style="width: 110px; white-space: nowrap;">GAU / Chave</th>
+                <th style="min-width: 180px;">Título da Demanda</th>
+                <th style="width: 160px; white-space: nowrap;">Solicitante</th>
+                <th style="width: 160px; white-space: nowrap;">Status</th>
+                <th style="width: 120px; white-space: nowrap;">Data de Criação</th>
+              </tr>
+            </thead>
+            <tbody id="triage-table-body">
+              <!-- Dinamicamente gerado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: DASHBOARD CONSOLIDADO -->
+    <div class="view-container" id="view-dashboard">
+      
+      <!-- BANNER EXECUTIVO DO DASHBOARD -->
+      <div class="triage-banner-panel mb-6" style="margin-bottom: 28px !important;">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="badge badge-medium mb-3">
+              <i class="fa-solid fa-chart-line text-emerald-400 me-1.5"></i> Analytics & Métricas Consolidadas
+            </div>
+            <h2 class="text-xl md:text-2xl font-extrabold text-white tracking-tight">Dashboard Consolidado 3 Squads</h2>
+            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+              Visão geral e executiva de throughput, capacidade operacional e demandas em alerta nas Squads de Dados, Operações e RPA.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" class="btn btn-secondary btn-export" onclick="app.exportPDF()">
+              <i class="fa-solid fa-print" style="color:#6366f1; margin-right:6px;"></i> Imprimir / PDF
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAINEL 1: FILTROS AVANÇADOS DO DASHBOARD -->
+      <div class="glass-panel" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 24px !important; margin-bottom: 28px !important;">
+        <!-- Cabeçalho dos Filtros -->
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;">
+          <h3 style="font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; margin: 0; padding-top: 2px;">
+            <i class="fa-solid fa-filter text-emerald-400 me-2"></i> Filtros do Dashboard Consolidado
+          </h3>
+          <button type="button" class="btn btn-secondary text-xs py-2 px-3.5" onclick="app.clearDashboardFilters()">
+            <i class="fa-solid fa-rotate-left me-1.5"></i> Limpar Filtros
+          </button>
+        </div>
+
+        <!-- Linha de Controles de Seleção -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end;">
+          <!-- 1. Filtro por Squad -->
+          <div>
+            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Filtrar por Squad:</label>
+            <select id="dash-filter-squad" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
+              <option value="all">Todas as Squads (Dados, Operações, RPA)</option>
+              <option value="dados">Squad de Dados</option>
+              <option value="operacoes">Squad de Operações</option>
+              <option value="rpa">Squad de RPA</option>
+            </select>
+          </div>
+
+          <!-- 2. Filtro por Status -->
+          <div>
+            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Filtrar por Status:</label>
+            <select id="dash-filter-status" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
+              <option value="all">Todos os Status</option>
+              <option value="Em Andamento">Em Andamento</option>
+              <option value="Backlog">Backlog</option>
+              <option value="Bloqueado">Bloqueado</option>
+              <option value="Concluído">Concluído</option>
+            </select>
+          </div>
+
+          <!-- 3. Período Customizável -->
+          <div>
+            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Período Temporal:</label>
+            <select id="dash-filter-period" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
+              <option value="all">Todo o Período</option>
+              <option value="today">Hoje (Dia)</option>
+              <option value="week">Esta Semana</option>
+              <option value="month">Este Mês</option>
+              <option value="year">Este Ano</option>
+              <option value="custom">De xxxx Até xxxx (Personalizado)</option>
+            </select>
+          </div>
+
+          <!-- 4. Seleção Customizada de Data (De / Até) -->
+          <div id="dash-custom-date-container" class="hidden" style="display: flex; gap: 8px; width: 100%;">
+            <div style="flex: 1;">
+              <label style="color: #94a3b8; display: block; font-size: 10px; margin-bottom: 8px; font-weight: 700;">De (Data Inicial):</label>
+              <input type="date" name="dash_date_from_filter" id="dash-date-from" style="width: 100%; padding: 9px 10px; font-size: 11px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #34d399; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" />
+            </div>
+            <div style="flex: 1;">
+              <label style="color: #94a3b8; display: block; font-size: 10px; margin-bottom: 8px; font-weight: 700;">Até (Data Final):</label>
+              <input type="date" name="dash_date_to_filter" id="dash-date-to" style="width: 100%; padding: 9px 10px; font-size: 11px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #34d399; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAINEL 2: AS 5 MÉTRICAS PRINCIPAIS (+ LEAD TIME MÉDIO) -->
+      <div class="grid-metrics" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 28px !important; gap: 18px !important;">
+        <!-- 1. Em Andamento -->
+        <div class="glass-panel metric-card" style="margin-bottom: 0 !important;">
+          <div>
+            <div class="metric-val text-cyan-400" id="dash-total-in-progress">0</div>
+            <div class="metric-lbl">Total Em Andamento</div>
+          </div>
+          <div class="metric-icon bg-cyan-500/20 text-cyan-400"><i class="fa-solid fa-spinner fa-spin-pulse"></i></div>
+        </div>
+
+        <!-- 2. Em Backlog -->
+        <div class="glass-panel metric-card" style="margin-bottom: 0 !important;">
+          <div>
+            <div class="metric-val text-amber-400" id="dash-total-backlog">0</div>
+            <div class="metric-lbl">Total em Backlog</div>
+          </div>
+          <div class="metric-icon bg-amber-500/20 text-amber-400"><i class="fa-solid fa-list-check"></i></div>
+        </div>
+
+        <!-- 3. Com Bloqueio -->
+        <div class="glass-panel metric-card" style="margin-bottom: 0 !important;">
+          <div>
+            <div class="metric-val text-rose-400" id="dash-total-blocked">0</div>
+            <div class="metric-lbl">Total com Bloqueio</div>
+          </div>
+          <div class="metric-icon bg-rose-500/20 text-rose-400"><i class="fa-solid fa-ban"></i></div>
+        </div>
+
+        <!-- 4. Total Concluídos -->
+        <div class="glass-panel metric-card" style="margin-bottom: 0 !important;">
+          <div>
+            <div class="metric-val text-emerald-400" id="dash-total-completed">0</div>
+            <div class="metric-lbl">Total Concluídos</div>
+          </div>
+          <div class="metric-icon bg-emerald-500/20 text-emerald-400"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+
+      </div>
+
+      <!-- PAINEL 2.5: INDICADORES EXECUTIVOS DA SQUAD RPA (PENDÊNCIAS RPA) -->
+      <div class="glass-panel mb-6" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 20px !important; margin-bottom: 28px !important;">
+        <div class="flex items-center justify-between mb-4">
+          <h3 style="font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; margin: 0; padding-top: 2px;" class="flex items-center gap-2">
+            <i class="fa-solid fa-robot text-emerald-400"></i> Indicadores da Squad RPA (Pendências RPA)
+          </h3>
+          <span class="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold px-2.5 py-0.5">Módulo RPA</span>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <!-- 1. Total Ocorrências -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-white" id="dash-rpa-kpi-total">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Total Ocorrências</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-list-ul"></i></div>
+          </div>
+
+          <!-- 2. Em Aberto -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-rose-400" id="dash-rpa-kpi-aberto">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Em Aberto</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          </div>
+
+          <!-- 3. Em Validação -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-cyan-400" id="dash-rpa-kpi-validacao">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Em Validação</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-magnifying-glass"></i></div>
+          </div>
+
+          <!-- 4. Severidade Crítica -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-amber-400" id="dash-rpa-kpi-critica">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Severidade Crítica</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-fire-flame-curved"></i></div>
+          </div>
+
+          <!-- 5. Resolvidos -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-emerald-400" id="dash-rpa-kpi-resolvido">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Resolvidos</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAINEL 3: MATRIZ DE 4 GRÁFICOS INTERATIVOS (GRID 2x2) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="margin-bottom: 28px !important; gap: 24px !important;">
+        <!-- Gráfico 1: Distribuição por Squad -->
+        <div class="glass-panel" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 24px !important; margin-bottom: 0 !important;">
+          <h3 style="font-size: 13px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; margin-top: 0; padding-top: 2px;">
+            <i class="fa-solid fa-chart-pie me-2 text-emerald-400"></i> Distribuição por Squad
+          </h3>
+          <div style="position: relative; height: 185px; width: 100%; display: flex; align-items: center; justify-content: center;">
+            <canvas id="chart-squad-dist"></canvas>
+          </div>
+        </div>
+
+        <!-- Gráfico 2: Composição por Status -->
+        <div class="glass-panel" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 24px !important; margin-bottom: 0 !important;">
+          <h3 style="font-size: 13px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; margin-top: 0; padding-top: 2px;">
+            <i class="fa-solid fa-chart-bar me-2 text-cyan-400"></i> Status das Demandas
+          </h3>
+          <div style="position: relative; height: 185px; width: 100%;">
+            <canvas id="chart-status-dist"></canvas>
+          </div>
+        </div>
+
+        <!-- Gráfico 3: Evolução de Entregas (Throughput) -->
+        <div class="glass-panel" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 24px !important; margin-bottom: 0 !important;">
+          <h3 style="font-size: 13px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; margin-top: 0; padding-top: 2px;">
+            <i class="fa-solid fa-chart-line me-2 text-indigo-400"></i> Evolução de Entregas (Throughput)
+          </h3>
+          <div style="position: relative; height: 185px; width: 100%;">
+            <canvas id="chart-trend-dist"></canvas>
+          </div>
+        </div>
+
+        <!-- Gráfico 4: Top 5 Solicitantes por Volume -->
+        <div class="glass-panel" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 24px !important; margin-bottom: 0 !important;">
+          <h3 style="font-size: 13px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; margin-top: 0; padding-top: 2px;">
+            <i class="fa-solid fa-users-gear me-2 text-amber-400"></i> Top 5 Solicitantes
+          </h3>
+          <div style="position: relative; height: 185px; width: 100%;">
+            <canvas id="chart-top-requesters"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAINEL 4: TABELA EXECUTIVA DE DEMANDAS BLOQUEADAS & ALERTAS -->
+      <div class="glass-card" style="padding: 24px !important; margin-bottom: 28px !important;">
+        <div class="flex items-center justify-between gap-4 mb-5 border-b border-white/10 pb-4">
+          <h3 class="text-sm md:text-base font-bold text-white tracking-tight flex items-center gap-2.5 margin-0">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg"></i>
+            <span>Demandas em Alerta / Bloqueadas</span>
+          </h3>
+          <span class="badge bg-amber-500/15 text-amber-400 border border-amber-500/30 text-xs px-2.5 py-1" id="dash-blocked-badge">
+            0 bloqueadas
+          </span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table w-full text-left">
+            <thead>
+              <tr>
+                <th style="width: 45px;">#</th>
+                <th style="width: 120px;">GAU / CHAVE</th>
+                <th style="min-width: 200px;">TÍTULO DA DEMANDA</th>
+                <th style="width: 140px;">SQUAD</th>
+                <th style="width: 160px;">SOLICITANTE</th>
+                <th style="width: 140px;">STATUS</th>
+                <th style="width: 120px; text-align: right;">AÇÃO</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-dash-blocked">
+              <!-- Renderizado via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 3: DEMANDAS EM ANDAMENTO (ANTIGO QUADRO DA SQUAD) -->
+    <div class="view-container" id="view-board">
+      <div class="flex items-center gap-2 bg-[#111827] p-1.5 rounded-xl border border-[#1f2937] mb-6">
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-bold transition-all tab-btn-board bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-lg shadow-emerald-500/10" onclick="app.navigate('board')">
+          Em Andamento
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all tab-btn-backlog text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('backlog')">
+          Backlog
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all tab-btn-concluidos text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('concluidos')">
+          Concluídos
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer rpa-only-tab-btn text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('rpa-pendencies')">
+          ⚠️ Pendências RPA
+        </button>
+      </div>
+      <!-- BANNER DE SPRINT / QUARTER DINÂMICO POR SQUAD -->
+      <div class="sprint-banner-dados" id="squad-dados-sprint-banner">
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-lg flex items-center justify-center border border-emerald-500/30">
+            <i class="fa-solid fa-hourglass-half"></i>
+          </div>
+          <div>
+            <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider block" id="sprint-banner-title">Quarter squad de Operações</span>
+            <h3 class="text-sm md:text-base font-extrabold text-white mt-0.5" id="sprint-banner-subtitle">Quarter vigente - 3° Término <span class="text-emerald-400 font-black">30/09</span></h3>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="badge bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 font-extrabold text-xs rounded-lg inline-block" id="sprint-banner-badge">3° Quarter</span>
+        </div>
+      </div>
+
+      <div class="triage-table-panel">
+        <div class="panel-header-row">
+          <div class="panel-header-left">
+            <h2 style="font-size:20px; font-weight:800; color:#fff; margin:0;" id="board-squad-title">Em Andamento</h2>
+            <p style="font-size:12px; color:#94a3b8; margin:4px 0 0 0;" id="board-squad-desc">Acompanhamento e monitoramento de demandas em andamento</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" class="btn btn-secondary btn-export" onclick="app.exportExcel()">
+              <i class="fa-solid fa-file-excel" style="color:#34d399; margin-right:6px;"></i> Exportar Excel
+            </button>
+            <button type="button" class="btn btn-secondary btn-export" onclick="app.exportPDF()">
+              <i class="fa-solid fa-print" style="color:#6366f1; margin-right:6px;"></i> Imprimir / PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="search-box" style="width:100%; margin-bottom:24px;">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-board" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderBoardView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th style="width: 45px; white-space: nowrap;">#</th>
+                <th style="width: 110px; white-space: nowrap;">GAU / Chave</th>
+                <th style="min-width: 180px;">Título da Demanda</th>
+                <th style="width: 160px; white-space: nowrap;">Solicitante</th>
+                <th style="width: 160px; white-space: nowrap;">Status</th>
+                <th style="width: 120px; white-space: nowrap;">Data de Criação</th>
+              </tr>
+            </thead>
+            <tbody id="board-table-body">
+              <!-- Dinamicamente gerado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: BACKLOG DE DEMANDAS -->
+    <div class="view-container" id="view-backlog">
+      <div class="flex items-center gap-2 bg-[#111827] p-1.5 rounded-xl border border-[#1f2937] mb-6">
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all tab-btn-board text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('board')">
+          Em Andamento
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-bold transition-all tab-btn-backlog bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-lg shadow-emerald-500/10" onclick="app.navigate('backlog')">
+          Backlog
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all tab-btn-concluidos text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('concluidos')">
+          Concluídos
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer rpa-only-tab-btn text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('rpa-pendencies')">
+          ⚠️ Pendências RPA
+        </button>
+      </div>
+      <div class="triage-table-panel">
+        <div class="panel-header-row">
+          <div class="panel-header-left">
+            <h2 style="font-size:20px; font-weight:800; color:#fff; margin:0;" id="backlog-squad-title">Backlog</h2>
+            <p style="font-size:12px; color:#94a3b8; margin:4px 0 0 0;">Listagem de solicitações aguardando início de tratamento na squad</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" class="btn btn-secondary btn-export" onclick="app.exportExcel()">
+              <i class="fa-solid fa-file-excel" style="color:#34d399; margin-right:6px;"></i> Exportar Excel
+            </button>
+            <button type="button" class="btn btn-secondary btn-export" onclick="app.exportPDF()">
+              <i class="fa-solid fa-print" style="color:#6366f1; margin-right:6px;"></i> Imprimir / PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="search-box" style="width:100%; margin-bottom:24px;">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-backlog" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderBacklogView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th style="width: 65px; white-space: nowrap;">Ordem</th>
+                <th style="width: 110px; white-space: nowrap;">GAU / Chave</th>
+                <th style="min-width: 180px;">Título da Demanda</th>
+                <th style="width: 160px; white-space: nowrap;">Solicitante</th>
+                <th style="width: 160px; white-space: nowrap;">Status</th>
+                <th style="width: 120px; white-space: nowrap;">Data de Criação</th>
+              </tr>
+            </thead>
+            <tbody id="backlog-table-body">
+              <!-- Dinamicamente gerado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 5: CONCLUÍDOS -->
+    <div class="view-container" id="view-concluidos">
+      <div class="flex items-center gap-2 bg-[#111827] p-1.5 rounded-xl border border-[#1f2937] mb-6">
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all tab-btn-board text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('board')">
+          Em Andamento
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all tab-btn-backlog text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('backlog')">
+          Backlog
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-bold transition-all tab-btn-concluidos bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-lg shadow-emerald-500/10" onclick="app.navigate('concluidos')">
+          Concluídos
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer rpa-only-tab-btn text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('rpa-pendencies')">
+          ⚠️ Pendências RPA
+        </button>
+      </div>
+      <div class="triage-table-panel">
+        <div class="panel-header-row">
+          <div class="panel-header-left">
+            <h2 style="font-size:20px; font-weight:800; color:#fff; margin:0;" id="concluidos-squad-title">Concluídos</h2>
+            <p style="font-size:12px; color:#94a3b8; margin:4px 0 0 0;"><span class="badge badge-medium" id="completed-count-badge">0 entregas</span></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" class="btn btn-secondary btn-export" onclick="app.exportExcel()">
+              <i class="fa-solid fa-file-excel" style="color:#34d399; margin-right:6px;"></i> Exportar Excel
+            </button>
+            <button type="button" class="btn btn-secondary btn-export" onclick="app.exportPDF()">
+              <i class="fa-solid fa-print" style="color:#6366f1; margin-right:6px;"></i> Imprimir / PDF
+            </button>
+          </div>
+        </div>
+
+        <div class="search-box" style="width:100%; margin-bottom:24px;">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-concluidos" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderCompletedView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th style="width: 110px; white-space: nowrap;">GAU</th>
+                <th style="min-width: 180px;">Demanda</th>
+                <th style="width: 160px; white-space: nowrap;">Responsável</th>
+                <th style="width: 120px; white-space: nowrap;">Data de criação</th>
+                <th style="width: 120px; white-space: nowrap;">Data de conclusão</th>
+                <th style="min-width: 180px;">Ganhos</th>
+              </tr>
+            </thead>
+            <tbody id="completed-table-body">
+              <!-- Dinamicamente gerado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: PENDÊNCIAS RPA -->
+    <div class="view-container" id="view-rpa-pendencies">
+      <!-- 1. BARRA DE ABAS HORIZONTAIS -->
+      <div class="flex items-center gap-2 bg-[#111827] p-1.5 rounded-xl border border-[#1f2937] mb-6">
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all tab-btn-board text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('board')">
+          Em Andamento
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all tab-btn-backlog text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('backlog')">
+          Backlog
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all tab-btn-concluidos text-gray-400 hover:text-white border border-transparent" onclick="app.navigate('concluidos')">
+          Concluídos
+        </button>
+        <button type="button" class="px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer rpa-only-tab-btn bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-lg shadow-emerald-500/10" onclick="app.navigate('rpa-pendencies')">
+          ⚠️ Pendências RPA
+        </button>
+      </div>
+
+      <!-- 2. TRÊS QUADROS DE MÉTRICAS DE RESUMO DAS PENDÊNCIAS RPA -->
+      <div class="triage-metrics-row mb-6 flex items-center gap-4">
+        <div class="metric-box-card metric-box-amber flex-1 p-4 rounded-xl bg-[#111827] border border-[#1f2937]">
+          <span class="metric-box-lbl text-amber-500 text-xs font-bold block mb-1">TOTAL DE PENDÊNCIAS</span>
+          <div class="metric-box-val text-amber-400 text-2xl font-black" id="metric-rpa-total">0 pendências</div>
+        </div>
+        <div class="metric-box-card metric-box-rose flex-1 p-4 rounded-xl bg-[#111827] border border-[#1f2937]">
+          <span class="metric-box-lbl text-rose-400 text-xs font-bold block mb-1">EM ABERTO / CRÍTICAS</span>
+          <div class="metric-box-val text-rose-400 text-2xl font-black" id="metric-rpa-open">0 abertas</div>
+        </div>
+        <div class="metric-box-card metric-box-emerald flex-1 p-4 rounded-xl bg-[#111827] border border-[#1f2937]">
+          <span class="metric-box-lbl text-emerald-400 text-xs font-bold block mb-1">RESOLVIDAS / MONITORADAS</span>
+          <div class="metric-box-val text-emerald-400 text-2xl font-black" id="metric-rpa-resolved">0 concluídas</div>
+        </div>
+      </div>
+
+      <!-- 3. PAINEL DE TABELA E BOTÃO DE CADASTRO + NOVA PENDÊNCIA RPA -->
+      <div class="triage-table-panel">
+        <div class="panel-header-row mb-6 flex items-center justify-between">
+          <div>
+            <h2 style="font-size:20px; font-weight:800; color:#fff; margin:0;" id="rpa-squad-title">
+              <i class="fa-solid fa-robot text-amber-400 me-2"></i> Pendências de Robôs em Produção
+            </h2>
+            <p style="font-size:12px; color:#94a3b8; margin:4px 0 0 0;" id="rpa-squad-desc">
+              Ocorrências recorrentes, problemas de infra/APIs e histórico de cobrança (Redesign & Caio)
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="app.openNewRpaPendencyModal()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10 cursor-pointer">
+              <i class="fa-solid fa-plus"></i> Nova Pendência RPA
+            </button>
+            <button type="button" class="btn btn-secondary text-xs py-2 px-3.5" onclick="app.printRpaPDF()">
+              <i class="fa-solid fa-print text-indigo-400 me-1.5"></i> Imprimir / PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- BARRA DE FILTROS DINÂMICOS MULTICRITÉRIO UNIFICADA -->
+        <div class="bg-slate-900/60 backdrop-blur-md p-4 rounded-xl border border-slate-800/80 shadow-lg mb-5 flex flex-col gap-3">
+          <!-- LINHA 1: BUSCA, RESPONSÁVEL, STATUS, PERÍODO TEMPORAL E LIMPAR -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+            <!-- BUSCA TEXTUAL -->
+            <div class="md:col-span-3 relative flex items-center">
+              <i class="fa-solid fa-magnifying-glass absolute left-3 text-slate-400 text-xs"></i>
+              <input type="search" id="rpa-filter-search" class="w-full bg-slate-950/80 border border-slate-800 text-white text-xs rounded-lg pl-9 pr-3 py-2 focus:outline-none focus:border-emerald-500/50" placeholder="Buscar por robô ou ocorrência..." onkeyup="app.renderRpaPendenciesView()">
+            </div>
+
+            <!-- FILTRO RESPONSÁVEL -->
+            <div class="md:col-span-2">
+              <select id="rpa-filter-responsible" class="w-full bg-slate-950/80 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500/50" onchange="app.renderRpaPendenciesView()">
+                <option value="">👤 Todos Responsáveis</option>
+                <option value="Redesign">Redesign</option>
+                <option value="Caio">Caio</option>
+                <option value="Emanapay">Emanapay</option>
+              </select>
+            </div>
+
+            <!-- FILTRO STATUS -->
+            <div class="md:col-span-2">
+              <select id="rpa-filter-status" class="w-full bg-slate-950/80 border border-slate-800 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500/50" onchange="app.renderRpaPendenciesView()">
+                <option value="">📌 Todos os Status</option>
+                <option value="ABERTO">🚨 Em Aberto</option>
+                <option value="EM_VALIDACAO">🔍 Em Validação</option>
+                <option value="RESOLVIDO">🟢 Resolvido</option>
+              </select>
+            </div>
+
+            <!-- PERÍODO TEMPORAL UNIFICADO -->
+            <div class="md:col-span-4">
+              <select id="rpa-filter-period" class="w-full bg-slate-950/80 border border-slate-800 text-emerald-400 font-semibold text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500/50" onchange="window.RpaPendenciesModule ? window.RpaPendenciesModule.onPeriodChange() : app.renderRpaPendenciesView()">
+                <option value="all">📅 Período Temporal: Todo o Período</option>
+                <option value="today">Hoje (Dia)</option>
+                <option value="week">Esta Semana (Últimos 7 dias)</option>
+                <option value="month">Este Mês</option>
+                <option value="year">Este Ano</option>
+                <option value="custom">De xxxx Até xxxx (Personalizado)</option>
+              </select>
+            </div>
+
+            <!-- BOTÃO LIMPAR FILTROS -->
+            <div class="md:col-span-1 flex justify-end">
+              <button type="button" onclick="app.resetRpaFilters()" class="btn btn-secondary text-[11px] py-2 px-3 w-full flex items-center justify-center gap-1 text-slate-300 hover:text-white" title="Limpar Todos os Filtros">
+                <i class="fa-solid fa-filter-circle-xmark"></i> Limpar
+              </button>
+            </div>
+          </div>
+
+          <!-- LINHA SECUNDÁRIA EXPANSÍVEL APENAS QUANDO FOR PERSONALIZADO -->
+          <div id="rpa-custom-date-container" class="hidden grid-cols-1 md:grid-cols-12 gap-3 items-center pt-2 border-t border-slate-800/60">
+            <div class="md:col-span-4">
+              <select id="rpa-filter-date-ref" class="w-full bg-slate-950/80 border border-slate-800 text-slate-300 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-emerald-500/50" onchange="app.renderRpaPendenciesView()">
+                <option value="created_at">🗓️ Ref: Data de Criação</option>
+                <option value="resolved_at">✅ Ref: Data de Conclusão / Atz</option>
+              </select>
+            </div>
+            <div class="md:col-span-4 flex items-center gap-1.5">
+              <span class="text-[11px] text-slate-400 shrink-0 font-medium">De:</span>
+              <input type="date" id="rpa-filter-date-start" class="w-full bg-slate-950/80 border border-slate-800 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500/50" onchange="app.renderRpaPendenciesView()">
+            </div>
+            <div class="md:col-span-4 flex items-center gap-1.5">
+              <span class="text-[11px] text-slate-400 shrink-0 font-medium">Até:</span>
+              <input type="date" id="rpa-filter-date-end" class="w-full bg-slate-950/80 border border-slate-800 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500/50" onchange="app.renderRpaPendenciesView()">
+            </div>
+          </div>
+        </div>
+
+        <!-- TABELA DE PENDÊNCIAS -->
+        <div class="table-responsive">
+          <table class="custom-table w-full text-left">
+            <thead>
+              <tr>
+                <th style="width: 24%;">ROBÔ(S) AFETADO(S)</th>
+                <th style="min-width: 200px;">DESCRIÇÃO / OCORRÊNCIA</th>
+                <th style="width: 16%;">RESPONSÁVEL(IS)</th>
+                <th style="width: 11%;">SEVERIDADE</th>
+                <th style="width: 12%;">STATUS</th>
+                <th style="width: 140px; text-align: right;">AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody id="rpa-pendencies-tbody">
+              <!-- Gerado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- VIEW 6: MODO REUNIÃO DPO -->
+    <div class="view-container" id="view-dpo-sync">
+      <div class="glass-panel p-8 text-center max-w-2xl mx-auto">
+        <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl mx-auto mb-4">
+          <i class="fa-solid fa-handshake"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-2">Modo Reunião DPO</h2>
+        <p class="text-sm text-slate-400 mb-6">
+          Passe por cada membro da equipe para atualizar o status das demandas ativas, promover novas tarefas e registrar os ganhos da semana.
+        </p>
+        <button class="btn btn-primary" onclick="app.startDpoMeeting()">
+          <i class="fa-solid fa-play"></i> Iniciar Alinhamento DPO
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 7: HISTÓRICO DPO -->
+    <div class="view-container" id="view-dpo-logs">
+      <div class="glass-panel p-6">
+        <h2 class="text-xl font-bold text-white mb-4">Registros de Alinhamento DPO</h2>
+        <div class="space-y-4" id="dpo-logs-container">
+          <!-- Dinamicamente gerado via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 8: GESTÃO DE ACESSOS & PERFIS -->
+    <div class="view-container" id="view-gestao-acessos">
+      
+      <!-- BANNER SUPERIOR DE SEGURANÇA E ACESSOS -->
+      <div class="triage-banner-panel mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="badge badge-medium mb-3">
+              <i class="fa-solid fa-shield-halved text-purple-400"></i> Segurança & Supabase Auth
+            </div>
+            <h2 class="text-xl md:text-2xl font-extrabold text-white tracking-tight">Gestão de Perfis & Acessos</h2>
+            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+              Gerenciamento centralizado de usuários, permissões por nível (Admin, Operador, Consulta) e aprovação de novos acessos.
+            </p>
+          </div>
+          <div class="flex items-center gap-2 text-xs text-slate-300 bg-white/5 px-3.5 py-2 rounded-xl border border-white/10 shrink-0">
+            <i class="fa-solid fa-user-shield text-emerald-400 text-sm"></i>
+            <span>Controle Ativo de Permissões</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3 CARDS DE RESUMO (FORMATO MINI-METRIC IGUAL À MESA DE TRIAGEM: SEM ÍCONE, SEM SUBTEXTO) -->
+      <div class="access-widgets-grid">
+        <!-- 1. TOTAL DE USUÁRIOS -->
+        <div class="mini-metric-card metric-box-blue">
+          <div>
+            <span class="mini-metric-lbl text-sky-400">TOTAL DE USUÁRIOS</span>
+            <div class="mini-metric-val text-white" id="stat-user-total">0</div>
+          </div>
+        </div>
+
+        <!-- 2. ADMINS -->
+        <div class="mini-metric-card metric-box-amber">
+          <div>
+            <span class="mini-metric-lbl text-amber-400">ADMINS</span>
+            <div class="mini-metric-val text-white" id="stat-user-admins">0</div>
+          </div>
+        </div>
+
+        <!-- 3. CONSULTA -->
+        <div class="mini-metric-card metric-box-emerald">
+          <div>
+            <span class="mini-metric-lbl text-emerald-400">CONSULTA</span>
+            <div class="mini-metric-val text-white" id="stat-user-consultas">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAINEL PRINCIPAL DE PERFIS DE ACESSO -->
+      <div class="glass-card p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 border-b border-white/10 pb-4">
+          <h3 class="text-base font-bold text-white tracking-tight flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-emerald-400"></i> Gestão de Perfis de Acesso
+          </h3>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5" onclick="app.openNewUserModal()" title="Cadastrar ou convidar novo usuário">
+              <i class="fa-solid fa-user-plus"></i>
+              <span>Novo Acesso / Convidar</span>
+            </button>
+            <button class="btn btn-secondary text-xs py-2 px-3.5 flex items-center gap-1.5" onclick="app.renderUsersTable()" title="Atualizar lista">
+              <i class="fa-solid fa-rotate-right text-purple-400"></i>
+              <span>Atualizar</span>
+            </button>
+            <button type="button" class="btn btn-secondary text-xs py-2 px-3.5 flex items-center gap-1.5" onclick="app.exportPDF()" title="Imprimir ou salvar visão em PDF">
+              <i class="fa-solid fa-print text-indigo-400"></i>
+              <span>Imprimir / PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table w-full text-left">
+            <thead>
+              <tr>
+                <th style="width: 22%;">NOME</th>
+                <th style="width: 28%;">E-MAIL</th>
+                <th style="width: 15%;">PERFIL</th>
+                <th style="width: 13%;">CADASTRO</th>
+                <th style="width: 10%;">STATUS</th>
+                <th style="width: 12%; text-align: right;">APROVAÇÃO</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-users">
+              <!-- Renderizado dinamicamente via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: ADD / EDIT MEMBER -->
+<div class="modal-backdrop hidden" id="modal-member" style="display: none;">
+  <div class="glass-panel modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Novo Membro da Squad</h3>
+      <button class="btn btn-secondary" onclick="app.closeModal('modal-member')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form onsubmit="app.saveMember(event)">
+      <input type="hidden" id="member-id">
+      <div class="form-group">
+        <label class="form-label">Nome Completo</label>
+        <input type="text" class="form-control" id="member-name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cargo / Função</label>
+        <input type="text" class="form-control" id="member-role" placeholder="Ex: Analista de Dados Sr." required>
+      </div>
+      <div class="grid grid-cols-2 gap-4 form-group">
+        <div>
+          <label class="form-label">Alocação Ops (%)</label>
+          <input type="number" class="form-control" id="member-alloc-ops" min="0" max="100" value="50">
+        </div>
+        <div>
+          <label class="form-label">Alocação Fin (%)</label>
+          <input type="number" class="form-control" id="member-alloc-fin" min="0" max="100" value="50">
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 mt-6">
+        <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-member')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Membro</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: DETALHES COMPLETOS DA DEMANDA (JIRA CLOUD) -->
+<div class="modal-backdrop hidden" id="modal-demand-details" style="display: none;" onclick="if(event.target === this) app.closeModal('modal-demand-details', event)">
+  <div class="glass-panel modal-content modal-demand-content">
+    <!-- Cabeçalho do Modal: Badges e Botão Único de Fechar (X) -->
+    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px; margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="badge badge-medium" style="font-size: 12px; font-weight: 800;" id="detail-gau-key">GAU-128</span>
+        <span class="badge badge-high" style="font-size: 11px;" id="detail-priority">2 - Alta</span>
+      </div>
+      <button type="button" class="detail-close-btn" title="Fechar Modal" onclick="app.closeModal('modal-demand-details', event)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Título da Demanda -->
+    <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary, #fff); line-height: 1.4; margin: 0 0 16px 0;" id="detail-title">Título da Demanda</h3>
+
+    <!-- CARD 1: Informações Gerais da Demanda -->
+    <div class="detail-card">
+      <h4 style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 12px 0;">
+        <i class="fa-solid fa-circle-info me-1.5"></i> Informações Gerais
+      </h4>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 12px;">
+        <div>
+          <span style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 2px;">Solicitante:</span>
+          <span style="font-weight: 700; color: var(--text-primary, #fff);" id="detail-requester">--</span>
+        </div>
+        <div>
+          <span style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 2px;">Data de Criação:</span>
+          <span style="font-weight: 700; color: #fbbf24;" id="detail-created-date">--</span>
+        </div>
+        <div>
+          <span style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 2px;">Status no Jira:</span>
+          <span class="badge badge-medium" style="display: inline-block; margin-top: 2px;" id="detail-status">Aguardando Triagem</span>
+        </div>
+        <div>
+          <span style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 2px;">Squad Atribuída:</span>
+          <span style="font-weight: 700; color: #34d399;" id="detail-squad">Mesa de Triagem</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2: Acompanhamento de Desenvolvimento & Linha do Tempo (Diferenciado por Squad) -->
+    <div class="detail-card hidden" id="section-squad-followup" style="border: 1px solid rgba(52, 211, 153, 0.25); background: rgba(15, 23, 42, 0.75); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+      <h4 style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 12px 0;" id="followup-title">
+        <i class="fa-solid fa-code-commit me-1.5"></i> Acompanhamento de Desenvolvimento
+      </h4>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;" id="followup-grid-container">
+        <div id="followup-role-container">
+          <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 4px; font-weight: 700;" id="followup-label-role">Atribuição / Especialidade:</label>
+          <select id="followup-dev-role" style="width: 100%; padding: 6px 10px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.saveSquadDevFields()">
+            <!-- Dinâmico para Squad de Dados -->
+          </select>
+        </div>
+
+        <div id="followup-name-container">
+          <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 4px; font-weight: 700;" id="followup-label-name">Desenvolvedor Responsável:</label>
+          <input type="text" id="followup-dev-name" placeholder="Ex: Nome do Responsável" style="width: 100%; padding: 6px 10px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" oninput="app.saveSquadDevFields()" />
+        </div>
+
+        <div>
+          <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 4px; font-weight: 700;" id="followup-label-target-date">Previsão de Entrega:</label>
+          <input type="date" id="followup-dev-target-date" style="width: 100%; padding: 6px 10px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fbbf24; border-radius: 8px; outline: none;" onchange="app.saveSquadDevFields()" />
+        </div>
+
+        <div>
+          <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 4px; font-weight: 700;" id="followup-label-progress">Evolução / Progresso:</label>
+          <select id="followup-dev-progress" style="width: 100%; padding: 6px 10px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #34d399; font-weight: 800; border-radius: 8px; outline: none;" onchange="app.saveSquadDevFields()">
+            <!-- Dinâmico por Squad -->
+          </select>
+        </div>
+      </div>
+
+      <!-- CAMPO DE GANHOS / IMPACTO DE NEGÓCIO (EDITÁVEL COM AUTO-SAVE) -->
+      <div id="followup-ganhos-container" style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 12px; margin-top: 12px; margin-bottom: 12px;">
+        <label style="color: #34d399; display: block; font-size: 11px; margin-bottom: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+          <i class="fa-solid fa-chart-line me-1"></i> Ganhos / Impacto de Negócio
+        </label>
+        <textarea id="followup-ganhos" rows="2" placeholder="Descreva os ganhos de produtividade, financeiros ou operacionais desta entrega..." style="width: 100%; padding: 8px 10px; font-size: 11px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #34d399; font-weight: 600; border-radius: 8px; outline: none; resize: vertical;" oninput="app.saveSquadDevFields()"></textarea>
+        <div style="display: flex; justify-content: flex-end; margin-top: 6px;">
+          <button onclick="app.saveSquadDevFields()" style="padding: 5px 14px; font-size: 11px; background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);">
+            <i class="fa-solid fa-floppy-disk"></i> Salvar Ganhos
+          </button>
+        </div>
+      </div>
+
+      <!-- SEÇÃO DA LINHA DO TEMPO DE ATUALIZAÇÕES COM BARRA DE ROLAGEM -->
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 12px; margin-top: 8px;">
+        <label style="color: #34d399; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">
+          <i class="fa-solid fa-timeline me-1"></i> Linha do Tempo de Atualizações
+        </label>
+        
+        <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+          <input type="date" id="followup-timeline-date" style="width: 130px; padding: 6px 8px; font-size: 11px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 6px;" />
+          <input type="text" id="followup-timeline-text" placeholder="Digite a nova atualização do card..." style="flex: 1; min-width: 180px; padding: 6px 10px; font-size: 11px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 6px;" onkeydown="if(event.key==='Enter') app.addTimelineEntry();" />
+          <button type="button" class="btn btn-primary" style="padding: 6px 12px; font-size: 11px;" onclick="app.addTimelineEntry()">
+            <i class="fa-solid fa-plus me-1"></i> Adicionar
+          </button>
+        </div>
+
+        <!-- Lista da Linha do Tempo com Scrollbar Lateral -->
+        <div class="timeline-scroll-container" id="followup-timeline-list">
+          <!-- Dinamicamente gerado via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2: Descrição Completa do Chamado (Fica por último) -->
+    <div class="detail-card" style="margin-bottom: 0;">
+      <h4 style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.8px; margin: 0 0 10px 0;">
+        <i class="fa-solid fa-align-left me-1.5"></i> Descrição Completa do Chamado
+      </h4>
+      <div style="background: rgba(3, 7, 18, 0.6); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; color: #cbd5e1; font-size: 12px; line-height: 1.6; max-height: 200px; overflow-y: auto; white-space: pre-wrap;" id="detail-description">
+        Sem descrição fornecida.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH OVERLAY — LOGIN SUPABASE (Padrão Painel-OPS) -->
+<div id="cs-auth-overlay" style="display: flex; position: fixed; inset: 0; z-index: 99999; background: rgba(3,7,18,0.95); backdrop-filter: blur(16px); align-items: center; justify-content: center; transition: opacity 0.3s ease;">
+  <div style="max-width: 420px; width: 100%; padding: 2rem; background: linear-gradient(145deg, rgba(17,24,39,0.9), rgba(10,15,26,0.95)); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.8);">
+    
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div style="width: 56px; height: 56px; margin: 0 auto 16px; background: rgba(0,230,153,0.15); border: 1px solid rgba(0,230,153,0.3); border-radius: 16px; display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-shield-halved" style="font-size: 24px; color: #00E699;"></i>
+      </div>
+      <h2 style="font-size: 1.4rem; font-weight: 800; color: #f8fafc; margin-bottom: 4px; letter-spacing: -0.3px;">Controle de Squads</h2>
+      <p style="color: #94a3b8; font-size: 0.85rem;">Governança Jira & Gestão de Demandas</p>
+    </div>
+    
+    <div id="auth-error-msg" style="display: none; background: rgba(244,63,94,0.1); border: 1px solid rgba(244,63,94,0.3); color: #f43f5e; padding: 0.75rem; border-radius: 8px; font-size: 0.82rem; margin-bottom: 1rem; text-align: center;"></div>
+    <div id="auth-info-msg" style="display: none; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #10b981; padding: 0.75rem; border-radius: 8px; font-size: 0.82rem; margin-bottom: 1rem; text-align: center;"></div>
+    
+    <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+      <div>
+        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">E-mail corporativo</label>
+        <input type="email" id="auth-email" placeholder="usuario@naturapay.net" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(15,23,42,0.95); color: #f8fafc; outline: none; font-size: 0.85rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='rgba(0,230,153,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'" />
+      </div>
+      <div>
+        <label style="display: block; font-size: 0.75rem; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">Senha</label>
+        <input type="password" id="auth-password" placeholder="Sua senha" style="width: 100%; padding: 0.65rem 0.85rem; border-radius: 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(15,23,42,0.95); color: #f8fafc; outline: none; font-size: 0.85rem; transition: border-color 0.2s;" onfocus="this.style.borderColor='rgba(0,230,153,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.12)'" onkeydown="if(event.key==='Enter'){event.preventDefault();app.handleLogin();}" />
+      </div>
+      
+      <button id="btn-auth-login" onclick="app.handleLogin()" style="width: 100%; padding: 0.7rem; border: none; border-radius: 10px; background: linear-gradient(135deg, #00E699, #00b377); color: #030712; font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; letter-spacing: 0.3px;" onmouseover="this.style.boxShadow='0 0 24px rgba(0,230,153,0.4)'" onmouseout="this.style.boxShadow='none'">
+        <i class="fa-solid fa-right-to-bracket" style="margin-right: 6px;"></i> Entrar
+      </button>
+      
+      <div style="text-align: center; margin: 0.3rem 0;">
+        <span style="color: #64748b; font-size: 0.78rem;">ou</span>
+      </div>
+      
+      <button id="btn-auth-signup" onclick="app.handleSignup()" style="width: 100%; padding: 0.65rem; border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; background: transparent; color: #94a3b8; font-weight: 600; font-size: 0.82rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='rgba(0,230,153,0.4)';this.style.color='#34d399'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)';this.style.color='#94a3b8'">
+        <i class="fa-solid fa-user-plus" style="margin-right: 6px;"></i> Criar nova conta
+      </button>
+    </div>
+
+    <p style="text-align: center; margin-top: 1.2rem; font-size: 0.7rem; color: #475569;">
+      Autenticação via <strong style="color: #34d399;">Supabase Auth</strong> · Mesmas credenciais do Painel-OPS
+    </p>
+  </div>
+</div>
+
+<!-- MODAL NOVO / EDITAR USUÁRIO DA GESTÃO DE ACESSOS -->
+<div class="modal-backdrop hidden" id="modal-user-edit" style="z-index: 9999; backdrop-filter: blur(8px);">
+  <div class="modal-content" style="max-width: 440px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 25px 60px rgba(0,0,0,0.7); border-radius: 16px; padding: 24px;">
+    <div class="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center text-purple-400 font-bold text-lg">
+          <i class="fa-solid fa-user-pen"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-white tracking-tight" id="user-modal-title">Cadastrar Usuário</h3>
+          <p class="text-xs text-slate-400">Controle de Permissões Supabase</p>
+        </div>
+      </div>
+      <button class="text-slate-400 hover:text-white transition-colors" onclick="app.closeUserModal()">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <form onsubmit="app.saveUserFromModal(event)">
+      <input type="hidden" id="user-modal-id" />
+      <div class="form-group mb-3">
+        <label class="form-label text-xs text-slate-300 font-bold">Nome Completo</label>
+        <input type="text" class="form-control text-xs py-2.5" id="user-modal-name" placeholder="Ex: Lucas Machiori" required style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
+      </div>
+
+      <div class="form-group mb-3">
+        <label class="form-label text-xs text-slate-300 font-bold">E-mail Corporativo</label>
+        <input type="email" class="form-control text-xs py-2.5" id="user-modal-email" placeholder="Ex: usuario@naturapay.net" required style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
+      </div>
+
+      <div class="form-group mb-4">
+        <label class="form-label text-xs text-slate-300 font-bold">Perfil de Acesso</label>
+        <select class="form-control text-xs py-2.5" id="user-modal-role" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;">
+          <option value="consulta">👁️ Consulta (Somente Leitura)</option>
+          <option value="admin">👨‍💻 Admin (Acesso Total)</option>
+        </select>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
+        <button type="button" class="btn btn-secondary text-xs px-4 py-2" onclick="app.closeUserModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary text-xs px-5 py-2">
+          <i class="fa-solid fa-floppy-disk me-1.5"></i> Salvar Usuário
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL DE CONFIGURAÇÕES DA API JIRA EM TEMPO REAL -->
+<div class="modal-backdrop hidden" id="modal-jira-config" style="display: none; align-items: center; justify-content: center; z-index: 9999;">
+  <div class="glass-panel" style="width: 100%; max-width: 580px; background: rgba(15, 23, 42, 0.96); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);">
+    <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">
+          <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-white tracking-tight">Conexão API Jira Cloud (Tempo Real)</h3>
+          <p class="text-xs text-slate-400">Endpoint HTTPS do Proxy e Parâmetros de Busca JQL</p>
+        </div>
+      </div>
+      <button class="text-slate-400 hover:text-white transition-colors" onclick="app.closeJiraConfigModal()">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <form onsubmit="app.saveJiraConfigModal(event)">
+      <div class="form-group mb-3">
+        <label class="form-label text-xs text-slate-300 font-bold">URL da API / Servidor Proxy HTTPS</label>
+        <input type="text" class="form-control text-xs py-2.5 font-mono" id="jira-cfg-custom-url" placeholder="https://emana-squads-jira-platform.onrender.com/api/jira/consultar-cards-jira" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
+        <span class="text-[10px] text-slate-400 block mt-1">Insira a URL HTTPS do servidor Proxy ou deixe em branco para usar o endpoint padrão.</span>
+      </div>
+
+      <div class="form-group mb-3">
+        <label class="form-label text-xs text-slate-300 font-bold">Domínio Jira Cloud</label>
+        <input type="text" class="form-control text-xs py-2.5 font-mono" id="jira-cfg-domain" placeholder="naturapay.atlassian.net" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
+      </div>
+
+      <div class="form-group mb-4">
+        <label class="form-label text-xs text-slate-300 font-bold">Filtro JQL de Busca</label>
+        <input type="text" class="form-control text-xs py-2.5 font-mono" id="jira-cfg-jql" placeholder="project = GAU ORDER BY created DESC" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
+      </div>
+
+      <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-700/50 mb-4 text-xs">
+        <span class="font-bold text-slate-300 block mb-1"><i class="fa-solid fa-circle-info text-cyan-400 me-1.5"></i> Status da Conexão em Tempo Real</span>
+        <span class="text-slate-400 block text-[11px]" id="jira-cfg-status-output">Pronto para testar a sincronização.</span>
+      </div>
+
+      <div class="flex items-center justify-between gap-2 pt-3 border-t border-white/10">
+        <button type="button" class="btn btn-secondary text-xs px-3.5 py-2" onclick="app.testJiraConnection()">
+          <i class="fa-solid fa-plug me-1.5 text-cyan-400"></i> Testar Conexão
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" class="btn btn-secondary text-xs px-4 py-2" onclick="app.closeJiraConfigModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary text-xs px-5 py-2">
+            <i class="fa-solid fa-floppy-disk me-1.5"></i> Salvar Configuração
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL DE CADASTRO E EDIÇÃO DE PENDÊNCIAS RPA -->
+<div class="modal-backdrop hidden" id="modal-rpa-edit" style="display: none; align-items: center; justify-content: center; z-index: 99999;">
+  <div class="glass-panel modal-content" style="max-width: 580px; background: rgba(15, 23, 42, 0.96); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 16px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);">
+    <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-robot"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-white tracking-tight" id="rpa-modal-edit-title">Nova Pendência de Robô RPA</h3>
+          <p class="text-xs text-slate-400">Cadastro de Incidente ou Ocorrência Técnica</p>
+        </div>
+      </div>
+      <button class="text-slate-400 hover:text-white transition-colors" onclick="app.closeRpaPendencyModal()">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <form onsubmit="app.saveRpaPendency(event); return false;">
+      <input type="hidden" id="rpa-edit-id" />
+
+      <!-- ROBÔS AFETADOS COM PÍLULAS -->
+      <div class="form-group mb-4">
+        <label class="block text-xs font-semibold text-gray-300 mb-1.5">Robô(s) Afetado(s) <span class="text-emerald-400">*</span></label>
+        <div class="w-full bg-[#0f172a]/90 border border-emerald-500/50 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/20 rounded-xl p-2 transition-all flex flex-wrap items-center gap-1.5 min-h-[44px]">
+          <div id="rpa-robot-pills-container" class="flex flex-wrap items-center gap-1.5"></div>
+          <select id="rpa-robot-adder-select" class="bg-transparent text-xs text-slate-300 focus:outline-none cursor-pointer flex-1 min-w-[130px] py-1 px-1 border-none outline-none font-normal" onchange="app.addRpaRobot(this)">
+            <option value="" selected class="bg-[#0f172a] text-gray-400">+ Selecionar Robô...</option>
+            <optgroup label="PAGAMENTOS NÃO BAIXADOS" class="bg-[#0f172a] text-gray-400 font-bold">
+              <option value="ID05 - Baixa Manual Lote" class="bg-[#0f172a] text-gray-200">ID05 - Baixa Manual Lote</option>
+              <option value="ID06 - Demandas de BKO" class="bg-[#0f172a] text-gray-200">ID06 - Demandas de BKO</option>
+              <option value="ID08 - Arquivo Reembolso" class="bg-[#0f172a] text-gray-200">ID08 - Arquivo Reembolso</option>
+              <option value="ID09 - Importação Reembolso Zord" class="bg-[#0f172a] text-gray-200">ID09 - Importação Reembolso Zord</option>
+              <option value="ID10 - Status Reembolso Zord" class="bg-[#0f172a] text-gray-200">ID10 - Status Reembolso Zord</option>
+              <option value="ID11 - Triagem Sucesso Zord" class="bg-[#0f172a] text-gray-200">ID11 - Triagem Sucesso Zord</option>
+              <option value="ID13 - Atualização Jira" class="bg-[#0f172a] text-gray-200">ID13 - Atualização Jira</option>
+              <option value="ID29 - Pendência Tesouraria" class="bg-[#0f172a] text-gray-200">ID29 - Pendência Tesouraria</option>
+            </optgroup>
+            <optgroup label="CANCELAMENTO DYNAMICS" class="bg-[#0f172a] text-gray-400 font-bold">
+              <option value="ID12 - Rejeitados Jira" class="bg-[#0f172a] text-gray-200">ID12 - Rejeitados Jira</option>
+              <option value="ID14 - Extração Tarefas Dynamics" class="bg-[#0f172a] text-gray-200">ID14 - Extração Tarefas Dynamics</option>
+              <option value="ID15 - Pendência Recompra" class="bg-[#0f172a] text-gray-200">ID15 - Pendência Recompra</option>
+              <option value="ID16 - Cancelamento Jira" class="bg-[#0f172a] text-gray-200">ID16 - Cancelamento Jira</option>
+              <option value="ID18 - Cancelamento Dynamics" class="bg-[#0f172a] text-gray-200">ID18 - Cancelamento Dynamics</option>
+              <option value="ID19 - Cancelamento SAP" class="bg-[#0f172a] text-gray-200">ID19 - Cancelamento SAP</option>
+              <option value="ID20 - Cancelamento CAPTA" class="bg-[#0f172a] text-gray-200">ID20 - Cancelamento CAPTA</option>
+            </optgroup>
+            <optgroup label="AMORTIZAÇÃO NOTAS DE CRÉDITO" class="bg-[#0f172a] text-gray-400 font-bold">
+              <option value="ID26 - Amortização Dispatcher" class="bg-[#0f172a] text-gray-200">ID26 - Amortização Dispatcher</option>
+              <option value="ID27 - Amortização Performer 1" class="bg-[#0f172a] text-gray-200">ID27 - Amortização Performer 1</option>
+              <option value="ID28 - Amortização Performer 2" class="bg-[#0f172a] text-gray-200">ID28 - Amortização Performer 2</option>
+              <option value="IDXX - Amortização Reembolso" class="bg-[#0f172a] text-gray-200">IDXX - Amortização Reembolso</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <!-- TÍTULO -->
+      <div class="form-group mb-4">
+        <label class="form-label text-xs text-slate-300 font-bold">Título / Resumo do Problema <span class="text-rose-400">*</span></label>
+        <input type="text" class="form-control text-xs py-2.5" id="rpa-edit-title" placeholder="Ex: Timeout na API bancária durante execução" required style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
+      </div>
+
+      <!-- RESPONSÁVEL & SEVERIDADE -->
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Responsável <span class="text-emerald-400">*</span></label>
+          <div class="w-full bg-[#0f172a]/90 border border-emerald-500/50 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/20 rounded-xl p-2 transition-all flex flex-wrap items-center gap-1.5 min-h-[44px]">
+            <div id="rpa-resp-pills-container" class="flex flex-wrap items-center gap-1.5"></div>
+            <select id="rpa-resp-adder-select" class="bg-transparent text-xs text-slate-300 focus:outline-none cursor-pointer flex-1 min-w-[130px] py-1 px-1 border-none outline-none font-normal" onchange="app.addRpaResponsible(this)">
+              <option value="" selected class="bg-[#0f172a] text-gray-400">+ Selecionar Responsável...</option>
+              <option value="Redesign" class="bg-[#0f172a] text-gray-200">Redesign</option>
+              <option value="Caio" class="bg-[#0f172a] text-gray-200">Caio</option>
+              <option value="Emanapay" class="bg-[#0f172a] text-gray-200">Emanapay</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="form-label text-xs text-slate-300 font-bold">Severidade <span class="text-rose-400">*</span></label>
+          <select class="form-control text-xs py-2.5" id="rpa-edit-severity" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;">
+            <option value="MEDIA">⚡ Média</option>
+            <option value="BAIXA">🟢 Baixa</option>
+            <option value="ALTA">🔥 Alta</option>
+            <option value="CRITICA">🚨 Crítica</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- STATUS INICIAL -->
+      <div class="form-group mb-4">
+        <label class="form-label text-xs text-slate-300 font-bold">Status <span class="text-rose-400">*</span></label>
+        <select class="form-control text-xs py-2.5" id="rpa-edit-status" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;">
+          <option value="ABERTO">Em Aberto</option>
+          <option value="EM_VALIDACAO">Em Validação</option>
+          <option value="RESOLVIDO">Resolvido</option>
+        </select>
+      </div>
+
+      <!-- LINHA DO TEMPO DE ATUALIZAÇÕES SEMANAIS -->
+      <div class="mb-5 p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30">
+        <label class="block text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          <i class="fa-solid fa-clock-rotate-left"></i> Linha do Tempo de Atualizações Semanais
+        </label>
+
+        <!-- INPUTS DE NOVA ATUALIZAÇÃO -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Data da Atualização</label>
+            <input type="date" id="rpa-update-date" class="form-control text-xs py-1.5" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-400 mb-1">Resumo / Evolução Semanal</label>
+            <div class="flex gap-2">
+              <input type="text" id="rpa-update-text" placeholder="Ex: Reunião realizada com Redesign e Caio..." class="form-control text-xs flex-1 py-1.5" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
+              <button type="button" onclick="app.addRpaTimelineUpdate()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition-all shrink-0 cursor-pointer flex items-center gap-1">
+                <i class="fa-solid fa-plus"></i> Add
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- LISTA DO HISTÓRICO -->
+        <div class="max-h-[140px] overflow-y-auto p-2 rounded-lg bg-slate-950/70 border border-slate-800/80 space-y-2" id="rpa-timeline-container">
+          <p class="text-[11px] text-slate-500 text-center py-2">Nenhuma atualização registrada.</p>
+        </div>
+      </div>
+
+      <!-- RODAPÉ DE AÇÕES -->
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
+        <button type="button" class="btn btn-secondary text-xs px-4 py-2" onclick="app.closeRpaPendencyModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary text-xs px-5 py-2">
+          <i class="fa-solid fa-floppy-disk me-1.5"></i> Salvar Pendência
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL DE DETALHES DA PENDÊNCIA RPA -->
+<div class="modal-backdrop hidden" id="modal-rpa-details" style="display: none; align-items: center; justify-content: center; z-index: 99999;">
+  <div class="glass-panel modal-content" style="max-width: 620px; background: rgba(15, 23, 42, 0.96); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);">
+    <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-clipboard-list"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-white tracking-tight" id="rpa-det-title">Detalhes da Ocorrência</h3>
+          <p class="text-xs text-slate-400" id="rpa-det-sub">Histórico e Evolução do Robô</p>
+        </div>
+      </div>
+      <button class="text-slate-400 hover:text-white transition-colors" onclick="app.closeRpaPendencyDetailsModal()">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <div id="rpa-det-content"></div>
+
+    <div class="flex items-center justify-end gap-2 pt-4 mt-6 border-t border-white/10">
+      <button type="button" class="btn btn-secondary text-xs px-4 py-2" onclick="app.closeRpaPendencyDetailsModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- JIRA ENGINE MODULE & CORE APP LOGIC -->
+<script src="jira-sync.js?v=20260809_v6.52.0-hml"></script>
+<script src="app.js?v=20260809_v6.52.0-hml"></script>
+<!-- MÓDULO AUTÔNOMO ISOLADO DA SQUAD RPA -->
+<script src="rpa-pendencies.js?v=20260809_v6.52.0-hml"></script>
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "Controle de Recursos - Squad de Dados",
+  "description": "Painel objetivo para acompanhamento de demandas, prazos, alocação (Operações vs Finanças) e reuniões semanais com o DPO.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Squads & Governança Jira - EmanaPay / Natura</title>
+    
+    <!-- Google Fonts (Outfit & Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons 6.4.0 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Supabase SDK v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- SheetJS (Excel Upload/Export) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- Custom Theme Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-badge">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div>
+        <div class="brand-title">EmanaPay</div>
+        <div class="brand-subtitle">Gestão de Squads & Jira</div>
+      </div>
+    </div>
+
+    <!-- SQUAD SELECTOR -->
+    <div class="squad-selector">
+      <span class="selector-label">Squad Ativa</span>
+      <div class="squad-btn-group">
+        <button class="squad-tab-btn active-dados" id="btn-squad-dados" onclick="app.setSquad('dados')">
+          <span><i class="fa-solid fa-database me-2"></i> Squad de Dados</span>
+          <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+        <button class="squad-tab-btn" id="btn-squad-operacoes" onclick="app.setSquad('operacoes')">
+          <span><i class="fa-solid fa-gears me-2"></i> Squad de Operações</span>
+          <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+        <button class="squad-tab-btn" id="btn-squad-rpa" onclick="app.setSquad('rpa')">
+          <span><i class="fa-solid fa-robot me-2"></i> Squad de RPA</span>
+          <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN NAVIGATION LINKS -->
+    <nav class="sidebar-nav">
+      <a class="nav-item active" id="nav-triagem" onclick="app.navigate('triagem')">
+        <i class="fa-solid fa-inbox"></i>
+        <span>Mesa de Triagem</span>
+        <span class="nav-badge" id="badge-triage-count">0</span>
+      </a>
+      <a class="nav-item" id="nav-dashboard" onclick="app.navigate('dashboard')">
+        <i class="fa-solid fa-chart-pie"></i>
+        <span>Dashboard Consolidado</span>
+      </a>
+      <a class="nav-item" id="nav-board" onclick="app.navigate('board')">
+        <i class="fa-solid fa-users-gear"></i>
+        <span>Quadro da Squad</span>
+      </a>
+      <a class="nav-item" id="nav-backlog" onclick="app.navigate('backlog')">
+        <i class="fa-solid fa-list-check"></i>
+        <span>Backlog de Demandas</span>
+      </a>
+      <a class="nav-item" id="nav-concluidos" onclick="app.navigate('concluidos')">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Entregas Concluídas</span>
+      </a>
+      <a class="nav-item" id="nav-dpo-sync" onclick="app.navigate('dpo-sync')">
+        <i class="fa-solid fa-handshake"></i>
+        <span>Modo Reunião DPO</span>
+      </a>
+      <a class="nav-item" id="nav-dpo-logs" onclick="app.navigate('dpo-logs')">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span>Histórico DPO</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="main-wrapper">
+    
+    <!-- TOP HEADER BAR -->
+    <header class="top-header">
+      <div class="header-title-area">
+        <button class="btn btn-secondary lg:hidden" onclick="app.toggleMobileSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h1 class="header-title" id="page-title">Mesa de Triagem & Governança Jira</h1>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="badge badge-medium" id="header-squad-badge">
+          <i class="fa-solid fa-database"></i> Squad de Dados
+        </span>
+        <span class="text-xs text-muted" id="header-clock">--:--:--</span>
+      </div>
+    </header>
+
+    <!-- VIEW 1: MESA DE TRIAGEM -->
+    <div class="view-container active-view" id="view-triagem">
+      
+      <!-- HEADER BANNER WITH SINGLE SYNC BUTTON -->
+      <div class="glass-panel p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="badge badge-medium mb-2">
+              <i class="fa-solid fa-bolt text-emerald-400"></i> Integrador Jira GAU
+            </div>
+            <h2 class="text-2xl font-bold text-white">Mesa de Triagem & Monitor de Demandas</h2>
+            <p class="text-sm text-slate-400 mt-1 max-w-xl">
+              Sincronize novas solicitações do Jira (projeto GAU), analise a demanda e encaminhe para a Squad responsável.
+            </p>
+          </div>
+
+          <!-- BOTÃO ÚNICO DE SINCRONIZAÇÃO JIRA -->
+          <div class="flex flex-col items-end gap-2 shrink-0">
+            <button class="btn btn-primary" id="btn-sync-jira" onclick="app.triggerJiraSync()">
+              <i class="fa-solid fa-rotate-right" id="icon-sync-spin"></i>
+              <span>🔄 Atualizar cards do Jira</span>
+            </button>
+            <span class="text-xs text-slate-400" id="sync-last-time">Última sync: --:--:--</span>
+          </div>
+        </div>
+
+        <!-- NOTIFICATION TOAST BANNER -->
+        <div class="mt-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold hidden" id="sync-toast-banner">
+          <i class="fa-solid fa-circle-check me-2"></i> <span id="sync-toast-message"></span>
+        </div>
+      </div>
+
+      <!-- METRICS ROW -->
+      <div class="grid-metrics">
+        <div class="glass-panel metric-card">
+          <div>
+            <div class="metric-val" id="metric-triage-pending">0</div>
+            <div class="metric-lbl">Aguardando Triagem</div>
+          </div>
+          <div class="metric-icon bg-amber-500/20 text-amber-400"><i class="fa-solid fa-clock"></i></div>
+        </div>
+
+        <div class="glass-panel metric-card">
+          <div>
+            <div class="metric-val" id="metric-triage-triaged">0</div>
+            <div class="metric-lbl">Triados & Enviados</div>
+          </div>
+          <div class="metric-icon bg-emerald-500/20 text-emerald-400"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+
+        <div class="glass-panel metric-card">
+          <div>
+            <div class="metric-val" id="metric-triage-rejected">0</div>
+            <div class="metric-lbl">Demandas Rejeitadas</div>
+          </div>
+          <div class="metric-icon bg-rose-500/20 text-rose-400"><i class="fa-solid fa-ban"></i></div>
+        </div>
+      </div>
+
+      <!-- CARDS LIST CONTAINER -->
+      <div class="glass-panel p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-lg font-bold text-white">Solicitações na Fila</h3>
+          <div class="flex items-center gap-2">
+            <input type="text" class="form-control" id="search-triage" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderTriageView()" style="width: 260px;">
+          </div>
+        </div>
+
+        <div class="grid-cards" id="triage-cards-container">
+          <!-- Dinamicamente gerado via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: DASHBOARD CONSOLIDADO -->
+    <div class="view-container" id="view-dashboard">
+      <div class="grid-metrics">
+        <div class="glass-panel metric-card">
+          <div>
+            <div class="metric-val" id="dash-total-members">0</div>
+            <div class="metric-lbl">Total de Membros</div>
+          </div>
+          <div class="metric-icon bg-blue-500/20 text-blue-400"><i class="fa-solid fa-users"></i></div>
+        </div>
+
+        <div class="glass-panel metric-card">
+          <div>
+            <div class="metric-val" id="dash-active-members">0</div>
+            <div class="metric-lbl">Membros Ativos</div>
+          </div>
+          <div class="metric-icon bg-emerald-500/20 text-emerald-400"><i class="fa-solid fa-user-check"></i></div>
+        </div>
+
+        <div class="glass-panel metric-card">
+          <div>
+            <div class="metric-val" id="dash-pending-backlog">0</div>
+            <div class="metric-lbl">Backlog Pendente</div>
+          </div>
+          <div class="metric-icon bg-amber-500/20 text-amber-400"><i class="fa-solid fa-list"></i></div>
+        </div>
+
+        <div class="glass-panel metric-card">
+          <div>
+            <div class="metric-val" id="dash-total-completed">0</div>
+            <div class="metric-lbl">Entregas Concluídas</div>
+          </div>
+          <div class="metric-icon bg-purple-500/20 text-purple-400"><i class="fa-solid fa-trophy"></i></div>
+        </div>
+      </div>
+
+      <!-- CHARTS CONTAINER -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="glass-panel p-6">
+          <h3 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-chart-pie me-2 text-emerald-400"></i> Distribuição por Squad</h3>
+          <canvas id="chart-squad-dist" height="220"></canvas>
+        </div>
+        <div class="glass-panel p-6">
+          <h3 class="text-base font-bold text-white mb-4"><i class="fa-solid fa-chart-bar me-2 text-blue-400"></i> Status do Backlog</h3>
+          <canvas id="chart-status-dist" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: QUADRO DA SQUAD -->
+    <div class="view-container" id="view-board">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-white" id="board-squad-title">Quadro de Membros - Squad de Dados</h2>
+          <p class="text-xs text-slate-400">Distribuição de capacidade (Ops vs Fin) e tarefas ativas</p>
+        </div>
+        <button class="btn btn-primary" onclick="app.openMemberModal()">
+          <i class="fa-solid fa-plus"></i> Novo Membro
+        </button>
+      </div>
+
+      <div class="grid-cards" id="board-members-container">
+        <!-- Dinamicamente gerado via JS -->
+      </div>
+    </div>
+
+    <!-- VIEW 4: BACKLOG DE DEMANDAS -->
+    <div class="view-container" id="view-backlog">
+      <div class="glass-panel p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Backlog da Squad</h2>
+            <p class="text-xs text-slate-400">Gestão de prioridade e ordem de tratamento (1 a 100)</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="btn btn-secondary" onclick="app.exportExcel()">
+              <i class="fa-solid fa-file-excel text-emerald-400"></i> Exportar Excel
+            </button>
+            <button class="btn btn-primary" onclick="app.openTaskModal()">
+              <i class="fa-solid fa-plus"></i> Nova Demanda
+            </button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Ordem</th>
+                <th>GAU / Chave</th>
+                <th>Título da Demanda</th>
+                <th>Solicitante</th>
+                <th>Prioridade</th>
+                <th>Categoria</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="backlog-table-body">
+              <!-- Dinamicamente gerado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 5: ENTREGAS CONCLUÍDAS -->
+    <div class="view-container" id="view-concluidos">
+      <div class="glass-panel p-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-white">Histórico de Entregas Concluídas</h2>
+          <span class="badge badge-medium" id="completed-count-badge">0 entregas</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Demanda / Código</th>
+                <th>Responsável</th>
+                <th>Data Conclusão</th>
+                <th>Ganhos / Impacto de Negócio</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="completed-table-body">
+              <!-- Dinamicamente gerado via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 6: MODO REUNIÃO DPO -->
+    <div class="view-container" id="view-dpo-sync">
+      <div class="glass-panel p-8 text-center max-w-2xl mx-auto">
+        <div class="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl mx-auto mb-4">
+          <i class="fa-solid fa-handshake"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-2">Modo Reunião DPO</h2>
+        <p class="text-sm text-slate-400 mb-6">
+          Passe por cada membro da equipe para atualizar o status das demandas ativas, promover novas tarefas e registrar os ganhos da semana.
+        </p>
+        <button class="btn btn-primary" onclick="app.startDpoMeeting()">
+          <i class="fa-solid fa-play"></i> Iniciar Alinhamento DPO
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 7: HISTÓRICO DPO -->
+    <div class="view-container" id="view-dpo-logs">
+      <div class="glass-panel p-6">
+        <h2 class="text-xl font-bold text-white mb-4">Registros de Alinhamento DPO</h2>
+        <div class="space-y-4" id="dpo-logs-container">
+          <!-- Dinamicamente gerado via JS -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL: ADD / EDIT MEMBER -->
+<div class="modal-backdrop" id="modal-member">
+  <div class="glass-panel modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Novo Membro da Squad</h3>
+      <button class="btn btn-secondary" onclick="app.closeModal('modal-member')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form onsubmit="app.saveMember(event)">
+      <input type="hidden" id="member-id">
+      <div class="form-group">
+        <label class="form-label">Nome Completo</label>
+        <input type="text" class="form-control" id="member-name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cargo / Função</label>
+        <input type="text" class="form-control" id="member-role" placeholder="Ex: Analista de Dados Sr." required>
+      </div>
+      <div class="grid grid-cols-2 gap-4 form-group">
+        <div>
+          <label class="form-label">Alocação Ops (%)</label>
+          <input type="number" class="form-control" id="member-alloc-ops" min="0" max="100" value="50">
+        </div>
+        <div>
+          <label class="form-label">Alocação Fin (%)</label>
+          <input type="number" class="form-control" id="member-alloc-fin" min="0" max="100" value="50">
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 mt-6">
+        <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-member')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Membro</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: ADD / EDIT DEMAND -->
+<div class="modal-backdrop" id="modal-task">
+  <div class="glass-panel modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Nova Demanda</h3>
+      <button class="btn btn-secondary" onclick="app.closeModal('modal-task')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <form onsubmit="app.saveTask(event)">
+      <input type="hidden" id="task-id">
+      <div class="form-group">
+        <label class="form-label">GAU / Código Jira</label>
+        <input type="text" class="form-control" id="task-gau" placeholder="Ex: GAU-1024" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Título da Demanda</label>
+        <input type="text" class="form-control" id="task-title" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Solicitante</label>
+        <input type="text" class="form-control" id="task-requester" required>
+      </div>
+      <div class="grid grid-cols-2 gap-4 form-group">
+        <div>
+          <label class="form-label">Prioridade</label>
+          <select class="form-control" id="task-priority">
+            <option value="1 - Urgente">1 - Urgente</option>
+            <option value="2 - Alta" selected>2 - Alta</option>
+            <option value="3 - Média">3 - Média</option>
+            <option value="4 - Baixa">4 - Baixa</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Categoria</label>
+          <select class="form-control" id="task-category">
+            <option value="Ingestão">Ingestão</option>
+            <option value="Dashboard">Dashboard</option>
+            <option value="API">API</option>
+            <option value="Automação">Automação</option>
+            <option value="Processos" selected>Processos</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 mt-6">
+        <button type="button" class="btn btn-secondary" onclick="app.closeModal('modal-task')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Demanda</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JIRA ENGINE MODULE & CORE APP LOGIC -->
+<script src="jira-sync.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
