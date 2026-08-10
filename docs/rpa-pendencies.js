@@ -615,8 +615,14 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       if (!val || val.indexOf('Selecionar') !== -1) return;
 
       if (!Array.isArray(this.selectedRobots)) this.selectedRobots = [];
-      if (!this.selectedRobots.includes(val)) {
-        this.selectedRobots.push(val);
+
+      if (val === 'Nenhum' || val === 'Todos os robôs') {
+        this.selectedRobots = [val];
+      } else {
+        this.selectedRobots = this.selectedRobots.filter(r => r !== 'Nenhum' && r !== 'Todos os robôs');
+        if (!this.selectedRobots.includes(val)) {
+          this.selectedRobots.push(val);
+        }
       }
 
       this.renderRobotPills();
@@ -648,11 +654,21 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
 
       container.innerHTML = this.selectedRobots.map(robot => {
         const safeName = robot.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        let badgeClass = 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300';
+        let iconClass = 'fa-robot text-emerald-400';
+        if (robot === 'Nenhum') {
+          badgeClass = 'bg-rose-500/20 border-rose-500/50 text-rose-300';
+          iconClass = 'fa-ban text-rose-400';
+        } else if (robot === 'Todos os robôs') {
+          badgeClass = 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300';
+          iconClass = 'fa-cubes text-cyan-400';
+        }
+
         return `
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 shadow-sm my-0.5">
-            <i class="fa-solid fa-robot text-emerald-400 text-xs"></i>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${badgeClass} border shadow-sm my-0.5">
+            <i class="fa-solid ${iconClass} text-xs"></i>
             <span>${robot}</span>
-            <button type="button" onclick="window.RpaPendenciesModule.removeRobot('${safeName}')" class="ml-1 text-emerald-300 hover:text-white font-bold cursor-pointer transition-colors" title="Remover">✕</button>
+            <button type="button" onclick="window.RpaPendenciesModule.removeRobot('${safeName}')" class="ml-1 opacity-80 hover:opacity-100 font-bold cursor-pointer transition-colors" title="Remover">✕</button>
           </span>
         `;
       }).join('');
