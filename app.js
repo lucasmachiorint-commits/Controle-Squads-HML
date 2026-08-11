@@ -588,7 +588,7 @@ const app = {
     if (overlay) {
       overlay.style.setProperty('display', 'none', 'important');
       overlay.style.setProperty('opacity', '0', 'important');
-      overlay.style.setProperty('pointer-events', 'none', 'important');
+        overlay.style.setProperty('pointer-events', 'none', 'important');
     }
   },
 
@@ -598,15 +598,18 @@ const app = {
   async saveStateToSupabase() {
     if (!supabaseClient || !this.authUserId || this.authUserId === 'guest') return;
     _lastSelfSaveTime = Date.now();
+    const isHml = (typeof window !== 'undefined' && window.location && window.location.href && window.location.href.toUpperCase().includes('HML'));
+    const rowId = isHml ? 'hml_default' : 'default';
+
     const payload = {
-      id: 'default',
+      id: rowId,
       data: this.state,
       updated_by: this.authUserId || null,
       updated_at: new Date().toISOString()
     };
     try {
       let { error } = await supabaseClient.from('cs_board_state').upsert(payload);
-      if (error) {
+      if (error && !isHml) {
         await supabaseClient.from('board_state').upsert(payload);
       }
     } catch (err) {
@@ -614,8 +617,45 @@ const app = {
     }
   },
 
+  async copyDataFromPrd() {
+    if (!confirm('Deseja substituir os dados de Homologação com uma cópia atualizada do ambiente de Produção?\n\nIsso atualizará todas as pendências, cards e quadros de HML com o cenário atual de Produção.')) return;
+    if (!supabaseClient) return;
+
+    try {
+      const { data: prdRes, error } = await supabaseClient
+        .from('cs_board_state')
+        .select('data')
+        .eq('id', 'default')
+        .maybeSingle();
+
+      if (!error && prdRes && prdRes.data) {
+        this.state = prdRes.data;
+        await this.saveStateToSupabase();
+        if (window.RpaPendenciesModule) {
+          if (Array.isArray(this.state.rpaPendencies)) {
+            window.RpaPendenciesModule.pendencies = this.state.rpaPendencies;
+            window.RpaPendenciesModule.saveLocal();
+          }
+          if (window.RpaPendenciesModule.fetchPendencies) {
+            await window.RpaPendenciesModule.fetchPendencies();
+          }
+        }
+        this.render();
+        alert('✅ Cenário de Produção copiado para Homologação com sucesso!');
+      } else {
+        alert('⚠️ Não foi possível obter os dados de Produção no momento.');
+      }
+    } catch (err) {
+      console.error('[Copy PRD -> HML Error]', err);
+      alert('Erro ao copiar dados de Produção: ' + (err.message || err));
+    }
+  },
+
   async loadStateFromSupabase() {
     if (!supabaseClient) return false;
+    const isHml = (typeof window !== 'undefined' && window.location && window.location.href && window.location.href.toUpperCase().includes('HML'));
+    const rowId = isHml ? 'hml_default' : 'default';
+
     try {
       let data = null;
       let error = null;
@@ -623,11 +663,30 @@ const app = {
       const res1 = await supabaseClient
         .from('cs_board_state')
         .select('data, updated_at')
-        .eq('id', 'default')
+        .eq('id', rowId)
         .maybeSingle();
 
-      if (!res1.error && res1.data) {
+      if (!res1.error && res1.data && res1.data.data) {
         data = res1.data;
+      } else if (isHml) {
+        // Se estiver em HML e hml_default não tiver dados, carregar a cópia inicial de PRD ('default')
+        const prdRes = await supabaseClient
+          .from('cs_board_state')
+          .select('data, updated_at')
+          .eq('id', 'default')
+          .maybeSingle();
+
+        if (!prdRes.error && prdRes.data && prdRes.data.data) {
+          data = prdRes.data;
+          try {
+            await supabaseClient.from('cs_board_state').upsert({
+              id: 'hml_default',
+              data: prdRes.data.data,
+              updated_by: this.authUserId || null,
+              updated_at: new Date().toISOString()
+            });
+          } catch (_) {}
+        }
       } else {
         const res2 = await supabaseClient
           .from('board_state')

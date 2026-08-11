@@ -469,11 +469,14 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
     async fetchPendencies() {
       try {
         if (window.supabaseClient) {
-          // 1. Tentar ler da tabela centralizada cs_board_state (acesso universal garantido para todos os usuários)
+          const isHml = (typeof window !== 'undefined' && window.location && window.location.href && window.location.href.toUpperCase().includes('HML'));
+          const rowId = isHml ? 'hml_default' : 'default';
+
+          // 1. Tentar ler da tabela centralizada cs_board_state de acordo com o ambiente
           const { data: boardState, error: bsError } = await window.supabaseClient
             .from('cs_board_state')
             .select('data')
-            .eq('id', 'default')
+            .eq('id', rowId)
             .maybeSingle();
 
           if (!bsError && boardState && boardState.data && Array.isArray(boardState.data.rpaPendencies) && boardState.data.rpaPendencies.length > 0) {
@@ -527,14 +530,20 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         if (this._realtimeChannel) {
           try { window.supabaseClient.removeChannel(this._realtimeChannel); } catch (_) {}
         }
+        const isHml = (typeof window !== 'undefined' && window.location && window.location.href && window.location.href.toUpperCase().includes('HML'));
+        const rowId = isHml ? 'hml_default' : 'default';
+
         this._realtimeChannel = window.supabaseClient
-          .channel('rpa_pendencies_realtime_v3')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'cs_board_state' }, () => {
-            console.log('[RPA Realtime] Alteração remota detectada no cs_board_state. Atualizando tela de todos os usuários...');
+          .channel('rpa_pendencies_realtime_v4_' + (isHml ? 'hml' : 'prd'))
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'cs_board_state' }, (payload) => {
+            if (payload && payload.new && payload.new.id && payload.new.id !== rowId) {
+              return; // Ignorar alterações de outro ambiente!
+            }
+            console.log('[RPA Realtime] Alteração remota no ambiente detectada. Atualizando tela...');
             this.fetchPendencies();
           })
           .on('postgres_changes', { event: '*', schema: 'public', table: 'rpa_pendencies' }, () => {
-            console.log('[RPA Realtime] Alteração remota detectada na tabela rpa_pendencies. Atualizando tela...');
+            console.log('[RPA Realtime] Alteração remota na tabela rpa_pendencies detectada. Atualizando tela...');
             this.fetchPendencies();
           })
           .subscribe();
