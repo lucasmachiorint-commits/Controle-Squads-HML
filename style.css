@@ -1027,6 +1027,9 @@ body.light-theme .team-solicitante-select {
   border-color: #7dd3fc !important;
   color: #0369a1 !important;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%230369a1' d='M0 0l5 6 5-6z'/></svg>") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 8px center !important;
+  background-size: 8px 5px !important;
 }
 
 body.light-theme .team-solicitante-select option {
@@ -1039,6 +1042,9 @@ body.light-theme .team-filter-select {
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23475569' d='M0 0l5 6 5-6z'/></svg>") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 8px 5px !important;
 }
 
 body.light-theme .team-filter-select option {
