@@ -1788,6 +1788,11 @@ body.light-theme .bg-slate-900\/80 {
 }
 
 @media print {
+  @page {
+    size: landscape;
+    margin: 6mm 8mm;
+  }
+
   /* 1. OCULTAR ELEMENTOS INTERATIVOS E DE NAVEGAÇÃO */
   #hml-banner-fixed,
   .no-print,
@@ -1818,7 +1823,7 @@ body.light-theme .bg-slate-900\/80 {
     visibility: hidden !important;
   }
 
-  /* 2. LAYOUT: Container principal ocupa 100% sem margens veda impressões */
+  /* 2. LAYOUT HORIZONTAL E FLUXO LÍQUIDO */
   body,
   html,
   .app-container,
@@ -1838,7 +1843,7 @@ body.light-theme .bg-slate-900\/80 {
     overflow: visible !important;
     background: #ffffff !important;
     color: #0f172a !important;
-    font-size: 11pt !important;
+    font-size: 10pt !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -1847,7 +1852,19 @@ body.light-theme .bg-slate-900\/80 {
     margin-left: 0 !important;
   }
 
-  /* 3. PRESERVAR CORES DOS CARDS E TABELAS SEM FORÇAR QUEBRAS DE PÁGINA */
+  /* 3. NAVEGAÇÃO DE ABAS E CABEÇALHOS HORIZONTAIS */
+  .view-tabs,
+  .sub-nav,
+  .board-header,
+  .view-header {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* 4. PRESERVAR CORES DOS CARDS E TABELAS SEM CORTAR INFORMAÇÕES */
   .glass-panel,
   .triage-banner-panel,
   .triage-table-panel {
@@ -1855,8 +1872,10 @@ body.light-theme .bg-slate-900\/80 {
     border: 1px solid #d1d5db !important;
     break-inside: auto !important;
     page-break-inside: auto !important;
-    margin-top: 10px !important;
+    margin-top: 6px !important;
     margin-bottom: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -1873,45 +1892,63 @@ body.light-theme .bg-slate-900\/80 {
     print-color-adjust: exact !important;
   }
 
-  /* 4. TABELAS: Garantir legibilidade */
-  .custom-table {
+  /* 5. TABELAS: LARGURA HORIZONTAL E QUEBRA DE TEXTO AUTOMÁTICA EM TODAS AS CÉLULAS */
+  .custom-table,
+  .rpa-table,
+  table {
     width: 100% !important;
+    max-width: 100% !important;
+    table-layout: auto !important;
     border-collapse: collapse !important;
   }
 
   .custom-table th,
-  .custom-table td {
-    border: 1px solid #d1d5db !important;
-    padding: 6px 8px !important;
-    font-size: 9pt !important;
+  .custom-table td,
+  .rpa-table th,
+  .rpa-table td,
+  th, td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 5px 6px !important;
+    font-size: 8.5pt !important;
+    line-height: 1.3 !important;
     color: #0f172a !important;
     background: #ffffff !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  .custom-table thead th {
+  .custom-table thead th,
+  .rpa-table thead th {
     background: #f1f5f9 !important;
     font-weight: 700 !important;
   }
 
-  /* 5. TIPOGRAFIA */
+  /* 6. TIPOGRAFIA E TEXTO COM QUEBRA ADAPTÁVEL */
   h1, h2, h3, h4, h5, h6 {
     color: #0f172a !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
     page-break-after: avoid !important;
   }
 
-  p, span, label, td, th {
+  p, span, label {
     color: #1e293b !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    white-space: normal !important;
   }
 
-  /* 6. LINKS */
+  /* 7. LINKS */
   a {
     color: #0f172a !important;
     text-decoration: none !important;
   }
 
-  /* 7. GRÁFICOS CANVAS */
+  /* 8. GRÁFICOS CANVAS */
   canvas {
     max-width: 100% !important;
     height: auto !important;
@@ -1919,19 +1956,19 @@ body.light-theme .bg-slate-900\/80 {
     page-break-inside: avoid !important;
   }
 
-  /* 8. PAGINAÇÃO */
+  /* 9. PAGINAÇÃO */
   .view-container {
     page-break-before: auto !important;
   }
 
-  /* 9. SPRINT BANNER */
+  /* 10. SPRINT BANNER */
   .sprint-banner-dados {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     break-inside: avoid !important;
   }
 
-  /* 10. MÉTRICAS COLORIDAS */
+  /* 11. MÉTRICAS COLORIDAS */
   .mini-metric-card.metric-box-emerald,
   .mini-metric-card.metric-box-amber,
   .mini-metric-card.metric-box-blue,
