@@ -1820,6 +1820,59 @@ body.light-theme .order-input-field:focus {
   box-shadow: 0 0 8px rgba(245, 158, 11, 0.3) !important;
 }
 
+/* Fix para Números e Ícones dos Cards do Dashboard no Light Mode */
+body.light-theme .metric-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+body.light-theme .metric-val {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+body.light-theme .metric-val.text-cyan-400 {
+  color: #0891b2 !important;
+}
+
+body.light-theme .metric-val.text-amber-400 {
+  color: #d97706 !important;
+}
+
+body.light-theme .metric-val.text-rose-400 {
+  color: #e11d48 !important;
+}
+
+body.light-theme .metric-val.text-emerald-400 {
+  color: #059669 !important;
+}
+
+body.light-theme .metric-lbl {
+  color: #475569 !important;
+}
+
+body.light-theme .metric-icon.bg-cyan-500\/20 {
+  background-color: #cff4fc !important;
+  color: #0891b2 !important;
+}
+
+body.light-theme .metric-icon.bg-amber-500\/20 {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+}
+
+body.light-theme .metric-icon.bg-rose-500\/20 {
+  background-color: #ffe4e6 !important;
+  color: #e11d48 !important;
+}
+
+body.light-theme .metric-icon.bg-emerald-500\/20 {
+  background-color: #d1fae5 !important;
+  color: #059669 !important;
+}
+
 /* ============================================================
    @MEDIA PRINT — Impressão Direta (window.print)
    ============================================================ */
