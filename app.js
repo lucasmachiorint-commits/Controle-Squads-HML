@@ -1889,8 +1889,9 @@ const app = {
         <td class="font-bold text-slate-400" style="white-space:nowrap; width:45px;">${idx + 1}</td>
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:110px;">${item.jiraKey}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:160px;">${item.requesterName || 'Solicitante Jira'}</td>
-        <td style="white-space:nowrap; width:160px;"><span class="badge badge-medium" style="white-space:nowrap;">${item.status || 'Aguardando Triagem'}</span></td>
+        <td class="text-slate-300" style="white-space:nowrap; width:150px;">${item.requesterName || 'Solicitante Jira'}</td>
+        <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:150px;">${item.teamSolicitante || '—'}</td>
+        <td style="white-space:nowrap; width:140px;"><span class="badge badge-medium" style="white-space:nowrap;">${item.status || 'Aguardando Triagem'}</span></td>
         <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:120px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
       </tr>
     `).join('');
@@ -1949,6 +1950,11 @@ const app = {
     document.getElementById('detail-priority').textContent = item.priority || '2 - Alta';
     document.getElementById('detail-title').textContent = item.title || item.taskTitle || 'Demanda do Jira';
     document.getElementById('detail-requester').textContent = item.requesterName || item.requester || item.completedBy || item.requesterArea || 'Solicitante Jira';
+    
+    const teamEl = document.getElementById('detail-team-solicitante');
+    if (teamEl) {
+      teamEl.textContent = item.teamSolicitante || '—';
+    }
     
     const dateEl = document.getElementById('detail-created-date');
     if (dateEl) {
@@ -2553,6 +2559,15 @@ const app = {
       });
     }
 
+    // 2.5. Filtro por Time Solicitante
+    const dashTeamFilter = document.getElementById('dash-filter-team')?.value || '';
+    if (dashTeamFilter) {
+      demands = demands.filter(d => {
+        if (dashTeamFilter === '__vazio__') return !d.teamSolicitante;
+        return (d.teamSolicitante || '').startsWith(dashTeamFilter);
+      });
+    }
+
     // Calcular as 5 Métricas Consolidadas + Taxa de Eficiência
     const totalDemands = demands.length;
     const inProgressCount = demands.filter(d => d.status === 'Em Andamento').length;
@@ -2813,6 +2828,7 @@ const app = {
           </td>
           <td class="text-xs font-semibold ${squadColor} py-3.5 px-4">${squadName}</td>
           <td class="text-xs text-slate-300 py-3.5 px-4">${item.requester || item.solicitante || 'N/A'}</td>
+          <td class="text-xs text-sky-300 font-semibold py-3.5 px-4">${item.teamSolicitante || '—'}</td>
           <td class="py-3.5 px-4">
             <span class="badge bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] px-2.5 py-1 rounded-full font-bold">
               🚫 BLOQUEADO
@@ -2904,18 +2920,27 @@ const app = {
     const inProgressItems = allItems.filter(i => i.status === 'Em Andamento' || i.status === 'Bloqueado');
 
     const searchTerm = (document.getElementById('search-board')?.value || '').toLowerCase();
+    const teamFilter = document.getElementById('filter-team-board')?.value || '';
 
     const filteredItems = inProgressItems.filter(item => {
-      return !searchTerm ||
+      const matchSearch = !searchTerm ||
         (item.title || '').toLowerCase().includes(searchTerm) ||
         (item.gau || item.jiraKey || '').toLowerCase().includes(searchTerm) ||
         (item.requester || '').toLowerCase().includes(searchTerm);
+      
+      let matchTeam = true;
+      if (teamFilter === '__vazio__') {
+        matchTeam = !item.teamSolicitante;
+      } else if (teamFilter) {
+        matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
+      }
+      return matchSearch && matchTeam;
     });
 
     if (filteredItems.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda em andamento ou bloqueada encontrada.</td>
+          <td colspan="7" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda em andamento ou bloqueada encontrada.</td>
         </tr>
       `;
       return;
@@ -2926,8 +2951,16 @@ const app = {
         <td class="font-bold text-slate-400" style="white-space:nowrap; width:45px;">${idx + 1}</td>
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:110px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:160px;">${item.requester || 'Solicitante Jira'}</td>
+        <td class="text-slate-300" style="white-space:nowrap; width:150px;">${item.requester || 'Solicitante Jira'}</td>
         <td onclick="event.stopPropagation();" style="white-space:nowrap; width:160px;">
+          <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)">
+            <option value="">— Selecione —</option>
+            <option value="Atendimento" ${item.teamSolicitante === 'Atendimento' ? 'selected' : ''}>Atendimento</option>
+            <option value="Conciliação" ${(item.teamSolicitante || '').startsWith('Conciliação') ? 'selected' : ''}>Conciliação</option>
+            <option value="Suporte Operacional" ${item.teamSolicitante === 'Suporte Operacional' ? 'selected' : ''}>Suporte Operacional</option>
+          </select>
+        </td>
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:150px;">
           <select class="status-select-dropdown status-em-andamento ${item.status === 'Bloqueado' ? 'status-bloqueado' : ''}" onchange="app.changeDemandStatus('${item.id}', this.value)">
             <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
             <option value="Bloqueado" ${item.status === 'Bloqueado' ? 'selected' : ''}>Bloqueado</option>
@@ -2965,18 +2998,27 @@ const app = {
     backlogItems.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
 
     const searchTerm = (document.getElementById('search-backlog')?.value || '').toLowerCase();
+    const teamFilter = document.getElementById('filter-team-backlog')?.value || '';
 
     const filteredItems = backlogItems.filter(item => {
-      return !searchTerm ||
+      const matchSearch = !searchTerm ||
         (item.title || '').toLowerCase().includes(searchTerm) ||
         (item.gau || item.jiraKey || '').toLowerCase().includes(searchTerm) ||
         (item.requester || '').toLowerCase().includes(searchTerm);
+
+      let matchTeam = true;
+      if (teamFilter === '__vazio__') {
+        matchTeam = !item.teamSolicitante;
+      } else if (teamFilter) {
+        matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
+      }
+      return matchSearch && matchTeam;
     });
 
     if (filteredItems.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda no backlog encontrada.</td>
+          <td colspan="7" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda no backlog encontrada.</td>
         </tr>
       `;
       return;
@@ -2997,8 +3039,16 @@ const app = {
         </td>
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:110px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:160px;">${item.requester || 'Solicitante Jira'}</td>
+        <td class="text-slate-300" style="white-space:nowrap; width:150px;">${item.requester || 'Solicitante Jira'}</td>
         <td onclick="event.stopPropagation();" style="white-space:nowrap; width:160px;">
+          <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)">
+            <option value="">— Selecione —</option>
+            <option value="Atendimento" ${item.teamSolicitante === 'Atendimento' ? 'selected' : ''}>Atendimento</option>
+            <option value="Conciliação" ${(item.teamSolicitante || '').startsWith('Conciliação') ? 'selected' : ''}>Conciliação</option>
+            <option value="Suporte Operacional" ${item.teamSolicitante === 'Suporte Operacional' ? 'selected' : ''}>Suporte Operacional</option>
+          </select>
+        </td>
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:150px;">
           <select class="status-select-dropdown status-backlog ${item.status === 'Bloqueado' ? 'status-bloqueado' : ''}" onchange="app.changeDemandStatus('${item.id}', this.value)">
             <option value="Backlog" ${item.status === 'Backlog' ? 'selected' : ''}>Backlog</option>
             <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
@@ -3071,6 +3121,59 @@ const app = {
     this.saveState();
   },
 
+  // Alterar Time Solicitante e disparar sincronização com Jira Cloud
+  changeTeamSolicitante(itemId, newTeam) {
+    let foundItem = null;
+    const squadId = this.activeSquad;
+
+    if (this.state.backlogItems && this.state.backlogItems[squadId]) {
+      foundItem = this.state.backlogItems[squadId].find(i => i.id === itemId || i.jiraKey === itemId || i.gau === itemId);
+    }
+    if (!foundItem && this.state.triageItems) {
+      foundItem = this.state.triageItems.find(i => i.id === itemId || i.jiraKey === itemId);
+    }
+    if (!foundItem && this.state.completedTasks && this.state.completedTasks[squadId]) {
+      foundItem = this.state.completedTasks[squadId].find(i => i.id === itemId || i.jiraKey === itemId || i.gau === itemId);
+    }
+
+    if (foundItem) {
+      foundItem.teamSolicitante = newTeam;
+      this.saveState();
+      
+      const keyToUpdate = foundItem.jiraKey || foundItem.gau;
+      if (keyToUpdate) {
+        this.updateTeamSolicitanteInJira(keyToUpdate, newTeam);
+      }
+    }
+  },
+
+  // Atualização bidirecional no Jira via API (customfield_11010)
+  async updateTeamSolicitanteInJira(jiraKey, teamSolicitante) {
+    if (!jiraKey || !teamSolicitante) return;
+    try {
+      const customUrl = localStorage.getItem('cs_jira_custom_url');
+      let baseUrl = 'http://localhost:3000';
+      if (customUrl && customUrl.startsWith('http')) {
+        try {
+          const parsed = new URL(customUrl);
+          baseUrl = parsed.origin;
+        } catch (e) {}
+      }
+      const res = await fetch(`${baseUrl}/api/jira/update-team-solicitante`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jiraKey, teamSolicitante })
+      });
+      if (res.ok) {
+        console.log(`[Jira Write Success] Time Solicitante atualizado no Jira para ${jiraKey}: ${teamSolicitante}`);
+      } else {
+        console.warn(`[Jira Write Warning] Falha na resposta da API Jira ao atualizar ${jiraKey}`);
+      }
+    } catch (e) {
+      console.log('[Jira Write Info] Servidor proxy local offline ou inacessível. Alteração salva localmente e no Supabase.');
+    }
+  },
+
   // RENDER: Entregas Concluídas (Com Filtro de Busca)
   renderCompletedView() {
     const tbody = document.getElementById('completed-table-body');
@@ -3082,18 +3185,27 @@ const app = {
 
     const items = this.state.completedTasks[this.activeSquad] || [];
     const searchTerm = (document.getElementById('search-concluidos')?.value || '').toLowerCase();
+    const teamFilter = document.getElementById('filter-team-concluidos')?.value || '';
 
     const filteredItems = items.filter(item => {
-      return !searchTerm ||
+      const matchSearch = !searchTerm ||
         (item.taskTitle || '').toLowerCase().includes(searchTerm) ||
         (item.completedBy || '').toLowerCase().includes(searchTerm) ||
         (item.jiraKey || '').toLowerCase().includes(searchTerm);
+
+      let matchTeam = true;
+      if (teamFilter === '__vazio__') {
+        matchTeam = !item.teamSolicitante;
+      } else if (teamFilter) {
+        matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
+      }
+      return matchSearch && matchTeam;
     });
 
     document.getElementById('completed-count-badge').textContent = `${filteredItems.length} entregas`;
 
     if (filteredItems.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-slate-500 font-semibold">Nenhuma entrega concluída encontrada.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500 font-semibold">Nenhuma entrega concluída encontrada.</td></tr>`;
       return;
     }
 
@@ -3101,7 +3213,8 @@ const app = {
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:110px;">${this.getItemGau(item)}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title || item.taskTitle}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:160px;">${item.requester || item.completedBy || item.requesterName || 'Solicitante Jira'}</td>
+        <td class="text-slate-300" style="white-space:nowrap; width:150px;">${item.requester || item.completedBy || item.requesterName || 'Solicitante Jira'}</td>
+        <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:150px;">${item.teamSolicitante || '—'}</td>
         <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:120px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
         <td class="text-slate-300 font-semibold text-xs" style="white-space:nowrap; width:120px;">${this.formatOnlyDate(item.completionDate || item.completedAt)}</td>
         <td class="text-emerald-400 text-xs italic" style="white-space:normal; word-break:break-word;">${item.gains || ''}</td>

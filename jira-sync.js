@@ -135,6 +135,27 @@ const JiraSyncEngine = {
       const description = card.description || card.descricao || card.notes || 'Sincronizado via Jira API';
       const requester = card.requester || card.reporter || card.solicitante || 'Solicitante Jira';
 
+      // Extração do campo Time Solicitante (customfield_11010)
+      const cfTeam = card.customfield_11010 || card.fields?.customfield_11010;
+      let teamSolicitante = card.teamSolicitante || '';
+      if (!teamSolicitante && cfTeam) {
+        let teamVal = '';
+        if (typeof cfTeam === 'object') {
+          teamVal = (cfTeam.id || cfTeam.value || cfTeam.name || '').toString();
+        } else {
+          teamVal = cfTeam.toString();
+        }
+        if (teamVal === '24153' || teamVal.toLowerCase().includes('atendimento')) {
+          teamSolicitante = 'Atendimento';
+        } else if (teamVal === '24154' || teamVal.toLowerCase().includes('conciliação') || teamVal.toLowerCase().includes('conciliacao') || teamVal.toLowerCase().includes('parâmetros')) {
+          teamSolicitante = 'Conciliação';
+        } else if (teamVal === '24152' || teamVal.toLowerCase().includes('suporte')) {
+          teamSolicitante = 'Suporte Operacional';
+        } else {
+          teamSolicitante = teamVal;
+        }
+      }
+
       const rawCreated = card.created || card.fields?.created || card.createdDate || card.date;
       let createdDate = new Date().toLocaleDateString('pt-BR');
       if (rawCreated) {
@@ -261,6 +282,7 @@ const JiraSyncEngine = {
             title,
             description,
             requesterName: requester,
+            teamSolicitante,
             priority: card.priority || '2 - Alta',
             category: card.category || 'Geral',
             suggestedSquad: targetSquadId,
@@ -280,6 +302,7 @@ const JiraSyncEngine = {
             area: 'Geral',
             completedBy: requester || targetSquadName,
             requester: requester || targetSquadName,
+            teamSolicitante,
             dueDate: card.dueDate || new Date().toISOString().split('T')[0],
             createdDate,
             completionDate: new Date().toLocaleDateString('pt-BR'),
@@ -294,6 +317,7 @@ const JiraSyncEngine = {
             title,
             notes: description,
             requester,
+            teamSolicitante,
             team: targetSquadName,
             dueDate: card.dueDate || new Date().toISOString().split('T')[0],
             createdDate,
@@ -335,6 +359,7 @@ const JiraSyncEngine = {
             title,
             description,
             requesterName: requester,
+            teamSolicitante,
             priority: card.priority || '2 - Alta',
             category: card.category || 'Geral',
             suggestedSquad: targetSquadId,
@@ -354,6 +379,7 @@ const JiraSyncEngine = {
             area: 'Geral',
             completedBy: requester || targetSquadName,
             requester: requester || targetSquadName,
+            teamSolicitante,
             dueDate: card.dueDate || new Date().toISOString().split('T')[0],
             createdDate,
             completionDate: new Date().toLocaleDateString('pt-BR'),
@@ -368,6 +394,7 @@ const JiraSyncEngine = {
             title,
             notes: description,
             requester,
+            teamSolicitante,
             team: targetSquadName,
             dueDate: card.dueDate || new Date().toISOString().split('T')[0],
             createdDate,
@@ -391,6 +418,10 @@ const JiraSyncEngine = {
           if (requester && (itemObj.requester !== requester && itemObj.requesterName !== requester)) {
             itemObj.requester = requester;
             itemObj.requesterName = requester;
+            isModified = true;
+          }
+          if (teamSolicitante && itemObj.teamSolicitante !== teamSolicitante) {
+            itemObj.teamSolicitante = teamSolicitante;
             isModified = true;
           }
           if (isModified) countUpdated++;

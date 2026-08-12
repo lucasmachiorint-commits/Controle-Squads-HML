@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Controle de Squads - Enterprise Board [HML] v6.76.0-hml</title>
+    <title>Controle de Squads - Enterprise Board [HML] v6.77.0-hml</title>
     
     <script>
       (function() {
@@ -20,11 +20,11 @@
             for (let name of names) { caches.delete(name); }
           });
         }
-        const TARGET_RELEASE = 'v6.76.0-hml';
+        const TARGET_RELEASE = 'v6.77.0-hml';
         const currentLock = localStorage.getItem('cs_deployed_release_lock_hml');
-        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.76.0-hml')) {
+        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.77.0-hml')) {
           localStorage.setItem('cs_deployed_release_lock_hml', TARGET_RELEASE);
-          window.location.href = window.location.pathname + '?v=6.76.0-hml&t=' + Date.now();
+          window.location.href = window.location.pathname + '?v=6.77.0-hml&t=' + Date.now();
         }
       })();
     </script>
@@ -56,7 +56,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     
     <!-- Custom Theme Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=20260812_v6.76.0-hml">
+    <link rel="stylesheet" href="style.css?v=20260812_v6.77.0-hml">
 </head>
 <body>
 
@@ -274,8 +274,9 @@
                 <th style="width: 45px; white-space: nowrap;">#</th>
                 <th style="width: 110px; white-space: nowrap;">GAU / Chave</th>
                 <th style="min-width: 180px;">Título da Demanda</th>
-                <th style="width: 160px; white-space: nowrap;">Solicitante</th>
-                <th style="width: 160px; white-space: nowrap;">Status</th>
+                <th style="width: 150px; white-space: nowrap;">Solicitante</th>
+                <th style="width: 150px; white-space: nowrap;">Time Solicitante</th>
+                <th style="width: 140px; white-space: nowrap;">Status</th>
                 <th style="width: 120px; white-space: nowrap;">Data de Criação</th>
               </tr>
             </thead>
@@ -345,6 +346,18 @@
               <option value="Backlog">Backlog</option>
               <option value="Bloqueado">Bloqueado</option>
               <option value="Concluído">Concluído</option>
+            </select>
+          </div>
+
+          <!-- 3. Filtro por Time Solicitante -->
+          <div>
+            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Time Solicitante:</label>
+            <select id="dash-filter-team" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
+              <option value="">🏢 Todos os Times</option>
+              <option value="Atendimento">Atendimento</option>
+              <option value="Conciliação">Conciliação</option>
+              <option value="Suporte Operacional">Suporte Operacional</option>
+              <option value="__vazio__">⚠️ Sem Time Definido</option>
             </select>
           </div>
 
@@ -532,12 +545,13 @@
             <thead>
               <tr>
                 <th style="width: 45px;">#</th>
-                <th style="width: 120px;">GAU / CHAVE</th>
-                <th style="min-width: 200px;">TÍTULO DA DEMANDA</th>
-                <th style="width: 140px;">SQUAD</th>
-                <th style="width: 160px;">SOLICITANTE</th>
-                <th style="width: 140px;">STATUS</th>
-                <th style="width: 120px; text-align: right;">AÇÃO</th>
+                <th style="width: 110px;">GAU / CHAVE</th>
+                <th style="min-width: 180px;">TÍTULO DA DEMANDA</th>
+                <th style="width: 130px;">SQUAD</th>
+                <th style="width: 140px;">SOLICITANTE</th>
+                <th style="width: 150px;">TIME SOLICITANTE</th>
+                <th style="width: 130px;">STATUS</th>
+                <th style="width: 110px; text-align: right;">AÇÃO</th>
               </tr>
             </thead>
             <tbody id="tbody-dash-blocked">
@@ -597,9 +611,20 @@
           </div>
         </div>
 
-        <div class="search-box" style="width:100%; margin-bottom:24px;">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-board" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderBoardView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+        <div class="flex flex-col md:flex-row gap-3 items-center mb-6">
+          <div class="search-box flex-1 w-full" style="margin-bottom: 0;">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-board" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderBoardView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+          </div>
+          <div class="w-full md:w-64">
+            <select id="filter-team-board" class="team-filter-select" onchange="app.renderBoardView()">
+              <option value="">🏢 Todos os Times</option>
+              <option value="Atendimento">Atendimento</option>
+              <option value="Conciliação">Conciliação</option>
+              <option value="Suporte Operacional">Suporte Operacional</option>
+              <option value="__vazio__">⚠️ Sem Time Definido</option>
+            </select>
+          </div>
         </div>
 
         <div class="table-responsive">
@@ -609,8 +634,9 @@
                 <th style="width: 45px; white-space: nowrap;">#</th>
                 <th style="width: 110px; white-space: nowrap;">GAU / Chave</th>
                 <th style="min-width: 180px;">Título da Demanda</th>
-                <th style="width: 160px; white-space: nowrap;">Solicitante</th>
-                <th style="width: 160px; white-space: nowrap;">Status</th>
+                <th style="width: 150px; white-space: nowrap;">Solicitante</th>
+                <th style="width: 160px; white-space: nowrap;">Time Solicitante</th>
+                <th style="width: 150px; white-space: nowrap;">Status</th>
                 <th style="width: 120px; white-space: nowrap;">Data de Criação</th>
               </tr>
             </thead>
@@ -654,9 +680,20 @@
           </div>
         </div>
 
-        <div class="search-box" style="width:100%; margin-bottom:24px;">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-backlog" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderBacklogView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+        <div class="flex flex-col md:flex-row gap-3 items-center mb-6">
+          <div class="search-box flex-1 w-full" style="margin-bottom: 0;">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-backlog" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderBacklogView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+          </div>
+          <div class="w-full md:w-64">
+            <select id="filter-team-backlog" class="team-filter-select" onchange="app.renderBacklogView()">
+              <option value="">🏢 Todos os Times</option>
+              <option value="Atendimento">Atendimento</option>
+              <option value="Conciliação">Conciliação</option>
+              <option value="Suporte Operacional">Suporte Operacional</option>
+              <option value="__vazio__">⚠️ Sem Time Definido</option>
+            </select>
+          </div>
         </div>
 
         <div class="table-responsive">
@@ -666,8 +703,9 @@
                 <th style="width: 65px; white-space: nowrap;">Ordem</th>
                 <th style="width: 110px; white-space: nowrap;">GAU / Chave</th>
                 <th style="min-width: 180px;">Título da Demanda</th>
-                <th style="width: 160px; white-space: nowrap;">Solicitante</th>
-                <th style="width: 160px; white-space: nowrap;">Status</th>
+                <th style="width: 150px; white-space: nowrap;">Solicitante</th>
+                <th style="width: 160px; white-space: nowrap;">Time Solicitante</th>
+                <th style="width: 150px; white-space: nowrap;">Status</th>
                 <th style="width: 120px; white-space: nowrap;">Data de Criação</th>
               </tr>
             </thead>
@@ -711,9 +749,20 @@
           </div>
         </div>
 
-        <div class="search-box" style="width:100%; margin-bottom:24px;">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-concluidos" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderCompletedView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+        <div class="flex flex-col md:flex-row gap-3 items-center mb-6">
+          <div class="search-box flex-1 w-full" style="margin-bottom: 0;">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-concluidos" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderCompletedView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+          </div>
+          <div class="w-full md:w-64">
+            <select id="filter-team-concluidos" class="team-filter-select" onchange="app.renderCompletedView()">
+              <option value="">🏢 Todos os Times</option>
+              <option value="Atendimento">Atendimento</option>
+              <option value="Conciliação">Conciliação</option>
+              <option value="Suporte Operacional">Suporte Operacional</option>
+              <option value="__vazio__">⚠️ Sem Time Definido</option>
+            </select>
+          </div>
         </div>
 
         <div class="table-responsive">
@@ -722,7 +771,8 @@
               <tr>
                 <th style="width: 110px; white-space: nowrap;">GAU</th>
                 <th style="min-width: 180px;">Demanda</th>
-                <th style="width: 160px; white-space: nowrap;">Responsável</th>
+                <th style="width: 150px; white-space: nowrap;">Responsável</th>
+                <th style="width: 150px; white-space: nowrap;">Time Solicitante</th>
                 <th style="width: 120px; white-space: nowrap;">Data de criação</th>
                 <th style="width: 120px; white-space: nowrap;">Data de conclusão</th>
                 <th style="min-width: 180px;">Ganhos</th>
@@ -1065,6 +1115,10 @@
         <div>
           <span style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 2px;">Solicitante:</span>
           <span style="font-weight: 700; color: var(--text-primary, #fff);" id="detail-requester">--</span>
+        </div>
+        <div>
+          <span style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 2px;">Time Solicitante:</span>
+          <span style="font-weight: 700; color: #38bdf8;" id="detail-team-solicitante">--</span>
         </div>
         <div>
           <span style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 2px;">Data de Criação:</span>
@@ -1482,10 +1536,10 @@
 </div>
 
 <!-- JIRA ENGINE MODULE & CORE APP LOGIC -->
-<script src="jira-sync.js?v=20260812_v6.76.0-hml"></script>
-<script src="app.js?v=20260812_v6.76.0-hml"></script>
+<script src="jira-sync.js?v=20260812_v6.77.0-hml"></script>
+<script src="app.js?v=20260812_v6.77.0-hml"></script>
 <!-- MÓDULO AUTÔNOMO ISOLADO DA SQUAD RPA -->
-<script src="rpa-pendencies.js?v=20260812_v6.76.0-hml"></script>
+<script src="rpa-pendencies.js?v=20260812_v6.77.0-hml"></script>
 
 </body>
 </html>

@@ -957,6 +957,91 @@ body.light-theme .modal-demand-content *::-webkit-scrollbar-thumb:hover {
   background: rgba(15, 23, 42, 0.95) !important;
 }
 
+/* Estilização do Select Inline de Time Solicitante */
+.team-solicitante-select {
+  padding: 6px 28px 6px 10px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  background: rgba(14, 116, 144, 0.15) !important;
+  color: #38bdf8 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%2338bdf8' d='M0 0l5 6 5-6z'/></svg>") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 8px 5px !important;
+}
+
+.team-solicitante-select:hover {
+  border-color: rgba(56, 189, 248, 0.7) !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25) !important;
+}
+
+.team-solicitante-select option {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+}
+
+/* Filtro Dropdown de Time Solicitante nos Menus */
+.team-filter-select {
+  width: 100% !important;
+  padding: 10px 32px 10px 14px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  background: rgba(15, 23, 42, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #f8fafc !important;
+  border-radius: 10px !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%2394a3b8' d='M0 0l5 6 5-6z'/></svg>") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 8px 5px !important;
+}
+
+.team-filter-select:hover {
+  border-color: rgba(56, 189, 248, 0.5) !important;
+}
+
+.team-filter-select option {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+/* Light Theme Overrides para Time Solicitante */
+body.light-theme .team-solicitante-select {
+  background-color: #f0f9ff !important;
+  border-color: #7dd3fc !important;
+  color: #0369a1 !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%230369a1' d='M0 0l5 6 5-6z'/></svg>") !important;
+}
+
+body.light-theme .team-solicitante-select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+body.light-theme .team-filter-select {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='%23475569' d='M0 0l5 6 5-6z'/></svg>") !important;
+}
+
+body.light-theme .team-filter-select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   .sidebar {
