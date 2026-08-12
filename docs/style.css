@@ -643,24 +643,74 @@ body {
   color: #f87171 !important;
 }
 
-/* Scrollbar customizada para os modais */
+/* Scrollbar customizada Pílula para os modais e para o campo Descrição Completa do Chamado */
 .modal-content::-webkit-scrollbar,
-.modal-demand-content::-webkit-scrollbar {
-  width: 6px;
+.modal-demand-content::-webkit-scrollbar,
+#detail-description::-webkit-scrollbar,
+.detail-card div::-webkit-scrollbar,
+.modal-content *::-webkit-scrollbar,
+.modal-demand-content *::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
 }
+
 .modal-content::-webkit-scrollbar-track,
-.modal-demand-content::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.4);
-  border-radius: 8px;
+.modal-demand-content::-webkit-scrollbar-track,
+#detail-description::-webkit-scrollbar-track,
+.detail-card div::-webkit-scrollbar-track,
+.modal-content *::-webkit-scrollbar-track,
+.modal-demand-content *::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4) !important;
+  border-radius: 9999px !important;
 }
+
 .modal-content::-webkit-scrollbar-thumb,
-.modal-demand-content::-webkit-scrollbar-thumb {
-  background: rgba(0, 230, 153, 0.3);
-  border-radius: 8px;
+.modal-demand-content::-webkit-scrollbar-thumb,
+#detail-description::-webkit-scrollbar-thumb,
+.detail-card div::-webkit-scrollbar-thumb,
+.modal-content *::-webkit-scrollbar-thumb,
+.modal-demand-content *::-webkit-scrollbar-thumb {
+  background: rgba(0, 230, 153, 0.35) !important;
+  border-radius: 9999px !important;
 }
+
 .modal-content::-webkit-scrollbar-thumb:hover,
-.modal-demand-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 230, 153, 0.6);
+.modal-demand-content::-webkit-scrollbar-thumb:hover,
+#detail-description::-webkit-scrollbar-thumb:hover,
+.detail-card div::-webkit-scrollbar-thumb:hover,
+.modal-content *::-webkit-scrollbar-thumb:hover,
+.modal-demand-content *::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 230, 153, 0.75) !important;
+}
+
+/* Scrollbar Pílula no Light Mode para Modais e Descrição Completa */
+body.light-theme .modal-content::-webkit-scrollbar-track,
+body.light-theme .modal-demand-content::-webkit-scrollbar-track,
+body.light-theme #detail-description::-webkit-scrollbar-track,
+body.light-theme .detail-card div::-webkit-scrollbar-track,
+body.light-theme .modal-content *::-webkit-scrollbar-track,
+body.light-theme .modal-demand-content *::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 9999px !important;
+}
+
+body.light-theme .modal-content::-webkit-scrollbar-thumb,
+body.light-theme .modal-demand-content::-webkit-scrollbar-thumb,
+body.light-theme #detail-description::-webkit-scrollbar-thumb,
+body.light-theme .detail-card div::-webkit-scrollbar-thumb,
+body.light-theme .modal-content *::-webkit-scrollbar-thumb,
+body.light-theme .modal-demand-content *::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border-radius: 9999px !important;
+}
+
+body.light-theme .modal-content::-webkit-scrollbar-thumb:hover,
+body.light-theme .modal-demand-content::-webkit-scrollbar-thumb:hover,
+body.light-theme #detail-description::-webkit-scrollbar-thumb:hover,
+body.light-theme .detail-card div::-webkit-scrollbar-thumb:hover,
+body.light-theme .modal-content *::-webkit-scrollbar-thumb:hover,
+body.light-theme .modal-demand-content *::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
 }
 
 /* Painel de Banner da Mesa de Triagem - Padding e Espaçamento Amplo (Sem Colisão com as Bordas) */
