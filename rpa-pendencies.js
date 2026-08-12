@@ -460,7 +460,10 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         this.pendencies = this.filterDeleted(this.pendencies);
         localStorage.setItem('cs_rpa_pendencies_v2', JSON.stringify(this.pendencies));
         if (window.app?.state) {
-          window.app.state.rpaPendencies = this.pendencies;
+          window.app.state.rpaPendencies = [...this.pendencies];
+          if (typeof window.app.saveStateToSupabase === 'function') {
+            window.app.saveStateToSupabase();
+          }
         }
       } catch (_) {}
     },
@@ -554,7 +557,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       if (!this._pollingInterval) {
         this._pollingInterval = setInterval(() => {
           this.fetchPendencies();
-        }, 10000);
+        }, 5000);
       }
     },
 
