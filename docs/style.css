@@ -1789,6 +1789,7 @@ body.light-theme .bg-slate-900\/80 {
 
 @media print {
   /* 1. OCULTAR ELEMENTOS INTERATIVOS E DE NAVEGAÇÃO */
+  #hml-banner-fixed,
   .no-print,
   .sidebar,
   .top-header,
@@ -1817,12 +1818,24 @@ body.light-theme .bg-slate-900\/80 {
     visibility: hidden !important;
   }
 
-  /* 2. LAYOUT: Container principal ocupa 100% sem margem da sidebar */
+  /* 2. LAYOUT: Container principal ocupa 100% sem margens veda impressões */
   body,
-  html {
+  html,
+  .app-container,
+  .main-wrapper,
+  .view-container,
+  .content-area,
+  .tab-content {
     margin: 0 !important;
+    margin-top: 0 !important;
     padding: 0 !important;
+    padding-top: 0 !important;
     width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
     background: #ffffff !important;
     color: #0f172a !important;
     font-size: 11pt !important;
@@ -1832,22 +1845,28 @@ body.light-theme .bg-slate-900\/80 {
 
   .main-wrapper {
     margin-left: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    background: #ffffff !important;
   }
 
-  /* 3. PRESERVAR CORES DOS CARDS E TABELAS */
-  .glass-card,
+  /* 3. PRESERVAR CORES DOS CARDS E TABELAS SEM FORÇAR QUEBRAS DE PÁGINA */
   .glass-panel,
   .triage-banner-panel,
-  .triage-table-panel,
-  .metric-card,
-  .detail-card,
-  .mini-metric-card {
+  .triage-table-panel {
     box-shadow: none !important;
     border: 1px solid #d1d5db !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .glass-card,
+  .metric-card,
+  .detail-card,
+  .mini-metric-card,
+  .custom-table tr {
+    box-shadow: none !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
     -webkit-print-color-adjust: exact !important;
