@@ -1359,6 +1359,26 @@ body.light-theme .nav-item.active {
   font-weight: 800 !important;
 }
 
+/* Preservação das Cores Únicas de cada Ícone do Menu Lateral no Light Mode */
+body.light-theme #nav-triagem i {
+  color: #0891b2 !important;
+}
+body.light-theme #nav-squad-dados i {
+  color: #059669 !important;
+}
+body.light-theme #nav-squad-operacoes i {
+  color: #ea580c !important;
+}
+body.light-theme #nav-squad-rpa i {
+  color: #db2777 !important;
+}
+body.light-theme #nav-dashboard i {
+  color: #0284c7 !important;
+}
+body.light-theme #nav-gestao-acessos i {
+  color: #7c3aed !important;
+}
+
 body.light-theme .nav-section-title {
   color: #94a3b8 !important;
 }
@@ -1508,8 +1528,8 @@ body.light-theme .text-slate-500 {
   color: #64748b !important;
 }
 
-/* Ajuste Dinâmico de Ícones Nativos e FontAwesome */
-body.light-theme i:not([class*="text-emerald"]):not([class*="text-amber"]):not([class*="text-rose"]):not([class*="text-cyan"]):not([class*="text-indigo"]):not([class*="text-red"]):not([class*="text-green"]) {
+/* Ajuste Dinâmico de Ícones Nativos e FontAwesome (Permitindo Ícones Coloridos) */
+body.light-theme i:not([class*="text-emerald"]):not([class*="text-amber"]):not([class*="text-orange"]):not([class*="text-rose"]):not([class*="text-pink"]):not([class*="text-purple"]):not([class*="text-sky"]):not([class*="text-cyan"]):not([class*="text-indigo"]):not([class*="text-red"]):not([class*="text-green"]):not([class*="text-violet"]) {
   color: #475569;
 }
 
