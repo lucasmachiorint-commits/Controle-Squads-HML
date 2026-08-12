@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Controle de Squads - Enterprise Board [HML] v6.66.0-hml</title>
+    <title>Controle de Squads - Enterprise Board [HML] v6.67.0-hml</title>
     
     <script>
       (function() {
@@ -20,11 +20,11 @@
             for (let name of names) { caches.delete(name); }
           });
         }
-        const TARGET_RELEASE = 'v6.66.0-hml';
+        const TARGET_RELEASE = 'v6.67.0-hml';
         const currentLock = localStorage.getItem('cs_deployed_release_lock_hml');
-        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.66.0-hml')) {
+        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.67.0-hml')) {
           localStorage.setItem('cs_deployed_release_lock_hml', TARGET_RELEASE);
-          window.location.href = window.location.pathname + '?v=6.66.0-hml&t=' + Date.now();
+          window.location.href = window.location.pathname + '?v=6.67.0-hml&t=' + Date.now();
         }
       })();
     </script>
@@ -56,7 +56,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     
     <!-- Custom Theme Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=20260812_v6.66.0-hml">
+    <link rel="stylesheet" href="style.css?v=20260812_v6.67.0-hml">
 </head>
 <body>
 
@@ -1422,7 +1422,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
           <div>
             <label class="block text-[11px] font-semibold text-slate-400 mb-1">Data da Atualização</label>
-            <input type="date" id="rpa-update-date" class="form-control text-xs py-1.5" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
+            <input type="text" id="rpa-update-date" placeholder="DD/MM/AAAA" maxlength="10" class="form-control text-xs py-1.5 text-center font-bold" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;" />
           </div>
           <div class="sm:col-span-2">
             <label class="block text-[11px] font-semibold text-slate-400 mb-1">Resumo / Evolução Semanal</label>
@@ -1479,10 +1479,10 @@
 </div>
 
 <!-- JIRA ENGINE MODULE & CORE APP LOGIC -->
-<script src="jira-sync.js?v=20260812_v6.66.0-hml"></script>
-<script src="app.js?v=20260812_v6.66.0-hml"></script>
+<script src="jira-sync.js?v=20260812_v6.67.0-hml"></script>
+<script src="app.js?v=20260812_v6.67.0-hml"></script>
 <!-- MÓDULO AUTÔNOMO ISOLADO DA SQUAD RPA -->
-<script src="rpa-pendencies.js?v=20260812_v6.66.0-hml"></script>
+<script src="rpa-pendencies.js?v=20260812_v6.67.0-hml"></script>
 
 </body>
 </html>

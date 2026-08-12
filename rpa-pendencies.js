@@ -740,7 +740,8 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
 
     // 4.5 Lógica da Linha do Tempo de Atualizações
     addTimelineUpdate() {
-      const dateVal = document.getElementById('rpa-update-date')?.value;
+      const dateInput = document.getElementById('rpa-update-date');
+      const dateVal = (dateInput?.value || '').trim();
       const textInput = document.getElementById('rpa-update-text');
       const textVal = (textInput?.value || '').trim();
 
@@ -750,17 +751,28 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       }
 
       let formattedDate = '--/--/----';
-      if (dateVal) {
+      let isoDate = new Date().toISOString();
+
+      if (dateVal && dateVal.includes('/')) {
+        const parts = dateVal.split('/');
+        if (parts.length === 3) {
+          formattedDate = `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
+          isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}T12:00:00.000Z`;
+        }
+      } else if (dateVal && dateVal.includes('-')) {
         const parts = dateVal.split('-');
-        if (parts.length === 3) formattedDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        if (parts.length === 3) {
+          formattedDate = `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+          isoDate = `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}T12:00:00.000Z`;
+        }
       } else {
-        formattedDate = new Date().toLocaleDateString('pt-BR');
+        const now = new Date();
+        formattedDate = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
       }
 
-      const nowIso = new Date().toISOString();
       this.selectedTimelineUpdates.unshift({
         id: 'upd-' + Date.now(),
-        date: dateVal || nowIso,
+        date: isoDate,
         displayDate: formattedDate,
         author: window.app?.userName || 'Usuário',
         text: textVal
@@ -1153,16 +1165,43 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       const sevEl = document.getElementById('rpa-edit-severity');
       const statusEl = document.getElementById('rpa-edit-status');
 
-      const todayIso = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, '0');
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      const todayBr = `${dd}/${mm}/${yyyy}`;
+
       const dateInput = document.getElementById('rpa-update-date');
       const textInput = document.getElementById('rpa-update-text');
 
-      if (dateInput) dateInput.value = todayIso;
+      if (dateInput) {
+        dateInput.value = todayBr;
+        dateInput.oninput = (e) => {
+          let v = e.target.value.replace(/\D/g, '');
+          if (v.length > 8) v = v.substring(0, 8);
+          if (v.length >= 5) {
+            e.target.value = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4, 8)}`;
+          } else if (v.length >= 3) {
+            e.target.value = `${v.substring(0, 2)}/${v.substring(2, 4)}`;
+          } else {
+            e.target.value = v;
+          }
+        };
+      }
       if (textInput) textInput.value = '';
 
       const formatDate = (iso) => {
         if (!iso) return '--/--/----';
-        try { return new Date(iso).toLocaleDateString('pt-BR'); } catch (_) { return iso; }
+        try {
+          const d = new Date(iso);
+          if (isNaN(d.getTime())) return iso;
+          const day = String(d.getUTCDate()).padStart(2, '0');
+          const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+          const year = d.getUTCFullYear();
+          return `${day}/${month}/${year}`;
+        } catch (_) {
+          return iso;
+        }
       };
 
       if (id) {
