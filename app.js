@@ -1886,13 +1886,13 @@ const app = {
 
     tbody.innerHTML = filteredDisplayItems.map((item, idx) => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
-        <td class="font-bold text-slate-400" style="white-space:nowrap; width:45px;">${idx + 1}</td>
-        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:110px;">${item.jiraKey}</td>
+        <td class="font-bold text-slate-400" style="white-space:nowrap; width:40px;">${idx + 1}</td>
+        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${item.jiraKey}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:150px;">${item.requesterName || 'Solicitante Jira'}</td>
-        <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:150px;">${item.teamSolicitante || '—'}</td>
-        <td style="white-space:nowrap; width:140px;"><span class="badge badge-medium" style="white-space:nowrap;">${item.status || 'Aguardando Triagem'}</span></td>
-        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:120px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
+        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requesterName || 'Solicitante Jira'}</td>
+        <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:135px;">${item.teamSolicitante || '—'}</td>
+        <td style="white-space:nowrap; width:125px;"><span class="badge badge-medium" style="white-space:nowrap;">${item.status || 'Aguardando Triagem'}</span></td>
+        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
       </tr>
     `).join('');
   },
@@ -2948,11 +2948,11 @@ const app = {
 
     tbody.innerHTML = filteredItems.map((item, idx) => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
-        <td class="font-bold text-slate-400" style="white-space:nowrap; width:45px;">${idx + 1}</td>
-        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:110px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
+        <td class="font-bold text-slate-400" style="white-space:nowrap; width:40px;">${idx + 1}</td>
+        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:150px;">${item.requester || 'Solicitante Jira'}</td>
-        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:160px;">
+        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requester || 'Solicitante Jira'}</td>
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:135px;">
           <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)">
             <option value="">— Selecione —</option>
             <option value="Atendimento" ${item.teamSolicitante === 'Atendimento' ? 'selected' : ''}>Atendimento</option>
@@ -2960,7 +2960,7 @@ const app = {
             <option value="Suporte Operacional" ${item.teamSolicitante === 'Suporte Operacional' ? 'selected' : ''}>Suporte Operacional</option>
           </select>
         </td>
-        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:150px;">
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:130px;">
           <select class="status-select-dropdown status-em-andamento ${item.status === 'Bloqueado' ? 'status-bloqueado' : ''}" onchange="app.changeDemandStatus('${item.id}', this.value)">
             <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
             <option value="Bloqueado" ${item.status === 'Bloqueado' ? 'selected' : ''}>Bloqueado</option>
@@ -2968,7 +2968,7 @@ const app = {
             <option value="Concluído" ${item.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
           </select>
         </td>
-        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:120px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
+        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
       </tr>
     `).join('');
   },
@@ -3026,7 +3026,7 @@ const app = {
 
     tbody.innerHTML = filteredItems.map((item) => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
-        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:65px;">
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:55px;">
           <input type="number" min="1" max="${backlogItems.length}" value="${item.treatmentOrder}"
             class="order-input-field"
             onchange="app.changeBacklogOrder('${item.id}', this.value)"
@@ -3037,10 +3037,10 @@ const app = {
             autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other"
           />
         </td>
-        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:110px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
+        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:150px;">${item.requester || 'Solicitante Jira'}</td>
-        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:160px;">
+        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requester || 'Solicitante Jira'}</td>
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:135px;">
           <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)">
             <option value="">— Selecione —</option>
             <option value="Atendimento" ${item.teamSolicitante === 'Atendimento' ? 'selected' : ''}>Atendimento</option>
@@ -3048,14 +3048,14 @@ const app = {
             <option value="Suporte Operacional" ${item.teamSolicitante === 'Suporte Operacional' ? 'selected' : ''}>Suporte Operacional</option>
           </select>
         </td>
-        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:150px;">
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:130px;">
           <select class="status-select-dropdown status-backlog ${item.status === 'Bloqueado' ? 'status-bloqueado' : ''}" onchange="app.changeDemandStatus('${item.id}', this.value)">
             <option value="Backlog" ${item.status === 'Backlog' ? 'selected' : ''}>Backlog</option>
             <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
             <option value="Bloqueado" ${item.status === 'Bloqueado' ? 'selected' : ''}>Bloqueado</option>
           </select>
         </td>
-        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:120px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
+        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
       </tr>
     `).join('');
   },
@@ -3211,12 +3211,12 @@ const app = {
 
     tbody.innerHTML = filteredItems.map(item => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
-        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:110px;">${this.getItemGau(item)}</td>
+        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${this.getItemGau(item)}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title || item.taskTitle}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:150px;">${item.requester || item.completedBy || item.requesterName || 'Solicitante Jira'}</td>
-        <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:150px;">${item.teamSolicitante || '—'}</td>
-        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:120px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
-        <td class="text-slate-300 font-semibold text-xs" style="white-space:nowrap; width:120px;">${this.formatOnlyDate(item.completionDate || item.completedAt)}</td>
+        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requester || item.completedBy || item.requesterName || 'Solicitante Jira'}</td>
+        <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:135px;">${item.teamSolicitante || '—'}</td>
+        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
+        <td class="text-slate-300 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.completionDate || item.completedAt)}</td>
         <td class="text-emerald-400 text-xs italic" style="white-space:normal; word-break:break-word;">${item.gains || ''}</td>
       </tr>
     `).join('');

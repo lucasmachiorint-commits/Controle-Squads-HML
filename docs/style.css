@@ -462,23 +462,24 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.8px;
   font-size: 11px;
-  padding: 14px 16px;
+  padding: 10px 10px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .custom-table td {
-  padding: 14px 16px;
+  padding: 10px 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   color: var(--text-primary);
   vertical-align: middle;
 }
 
-/* Estilo para dropdown de Status em tabelas sem corte de texto */
+/* Estilo para dropdown de Status compacto em tabelas */
 .status-select-dropdown {
-  min-width: 160px !important;
-  width: auto !important;
+  min-width: 125px !important;
+  width: 130px !important;
+  max-width: 135px !important;
   display: inline-block !important;
-  padding: 6px 28px 6px 10px !important;
+  padding: 5px 20px 5px 8px !important;
   font-size: 11px !important;
   font-weight: 700 !important;
   border-radius: 8px !important;
@@ -957,9 +958,12 @@ body.light-theme .modal-demand-content *::-webkit-scrollbar-thumb:hover {
   background: rgba(15, 23, 42, 0.95) !important;
 }
 
-/* Estilização do Select Inline de Time Solicitante */
+/* Estilização do Select Inline de Time Solicitante (Compacto) */
 .team-solicitante-select {
-  padding: 6px 28px 6px 10px !important;
+  min-width: 130px !important;
+  width: 135px !important;
+  max-width: 140px !important;
+  padding: 5px 20px 5px 8px !important;
   font-size: 11px !important;
   font-weight: 700 !important;
   border-radius: 9999px !important;
