@@ -739,6 +739,28 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
     },
 
     // 4.5 Lógica da Linha do Tempo de Atualizações
+    openRpaDatePicker() {
+      const hiddenPicker = document.getElementById('rpa-date-picker-hidden');
+      const textInput = document.getElementById('rpa-update-date');
+      if (hiddenPicker) {
+        if (textInput && textInput.value && textInput.value.includes('/')) {
+          const parts = textInput.value.split('/');
+          if (parts.length === 3) {
+            hiddenPicker.value = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+          }
+        }
+        try {
+          if (typeof hiddenPicker.showPicker === 'function') {
+            hiddenPicker.showPicker();
+          } else {
+            hiddenPicker.click();
+          }
+        } catch (_) {
+          try { hiddenPicker.click(); } catch (_) {}
+        }
+      }
+    },
+
     addTimelineUpdate() {
       const dateInput = document.getElementById('rpa-update-date');
       const dateVal = (dateInput?.value || '').trim();
@@ -1173,6 +1195,21 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
 
       const dateInput = document.getElementById('rpa-update-date');
       const textInput = document.getElementById('rpa-update-text');
+      const hiddenPicker = document.getElementById('rpa-date-picker-hidden');
+
+      if (hiddenPicker) {
+        hiddenPicker.onchange = (e) => {
+          const val = e.target.value;
+          if (val && val.includes('-')) {
+            const parts = val.split('-');
+            if (parts.length === 3) {
+              if (dateInput) {
+                dateInput.value = `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+              }
+            }
+          }
+        };
+      }
 
       if (dateInput) {
         dateInput.value = todayBr;

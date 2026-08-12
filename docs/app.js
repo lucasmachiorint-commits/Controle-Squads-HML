@@ -3329,6 +3329,12 @@ const app = {
     } else {
       window.print();
     }
+  },
+
+  openRpaDatePicker() {
+    if (window.RpaPendenciesModule && window.RpaPendenciesModule.openRpaDatePicker) {
+      window.RpaPendenciesModule.openRpaDatePicker();
+    }
   }
 };
 
