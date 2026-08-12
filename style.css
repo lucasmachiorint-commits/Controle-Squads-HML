@@ -2141,17 +2141,17 @@ body[data-squad="rpa"] .rpa-only-tab-btn,
     print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
-  body {
+  body.printing-rpa-report {
     background: #0f172a !important;
   }
-  body * {
+  body.printing-rpa-report * {
     visibility: hidden !important;
   }
-  #rpa-print-report-container,
-  #rpa-print-report-container * {
+  body.printing-rpa-report #rpa-print-report-container,
+  body.printing-rpa-report #rpa-print-report-container * {
     visibility: visible !important;
   }
-  #rpa-print-report-container {
+  body.printing-rpa-report #rpa-print-report-container {
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;

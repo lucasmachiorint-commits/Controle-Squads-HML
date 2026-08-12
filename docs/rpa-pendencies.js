@@ -1599,8 +1599,10 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         </div>
       `;
 
+      document.body.classList.add('printing-rpa-report');
       window.print();
       setTimeout(() => {
+        document.body.classList.remove('printing-rpa-report');
         if (printContainer) printContainer.innerHTML = '';
       }, 500);
     },
