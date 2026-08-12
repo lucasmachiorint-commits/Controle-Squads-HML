@@ -1779,6 +1779,47 @@ body.light-theme .bg-slate-900\/80 {
   color: #0f172a !important;
 }
 
+/* Fix para Botões de Abas (Sub-Nav) no Light Mode */
+body.light-theme .tab-btn-board,
+body.light-theme .tab-btn-backlog,
+body.light-theme .tab-btn-concluidos,
+body.light-theme .rpa-only-tab-btn {
+  color: #475569 !important;
+  background-color: transparent !important;
+}
+
+body.light-theme .tab-btn-board:hover,
+body.light-theme .tab-btn-backlog:hover,
+body.light-theme .tab-btn-concluidos:hover,
+body.light-theme .rpa-only-tab-btn:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.light-theme .tab-btn-board.bg-emerald-500\/20,
+body.light-theme .tab-btn-backlog.bg-emerald-500\/20,
+body.light-theme .tab-btn-concluidos.bg-emerald-500\/20,
+body.light-theme .rpa-only-tab-btn.bg-emerald-500\/20 {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+  border-color: #a7f3d0 !important;
+}
+
+/* Fix para Campo da Coluna Ordem no Backlog no Light Mode */
+body.light-theme .order-input-field {
+  background-color: #ffffff !important;
+  color: #d97706 !important;
+  border-color: #fcd34d !important;
+}
+
+body.light-theme .order-input-field:hover,
+body.light-theme .order-input-field:focus {
+  background-color: #fffbeb !important;
+  color: #b45309 !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3) !important;
+}
+
 /* ============================================================
    @MEDIA PRINT — Impressão Direta (window.print)
    ============================================================ */
