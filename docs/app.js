@@ -131,32 +131,25 @@ const app = {
   // INICIALIZAÇÃO
   // ============================================================
   async init() {
-    console.log('[APP INIT v9.0.0] Iniciando Controle de Squads...');
+    console.log('[APP INIT v10.0.0] Iniciando Controle de Squads [HML]...');
     this.ensureStateSanity();
     this.loadTheme();
+    this.setupInactivityMonitor();
     
-    const hasSession = await this.checkSession();
-    if (!hasSession) {
-      console.log('[APP INIT] Nenhuma sessão ativa aprovada. Acesso bloqueado - Exibindo autenticação.');
-      this.authUserId = null;
-      this.userEmail = '';
-      this.userName = 'Visitante';
-      this.userRole = 'consulta';
-      this.userStatus = null;
-      this.showAuthOverlay();
-      return;
-    }
+    // Preencher e-mail salvo anteriormente (se existir) para conveniência do usuário
+    try {
+      const rememberedEmail = localStorage.getItem('cs_remembered_email');
+      const emailEl = document.getElementById('auth-email');
+      if (rememberedEmail && emailEl && !emailEl.value) {
+        emailEl.value = rememberedEmail;
+      }
+    } catch (_) {}
 
-    this.loadLocalState();
-    await this.loadStateFromSupabase();
-    this.ensureStateSanity();
-    this.loadUsersState();
-    this.seedDefaultDataIfEmpty();
-    this.setupRealtimeSync();
-    this.restoreLastSyncTime();
-    this.setupKeyboardShortcuts();
-    this.render();
-    console.log('[APP INIT v9.0.0] Aplicação inicializada e renderizada com sucesso! ✅');
+    // FORÇAR TELA DE LOGIN A CADA NOVO ACESSO / FECHAMENTO DA PÁGINA / LIMPEZA DE CACHE
+    console.log('[APP INIT] Forçando confirmação de login no novo acesso.');
+    this.sessionAuthenticated = false;
+    this.authUserId = null;
+    this.showAuthOverlay();
   },
 
   loadTheme() {
@@ -400,6 +393,9 @@ const app = {
         if (user) {
           const isApproved = await this.setupUserSession(user);
           if (isApproved) {
+            this.sessionAuthenticated = true;
+            this.lastActivityTime = Date.now();
+            try { localStorage.setItem('cs_remembered_email', email); } catch (_) {}
             this.loadLocalState();
             await this.loadStateFromSupabase();
             this.loadUsersState();
@@ -559,6 +555,7 @@ const app = {
   },
 
   async handleLogout() {
+    this.sessionAuthenticated = false;
     if (this.realtimeChannel && supabaseClient) {
       try { supabaseClient.removeAllChannels(); } catch (_) {}
     }
@@ -568,6 +565,51 @@ const app = {
       try { await supabaseClient.auth.signOut(); } catch (e) { console.warn('Erro no logout:', e); }
     }
     this.showAuthOverlay();
+  },
+
+  async handleInactivityLogout() {
+    this.sessionAuthenticated = false;
+    if (this.realtimeChannel && supabaseClient) {
+      try { supabaseClient.removeAllChannels(); } catch (_) {}
+    }
+    this.realtimeChannel = null;
+    this.authUserId = null;
+    if (supabaseClient) {
+      try { await supabaseClient.auth.signOut(); } catch (_) {}
+    }
+    this.showAuthOverlay();
+    const errorEl = document.getElementById('auth-error-msg');
+    const infoEl = document.getElementById('auth-info-msg');
+    if (errorEl) {
+      errorEl.innerHTML = '<i class="fa-solid fa-clock me-1"></i> Sessão expirada por inatividade (mais de 30 minutos sem interação). Por favor, confirme seu e-mail e senha.';
+      errorEl.style.display = 'block';
+    }
+    if (infoEl) infoEl.style.display = 'none';
+  },
+
+  setupInactivityMonitor() {
+    this.lastActivityTime = Date.now();
+    const resetActivity = () => {
+      if (this.sessionAuthenticated) {
+        this.lastActivityTime = Date.now();
+      }
+    };
+
+    ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'click'].forEach(evt => {
+      window.addEventListener(evt, resetActivity, { passive: true });
+    });
+
+    if (!this.inactivityCheckInterval) {
+      this.inactivityCheckInterval = setInterval(() => {
+        if (this.sessionAuthenticated) {
+          const elapsed = Date.now() - this.lastActivityTime;
+          if (elapsed >= 30 * 60 * 1000) { // 30 minutos em milissegundos
+            console.warn('[INACTIVITY TIMEOUT] Sessão expirada após 30 minutos de inatividade.');
+            this.handleInactivityLogout();
+          }
+        }
+      }, 30000); // Checar a cada 30 segundos
+    }
   },
 
   showAuthOverlay() {
