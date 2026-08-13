@@ -171,6 +171,7 @@ app.get('/api/jira/consultar-cards-jira', async (req, res) => {
         squad: squadName,
         squadTarget: squadId,
         customfield_12475: cfSquad,
+        customfield_11010: fields.customfield_11010,
         requester: reporter,
         priority: fields.priority?.name || '2 - Alta',
         category: 'Geral',
