@@ -259,7 +259,8 @@ const app = {
               } catch (_) {}
             }
           } else {
-            this.userRole = rawRole.toLowerCase().includes('admin') ? 'admin' : 'consulta';
+            const roleLower = rawRole.toLowerCase();
+            this.userRole = roleLower.includes('admin') ? 'admin' : roleLower.includes('gerencial') ? 'gerencial' : 'consulta';
             this.userStatus = (rawStatus === 'ACTIVE' || rawStatus === 'ATIVO') ? 'ATIVO' : (rawStatus === 'BLOCKED' || rawStatus === 'BLOQUEADO') ? 'BLOQUEADO' : 'PENDENTE';
           }
           if (data.name || data.nome) this.userName = data.name || data.nome;
@@ -792,6 +793,10 @@ const app = {
         infoEl.textContent = `Admin: ${this.userName}`;
         infoEl.style.color = '#34d399';
         if (iconEl) iconEl.className = 'fa-solid fa-user-shield text-emerald-400';
+      } else if (this.userRole === 'gerencial') {
+        infoEl.textContent = `Gerencial: ${this.userName}`;
+        infoEl.style.color = '#c084fc';
+        if (iconEl) iconEl.className = 'fa-solid fa-user-tie text-purple-400';
       } else {
         infoEl.textContent = `Consulta: ${this.userName}`;
         infoEl.style.color = '#38bdf8';
@@ -813,6 +818,8 @@ const app = {
 
   applyRolePermissions() {
     const isAdmin = this.userRole === 'admin';
+    const isGerencial = this.userRole === 'gerencial';
+    const canEdit = isAdmin || isGerencial;
 
     // 1. Esconder/Exibir botões exclusivos do perfil Admin
     document.querySelectorAll('.admin-only').forEach(el => {
@@ -825,7 +832,7 @@ const app = {
       }
     });
 
-    // 2. Botões de Ação na aplicação
+    // 2. Botões de Ação na aplicação (somente Admin)
     const actionSelector = '.btn-add-demand, .btn-forward-squad, #btn-new-member, #btn-save-timeline, #btn-add-timeline-entry';
     document.querySelectorAll(actionSelector).forEach(btn => {
       if (isAdmin) {
@@ -839,7 +846,7 @@ const app = {
       }
     });
 
-    // 3. Campos editáveis no Modal de Detalhes (Read-Only para Consulta)
+    // 3. Campos editáveis no Modal de Detalhes (Read-Only para Consulta e Gerencial)
     const modalDetailFields = [
       'task-gau', 'task-title', 'task-requester',
       'followup-dev-role', 'followup-dev-name', 'followup-dev-target-date',
@@ -863,8 +870,8 @@ const app = {
       }
     });
 
-    // 5. Selects inline de status nas tabelas
-    document.querySelectorAll('.status-select-dropdown, .order-input-field').forEach(el => {
+    // 4. Selects inline de status nas tabelas (SOMENTE Admin)
+    document.querySelectorAll('.status-select-dropdown').forEach(el => {
       if (isAdmin) {
         el.removeAttribute('disabled');
         el.style.opacity = '1';
@@ -876,7 +883,20 @@ const app = {
       }
     });
 
-    // 6. Botões de ação do Jira e gerenciamento
+    // 5. Campos de ordem de backlog (Admin E Gerencial)
+    document.querySelectorAll('.order-input-field').forEach(el => {
+      if (canEdit) {
+        el.removeAttribute('disabled');
+        el.style.opacity = '1';
+        el.style.pointerEvents = 'auto';
+      } else {
+        el.setAttribute('disabled', 'true');
+        el.style.opacity = '0.6';
+        el.style.pointerEvents = 'none';
+      }
+    });
+
+    // 6. Botões de ação do Jira e gerenciamento (SOMENTE Admin)
     const jiraAdminBtns = ['#btn-sync-jira', '#btn-jira-config', '#btn-new-access', '.btn-triage-action'];
     document.querySelectorAll(jiraAdminBtns.join(', ')).forEach(btn => {
       if (isAdmin) {
@@ -889,6 +909,25 @@ const app = {
         btn.style.pointerEvents = 'none';
       }
     });
+
+    // 7. Botões de criar pendência RPA e demanda Automação (Admin E Gerencial)
+    document.querySelectorAll('.btn-new-rpa-pendency, .btn-new-automacao-demand').forEach(btn => {
+      if (canEdit) {
+        btn.removeAttribute('disabled');
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+      } else {
+        btn.setAttribute('disabled', 'true');
+        btn.style.opacity = '0.4';
+        btn.style.pointerEvents = 'none';
+      }
+    });
+
+    // 8. Ocultar menu "Gestão de Acessos" para Gerencial e Consulta
+    const navGestaoAcessos = document.getElementById('nav-gestao-acessos');
+    if (navGestaoAcessos) {
+      navGestaoAcessos.style.display = isAdmin ? '' : 'none';
+    }
   },
 
   setupKeyboardShortcuts() {
@@ -1413,6 +1452,7 @@ const app = {
                     ${isAdminCurrentUser ? '' : 'disabled="true"'}
                     style="background: rgba(15,23,42,0.9); color:#fff; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; min-width: 120px;">
               <option value="ADMIN" ${user.role === 'ADMIN' ? 'selected' : ''}>Admin</option>
+              <option value="GERENCIAL" ${user.role === 'GERENCIAL' ? 'selected' : ''}>Gerencial</option>
               <option value="CONSULTA" ${user.role === 'CONSULTA' ? 'selected' : ''}>Consulta</option>
             </select>
           </td>
@@ -1517,7 +1557,8 @@ const app = {
     }
 
     if (userId === this.authUserId) {
-      this.userRole = formattedRole.toLowerCase() === 'admin' ? 'admin' : 'consulta';
+      const rl = formattedRole.toLowerCase();
+      this.userRole = rl === 'admin' ? 'admin' : rl === 'gerencial' ? 'gerencial' : 'consulta';
       this.updateUserBadgeUI();
       this.applyRolePermissions();
     }

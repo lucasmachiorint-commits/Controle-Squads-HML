@@ -840,7 +840,7 @@
             </p>
           </div>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="app.openNewRpaPendencyModal()" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10 cursor-pointer">
+            <button type="button" onclick="app.openNewRpaPendencyModal()" class="btn-new-rpa-pendency bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10 cursor-pointer">
               <i class="fa-solid fa-plus"></i> Nova Pendência RPA
             </button>
             <button type="button" class="btn btn-secondary text-xs py-2 px-3.5" onclick="app.printRpaPDF()">
@@ -1301,6 +1301,7 @@
         <label class="form-label text-xs text-slate-300 font-bold">Perfil de Acesso</label>
         <select class="form-control text-xs py-2.5" id="user-modal-role" style="background: rgba(15,23,42,0.95); color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;">
           <option value="consulta">👁️ Consulta (Somente Leitura)</option>
+          <option value="gerencial">📋 Gerencial (Leitura + Ações Seletivas)</option>
           <option value="admin">👨‍💻 Admin (Acesso Total)</option>
         </select>
       </div>

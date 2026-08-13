@@ -262,7 +262,7 @@ var AutomacaoModule = window.AutomacaoModule = {
 
     if (this.activeTab === 'backlog') {
       html += '    <div>';
-      html += '      <button type="button" onclick="app.openAutomacaoModal()" class="bg-violet-500 hover:bg-violet-600 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-violet-500/20 cursor-pointer">';
+      html += '      <button type="button" onclick="app.openAutomacaoModal()" class="btn-new-automacao-demand bg-violet-500 hover:bg-violet-600 text-white font-bold px-4 py-2 rounded-lg text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-violet-500/20 cursor-pointer">';
       html += '        <i class="fa-solid fa-plus"></i> Adicionar Demanda';
       html += '      </button>';
       html += '    </div>';
@@ -355,15 +355,25 @@ var AutomacaoModule = window.AutomacaoModule = {
         html += '          </td>';
 
         // 9. AÇÕES
+        var isAdmin = window.app && window.app.userRole === 'admin';
+        var isGerencial = window.app && window.app.userRole === 'gerencial';
+        var currentUserEmail = (window.app && window.app.userEmail || '').toLowerCase();
+        var isOwner = item.createdBy && currentUserEmail && item.createdBy.toLowerCase() === currentUserEmail;
+        var canEditOrDelete = isAdmin || (isGerencial && isOwner);
+
         html += '          <td style="padding: 10px 8px; text-align: right;">';
-        html += '            <div class="flex items-center justify-end gap-1">';
-        html += '              <button onclick="app.openAutomacaoModal(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-1.5" title="Editar Demanda">';
-        html += '                <i class="fa-solid fa-pen text-slate-300"></i>';
-        html += '              </button>';
-        html += '              <button onclick="app.deleteAutomacaoDemand(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-1.5 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30" title="Excluir Demanda">';
-        html += '                <i class="fa-solid fa-trash-can"></i>';
-        html += '              </button>';
-        html += '            </div>';
+        if (canEditOrDelete) {
+          html += '            <div class="flex items-center justify-end gap-1">';
+          html += '              <button onclick="app.openAutomacaoModal(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-1.5" title="Editar Demanda">';
+          html += '                <i class="fa-solid fa-pen text-slate-300"></i>';
+          html += '              </button>';
+          html += '              <button onclick="app.deleteAutomacaoDemand(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-1.5 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30" title="Excluir Demanda">';
+          html += '                <i class="fa-solid fa-trash-can"></i>';
+          html += '              </button>';
+          html += '            </div>';
+        } else {
+          html += '            <span class="text-[10px] text-slate-500 font-mono">Somente Leitura</span>';
+        }
         html += '          </td>';
 
         html += '        </tr>';
@@ -497,6 +507,7 @@ var AutomacaoModule = window.AutomacaoModule = {
         criticality: criticality,
         status: 'backlog',
         treatmentOrder: nextOrder,
+        createdBy: window.app && window.app.userEmail ? window.app.userEmail : '',
         createdDate: createdFormatted,
         createdAt: nowIso,
         updatedAt: nowIso
@@ -511,6 +522,19 @@ var AutomacaoModule = window.AutomacaoModule = {
 
   deleteDemand: function(id) {
     if (!id) return;
+    var item = this.items.find(i => i.id === id);
+    if (!item) return;
+
+    var isAdmin = window.app && window.app.userRole === 'admin';
+    var isGerencial = window.app && window.app.userRole === 'gerencial';
+    var currentUserEmail = (window.app && window.app.userEmail || '').toLowerCase();
+    var isOwner = item.createdBy && currentUserEmail && item.createdBy.toLowerCase() === currentUserEmail;
+
+    if (!isAdmin && !(isGerencial && isOwner)) {
+      alert('Acesso negado: Você só pode excluir demandas criadas por você mesmo.');
+      return;
+    }
+
     if (confirm('Tem certeza que deseja excluir esta demanda de automação?')) {
       this.items = this.items.filter(i => i.id !== id);
       this.saveLocal();

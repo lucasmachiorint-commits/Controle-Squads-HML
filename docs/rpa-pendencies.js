@@ -1131,6 +1131,23 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
           latestUpdateText = item.description;
         }
 
+        const isAdmin = window.app?.userRole === 'admin';
+        const isGerencial = window.app?.userRole === 'gerencial';
+        const currentUserEmail = (window.app?.userEmail || '').toLowerCase();
+        const isOwner = item.createdBy && currentUserEmail && item.createdBy.toLowerCase() === currentUserEmail;
+        const canEditOrDelete = isAdmin || (isGerencial && isOwner);
+
+        const actionButtonsHtml = canEditOrDelete ? `
+          <div class="flex items-center justify-end gap-1.5">
+            <button onclick="app.openNewRpaPendencyModal('${item.id}')" class="btn btn-secondary text-[11px] py-1 px-2" title="Editar Pendência">
+              <i class="fa-solid fa-pen text-slate-300"></i>
+            </button>
+            <button onclick="app.deleteRpaPendency('${item.id}')" class="btn btn-secondary text-[11px] py-1 px-2 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30" title="Excluir Pendência">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        ` : `<span class="text-[10px] text-slate-500 font-mono">Somente Leitura</span>`;
+
         return `
           <tr class="hover:bg-white/5 transition-all">
             <td style="padding: 14px 16px;">
@@ -1165,14 +1182,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
             <td style="padding: 14px 16px;">${sevBadge}</td>
             <td style="padding: 14px 16px;">${statusBadge}</td>
             <td style="padding: 14px 16px; text-align: right;">
-              <div class="flex items-center justify-end gap-1.5">
-                <button onclick="app.openNewRpaPendencyModal('${item.id}')" class="btn btn-secondary text-[11px] py-1 px-2" title="Editar Pendência">
-                  <i class="fa-solid fa-pen text-slate-300"></i>
-                </button>
-                <button onclick="app.deleteRpaPendency('${item.id}')" class="btn btn-secondary text-[11px] py-1 px-2 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30" title="Excluir Pendência">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-              </div>
+              ${actionButtonsHtml}
             </td>
           </tr>
         `;
@@ -1361,6 +1371,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
           status,
           description: latestSummary,
           history_notes: [...this.selectedTimelineUpdates],
+          createdBy: window.app?.userEmail || '',
           created_at: nowIso,
           updated_at: nowIso
         };
@@ -1542,6 +1553,19 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
     },
 
     async deletePendency(id) {
+      const item = this.pendencies.find(i => i.id === id);
+      if (!item) return;
+
+      const isAdmin = window.app?.userRole === 'admin';
+      const isGerencial = window.app?.userRole === 'gerencial';
+      const currentUserEmail = (window.app?.userEmail || '').toLowerCase();
+      const isOwner = item.createdBy && currentUserEmail && item.createdBy.toLowerCase() === currentUserEmail;
+
+      if (!isAdmin && !(isGerencial && isOwner)) {
+        alert('Acesso negado: Você só pode excluir pendências criadas por você mesmo.');
+        return;
+      }
+
       if (!confirm('Tem certeza que deseja excluir esta pendência de robô?')) return;
 
       this.markDeleted(id);
