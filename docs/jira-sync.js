@@ -121,6 +121,7 @@ const JiraSyncEngine = {
     let countToCompleted = 0;
     let countUnchanged = 0;
     let countCancelled = 0;
+    const newBacklogItemsBySquad = { dados: [], operacoes: [], rpa: [] };
 
     cards.forEach((card, idx) => {
       const rawStatus = (card.status || card.fields?.status?.name || '').toString().trim();
@@ -310,7 +311,8 @@ const JiraSyncEngine = {
             requesterArea: requester
           });
         } else {
-          state.backlogItems[targetSquadId].unshift({
+          if (!newBacklogItemsBySquad[targetSquadId]) newBacklogItemsBySquad[targetSquadId] = [];
+          newBacklogItemsBySquad[targetSquadId].push({
             id: `backlog-${jiraKey}`,
             gau: jiraKey,
             jiraKey,
@@ -323,9 +325,9 @@ const JiraSyncEngine = {
             createdDate,
             priority: card.priority || '2 - Alta',
             category: card.category || 'Processos',
-            treatmentOrder: idx + 1,
             status: defaultStatus,
-            progress: 0
+            progress: 0,
+            rawCreated: rawCreated || card.created
           });
         }
       }
@@ -387,7 +389,8 @@ const JiraSyncEngine = {
             requesterArea: requester
           });
         } else {
-          state.backlogItems[targetSquadId].unshift({
+          if (!newBacklogItemsBySquad[targetSquadId]) newBacklogItemsBySquad[targetSquadId] = [];
+          newBacklogItemsBySquad[targetSquadId].push({
             id: `backlog-${jiraKey}`,
             gau: jiraKey,
             jiraKey,
@@ -400,9 +403,9 @@ const JiraSyncEngine = {
             createdDate,
             priority: card.priority || '2 - Alta',
             category: card.category || 'Processos',
-            treatmentOrder: idx + 1,
             status: defaultStatus,
-            progress: 0
+            progress: 0,
+            rawCreated: rawCreated || card.created
           });
         }
       }

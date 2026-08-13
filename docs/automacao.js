@@ -200,6 +200,51 @@ var AutomacaoModule = window.AutomacaoModule = {
     var filteredItems = this.items.filter(i => i.status === this.activeTab);
 
     if (this.activeTab === 'backlog') {
+      var parseCreationTimestamp = function(item) {
+        if (!item) return 0;
+        var raw = item.createdDate || item.createdAt || item.date || item.created;
+        if (!raw) return 0;
+        if (typeof raw === 'number') return raw;
+        var str = String(raw).trim();
+        if (str.includes('/')) {
+          var parts = str.split('/');
+          if (parts.length >= 3) {
+            var day = parseInt(parts[0], 10);
+            var month = parseInt(parts[1], 10) - 1;
+            var rest = parts[2].trim();
+            var year = parseInt(rest.split(' ')[0], 10);
+            if (year < 100) year += 2000;
+            var hour = 0, min = 0, sec = 0;
+            if (rest.includes(' ')) {
+              var timeParts = rest.split(' ')[1].split(':');
+              if (timeParts.length >= 1) hour = parseInt(timeParts[0], 10) || 0;
+              if (timeParts.length >= 2) min = parseInt(timeParts[1], 10) || 0;
+              if (timeParts.length >= 3) sec = parseInt(timeParts[2], 10) || 0;
+            }
+            return new Date(year, month, day, hour, min, sec).getTime();
+          }
+        }
+        var parsed = new Date(str).getTime();
+        return isNaN(parsed) ? 0 : parsed;
+      };
+
+      var unassigned = filteredItems.filter(function(i) { return !i.treatmentOrder || i.treatmentOrder <= 0; });
+      if (unassigned.length > 0) {
+        unassigned.sort(function(a, b) { return parseCreationTimestamp(a) - parseCreationTimestamp(b); });
+
+        var maxOrd = 0;
+        filteredItems.forEach(function(i) {
+          if (i.treatmentOrder && typeof i.treatmentOrder === 'number' && i.treatmentOrder > maxOrd) {
+            maxOrd = i.treatmentOrder;
+          }
+        });
+
+        unassigned.forEach(function(item) {
+          maxOrd++;
+          item.treatmentOrder = maxOrd;
+        });
+      }
+
       filteredItems.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
     } else {
       filteredItems.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0));

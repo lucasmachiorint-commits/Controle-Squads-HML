@@ -2396,7 +2396,14 @@ const app = {
       this.state.backlogItems[targetSquadId] = [];
     }
 
-    this.state.backlogItems[targetSquadId].unshift({
+    let maxOrder = 0;
+    (this.state.backlogItems[targetSquadId] || []).forEach(i => {
+      if (i.treatmentOrder && typeof i.treatmentOrder === 'number' && i.treatmentOrder > maxOrder) {
+        maxOrder = i.treatmentOrder;
+      }
+    });
+
+    this.state.backlogItems[targetSquadId].push({
       id: `backlog-${item.jiraKey}`,
       gau: item.jiraKey,
       jiraKey: item.jiraKey,
@@ -2406,7 +2413,7 @@ const app = {
       createdDate: item.createdDate || item.date,
       team: squadNames[targetSquadId],
       priority: item.priority || '2 - Alta',
-      treatmentOrder: 1,
+      treatmentOrder: maxOrder + 1,
       status: 'Backlog',
       progress: 0
     });
@@ -3098,16 +3105,55 @@ const app = {
     const allItems = this.state.backlogItems[this.activeSquad] || [];
     const backlogItems = allItems.filter(i => i.status !== 'Em Andamento' && i.status !== 'Concluído' && i.status !== 'Concluido');
 
-    // Garantir que cada item tenha uma ordem de tratativa única de 1 a N
-    const usedOrders = new Set();
-    backlogItems.forEach((item, idx) => {
-      if (!item.treatmentOrder || item.treatmentOrder <= 0 || usedOrders.has(item.treatmentOrder)) {
-        item.treatmentOrder = idx + 1;
+    // Função para extração de timestamp de criação para ordenação determinística
+    const parseCreationTimestamp = (item) => {
+      if (!item) return 0;
+      const raw = item.rawCreated || item.createdDate || item.createdAt || item.date || item.created;
+      if (!raw) return 0;
+      if (typeof raw === 'number') return raw;
+      const str = String(raw).trim();
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length >= 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          let rest = parts[2].trim();
+          let year = parseInt(rest.split(' ')[0], 10);
+          if (year < 100) year += 2000;
+          let hour = 0, min = 0, sec = 0;
+          if (rest.includes(' ')) {
+            const timeParts = rest.split(' ')[1].split(':');
+            if (timeParts.length >= 1) hour = parseInt(timeParts[0], 10) || 0;
+            if (timeParts.length >= 2) min = parseInt(timeParts[1], 10) || 0;
+            if (timeParts.length >= 3) sec = parseInt(timeParts[2], 10) || 0;
+          }
+          return new Date(year, month, day, hour, min, sec).getTime();
+        }
       }
-      usedOrders.add(item.treatmentOrder);
-    });
+      const parsed = new Date(str).getTime();
+      return isNaN(parsed) ? 0 : parsed;
+    };
 
-    // Ordenar por treatmentOrder
+    // Atribuir ordens aos itens que ainda não possuem treatmentOrder
+    // Os itens sem ordem são ordenados por Data de Criação ascendente (mais antigo = 1)
+    const unassignedItems = backlogItems.filter(i => !i.treatmentOrder || i.treatmentOrder <= 0);
+    if (unassignedItems.length > 0) {
+      unassignedItems.sort((a, b) => parseCreationTimestamp(a) - parseCreationTimestamp(b));
+
+      let maxOrder = 0;
+      backlogItems.forEach(i => {
+        if (i.treatmentOrder && typeof i.treatmentOrder === 'number' && i.treatmentOrder > maxOrder) {
+          maxOrder = i.treatmentOrder;
+        }
+      });
+
+      unassignedItems.forEach(item => {
+        maxOrder++;
+        item.treatmentOrder = maxOrder;
+      });
+    }
+
+    // Ordenar por treatmentOrder crescente (1, 2, 3...)
     backlogItems.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
 
     const searchTerm = (document.getElementById('search-backlog')?.value || '').toLowerCase();
