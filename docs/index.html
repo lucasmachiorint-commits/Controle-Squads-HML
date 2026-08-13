@@ -1584,7 +1584,11 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1.5">Data de Criação</label>
-          <input type="date" id="auto-edit-created-date" class="app-custom-input" />
+          <div class="relative flex items-center">
+            <input type="text" id="auto-edit-created-date" class="app-custom-input pr-10" placeholder="DD/MM/AAAA" maxlength="10" onkeyup="app.maskDateInput(this)" />
+            <input type="date" id="auto-edit-created-date-picker" class="absolute right-0 top-0 bottom-0 opacity-0 w-10 cursor-pointer z-10" onchange="app.syncAutomacaoPickerToDate(this.value)" />
+            <i class="fa-solid fa-calendar-days text-slate-400 absolute right-3 pointer-events-none text-sm"></i>
+          </div>
         </div>
 
         <div>

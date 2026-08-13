@@ -1,7 +1,7 @@
 /* ==========================================================================
    Controle de Squads - Módulo Isolado de Automação (automacao.js)
    Demandas Internas de Desenvolvimento & Automação
-   Design System Harmonizado Impeccable (v1.6.0)
+   Design System Harmonizado Impeccable (v1.7.0)
    ========================================================================== */
 
 var AutomacaoModule = window.AutomacaoModule = {
@@ -28,6 +28,28 @@ var AutomacaoModule = window.AutomacaoModule = {
     window.app.changeAutomacaoOrder = function(id, val) { self.changeOrder(id, val); };
     window.app.moveAutomacaoTo = function(id, status) { self.moveTo(id, status); };
     window.app.renderAutomacaoView = function() { self.renderView(); };
+    window.app.maskDateInput = function(el) { self.maskDateInput(el); };
+    window.app.syncAutomacaoPickerToDate = function(val) { self.syncPickerToDate(val); };
+  },
+
+  maskDateInput: function(el) {
+    if (!el) return;
+    var v = el.value.replace(/\D/g, '');
+    if (v.length > 8) v = v.substring(0, 8);
+    if (v.length >= 5) {
+      el.value = v.substring(0, 2) + '/' + v.substring(2, 4) + '/' + v.substring(4);
+    } else if (v.length >= 3) {
+      el.value = v.substring(0, 2) + '/' + v.substring(2);
+    } else {
+      el.value = v;
+    }
+  },
+
+  syncPickerToDate: function(pickerValue) {
+    if (!pickerValue) return;
+    var formatted = this.formatDatePtBr(pickerValue);
+    var dateEl = document.getElementById('auto-edit-created-date');
+    if (dateEl) dateEl.value = formatted;
   },
 
   ensureSequentialIds: function() {
@@ -39,7 +61,6 @@ var AutomacaoModule = window.AutomacaoModule = {
       }
     });
 
-    // Atribuir IDs sequenciais de 1 em diante para itens sem seqId
     this.items.forEach(function(item) {
       if (!item.seqId) {
         currentMax++;
@@ -139,6 +160,10 @@ var AutomacaoModule = window.AutomacaoModule = {
   formatDatePtBr: function(dateStr) {
     if (!dateStr) return new Date().toLocaleDateString('pt-BR');
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      var parts = dateStr.split('-');
+      return parts[2] + '/' + parts[1] + '/' + parts[0];
+    }
     try {
       var d = new Date(dateStr);
       if (!isNaN(d.getTime())) {
@@ -313,9 +338,9 @@ var AutomacaoModule = window.AutomacaoModule = {
         // 4. SOLICITANTE
         html += '          <td style="padding: 12px 16px;" class="text-xs font-semibold text-slate-300">' + (item.requester || '-') + '</td>';
 
-        // 5. TIME SOLICITANTE
-        html += '          <td style="padding: 12px 16px;">';
-        html += '            <span class="badge text-[10px] px-2.5 py-0.5 automacao-team-badge font-semibold">' + (item.team || 'Conciliação, Parâmetros, Processamento e Adquirência') + '</span>';
+        // 5. TIME SOLICITANTE (Apenas texto simples, sem moldura)
+        html += '          <td style="padding: 12px 16px;" class="text-xs font-semibold text-slate-300">';
+        html += '            ' + (item.team || 'Conciliação, Parâmetros, Processamento e Adquirência');
         html += '          </td>';
 
         // 6. COLUNA STATUS (Dropdown interativo)
@@ -327,7 +352,7 @@ var AutomacaoModule = window.AutomacaoModule = {
         html += '            </select>';
         html += '          </td>';
 
-        // 7. DATA DE CRIAÇÃO (DD/MM/YYYY)
+        // 7. DATA DE CRIAÇÃO (Formatada DIA/MÊS/ANO)
         html += '          <td style="padding: 12px 16px;" class="text-xs text-slate-400 font-semibold">' + formattedDate + '</td>';
 
         // 8. CRITICIDADE
@@ -369,11 +394,13 @@ var AutomacaoModule = window.AutomacaoModule = {
     var reqEl = document.getElementById('auto-edit-requester');
     var teamEl = document.getElementById('auto-edit-team');
     var dateEl = document.getElementById('auto-edit-created-date');
+    var pickerEl = document.getElementById('auto-edit-created-date-picker');
     var appEl = document.getElementById('auto-edit-application');
     var critEl = document.getElementById('auto-edit-criticality');
     var titleInput = document.getElementById('auto-edit-title');
     var descEl = document.getElementById('auto-edit-description');
 
+    var todayPtBr = new Date().toLocaleDateString('pt-BR');
     var todayIso = new Date().toISOString().split('T')[0];
 
     if (id) {
@@ -383,7 +410,11 @@ var AutomacaoModule = window.AutomacaoModule = {
         if (idEl) idEl.value = item.id;
         if (reqEl) reqEl.value = item.requester || '';
         if (teamEl) teamEl.value = item.team || 'Conciliação, Parâmetros, Processamento e Adquirência';
-        if (dateEl) dateEl.value = this.formatDateIsoForPicker(item.createdDate || item.createdAt);
+        
+        var formattedDate = this.formatDatePtBr(item.createdDate || item.createdAt);
+        if (dateEl) dateEl.value = formattedDate;
+        if (pickerEl) pickerEl.value = this.formatDateIsoForPicker(formattedDate);
+
         if (appEl) appEl.value = item.application || 'Controle de Squads';
         if (critEl) critEl.value = item.criticality || 'Média';
         if (titleInput) titleInput.value = item.title || '';
@@ -394,7 +425,8 @@ var AutomacaoModule = window.AutomacaoModule = {
       if (idEl) idEl.value = '';
       if (reqEl) reqEl.value = '';
       if (teamEl) teamEl.value = 'Conciliação, Parâmetros, Processamento e Adquirência';
-      if (dateEl) dateEl.value = todayIso;
+      if (dateEl) dateEl.value = todayPtBr;
+      if (pickerEl) pickerEl.value = todayIso;
       if (appEl) appEl.value = 'Controle de Squads';
       if (critEl) critEl.value = 'Média';
       if (titleInput) titleInput.value = '';
