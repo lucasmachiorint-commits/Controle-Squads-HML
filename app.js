@@ -3187,7 +3187,7 @@ const app = {
     tbody.innerHTML = filteredItems.map((item) => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
         <td onclick="event.stopPropagation();" style="white-space:nowrap; width:55px;">
-          <input type="number" min="1" max="${backlogItems.length}" value="${item.treatmentOrder}"
+          <input type="number" min="1" value="${item.treatmentOrder}"
             class="order-input-field"
             onchange="app.changeBacklogOrder('${item.id}', this.value)"
             onkeydown="if(event.key === 'Enter'){ this.blur(); }"
@@ -3222,7 +3222,7 @@ const app = {
     `).join('');
   },
 
-  // Alterar a ordem de prioridade no backlog com troca direta de posição (swap) e reordenação automática
+  // Alterar a ordem de prioridade no backlog permitindo valores customizados maiores que o total de itens
   changeBacklogOrder(itemId, newOrderInput) {
     const allItems = this.state.backlogItems[this.activeSquad] || [];
     const backlogItems = allItems.filter(i => i.status !== 'Em Andamento' && i.status !== 'Bloqueado' && i.status !== 'Concluído' && i.status !== 'Concluido');
@@ -3230,17 +3230,12 @@ const app = {
     if (!item) return;
 
     let newOrder = parseInt(newOrderInput, 10);
-    const totalItems = backlogItems.length;
 
-    // Se não for um número válido, recarregar sem alterar
-    if (isNaN(newOrder)) {
+    // Se não for um número válido ou menor que 1, recarregar sem alterar
+    if (isNaN(newOrder) || newOrder < 1) {
       this.renderBacklogView();
       return;
     }
-
-    // Clampar valor entre 1 e total de itens
-    if (newOrder < 1) newOrder = 1;
-    if (newOrder > totalItems) newOrder = totalItems;
 
     const oldOrder = item.treatmentOrder || 1;
     if (oldOrder === newOrder) {
@@ -3248,32 +3243,16 @@ const app = {
       return;
     }
 
-    // Encontrar a demanda que atualmente possui a ordem desejada (a demanda subscrita)
+    // Se outra demanda já possui exatamente essa ordem, realiza a troca (swap)
     const targetItem = backlogItems.find(bi => bi.id !== itemId && bi.treatmentOrder === newOrder);
-
     if (targetItem) {
-      // TROCA DIRETA (SWAP): a demanda subscrita recebe a antiga ordem do card editado
       targetItem.treatmentOrder = oldOrder;
-    } else {
-      // Ajustar itens entre old e new
-      backlogItems.forEach(bi => {
-        if (bi.id === itemId) return;
-        if (oldOrder < newOrder) {
-          if (bi.treatmentOrder > oldOrder && bi.treatmentOrder <= newOrder) {
-            bi.treatmentOrder--;
-          }
-        } else {
-          if (bi.treatmentOrder >= newOrder && bi.treatmentOrder < oldOrder) {
-            bi.treatmentOrder++;
-          }
-        }
-      });
     }
 
-    // Atribuir a nova ordem ao item editado
+    // Atribuir a nova ordem (mesmo se for superior à quantidade total de itens)
     item.treatmentOrder = newOrder;
 
-    // Salvar estado e re-renderizar a visualização ordenada
+    // Salvar estado e re-renderizar a visualização ordenada numericamente
     this.saveState();
     this.renderBacklogView();
   },
