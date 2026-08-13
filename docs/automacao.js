@@ -1,7 +1,7 @@
 /* ==========================================================================
    Controle de Squads - Módulo Isolado de Automação (automacao.js)
    Demandas Internas de Desenvolvimento & Automação
-   Design System Harmonizado Impeccable (v1.8.0)
+   Design System Harmonizado Impeccable (v1.9.0)
    ========================================================================== */
 
 var AutomacaoModule = window.AutomacaoModule = {
@@ -269,7 +269,7 @@ var AutomacaoModule = window.AutomacaoModule = {
     }
     html += '  </div>';
 
-    // 4. TABELA DE DEMANDAS (Compacta sem rolagem horizontal)
+    // 4. TABELA DE DEMANDAS (Sem subtítulo de Aplicação ou Descrição no resumo)
     html += '  <div class="w-full overflow-hidden">';
     html += '    <table class="custom-table w-full text-left" style="table-layout: auto;">';
     html += '      <thead>';
@@ -314,7 +314,7 @@ var AutomacaoModule = window.AutomacaoModule = {
 
         html += '        <tr class="hover:bg-white/5 transition-all">';
 
-        // 1. COLUNA ID (sequencial)
+        // 1. COLUNA ID
         html += '          <td style="padding: 10px 8px;" class="font-extrabold text-violet-400 text-xs">#' + (item.seqId || (idx + 1)) + '</td>';
 
         // 2. COLUNA ORDEM (apenas no Backlog)
@@ -324,12 +324,9 @@ var AutomacaoModule = window.AutomacaoModule = {
           html += '          </td>';
         }
 
-        // 3. TÍTULO DA DEMANDA (Apenas Título e Aplicação, sem Descrição)
+        // 3. TÍTULO DA DEMANDA (Somente o título, sem subtítulo de aplicação)
         html += '          <td style="padding: 10px 8px;">';
-        html += '            <span class="font-extrabold text-white text-xs block mb-0.5" title="' + (item.title || '').replace(/"/g, '&quot;') + '">' + (item.title || 'Sem título') + '</span>';
-        if (item.application) {
-          html += '            <span class="text-[10px] text-slate-400 font-semibold block">' + item.application + '</span>';
-        }
+        html += '            <span class="font-extrabold text-white text-xs block" title="' + (item.title || '').replace(/"/g, '&quot;') + '">' + (item.title || 'Sem título') + '</span>';
         html += '          </td>';
 
         // 4. SOLICITANTE
@@ -340,7 +337,7 @@ var AutomacaoModule = window.AutomacaoModule = {
         html += '            ' + (item.team || 'Conciliação, Parâmetros, Processamento e Adquirência');
         html += '          </td>';
 
-        // 6. COLUNA STATUS (Dropdown interativo compacto)
+        // 6. COLUNA STATUS
         html += '          <td onclick="event.stopPropagation();" style="white-space:nowrap; padding: 10px 8px;">';
         html += '            <select class="status-select-dropdown ' + statusClass + '" style="width: 115px !important; min-width: 115px !important; max-width: 115px !important; font-size: 10px !important; padding: 4px 16px 4px 6px !important;" onchange="app.moveAutomacaoTo(\'' + item.id + '\', this.value)">';
         html += '              <option value="backlog" ' + (item.status === 'backlog' ? 'selected' : '') + '>Backlog</option>';
@@ -349,7 +346,7 @@ var AutomacaoModule = window.AutomacaoModule = {
         html += '            </select>';
         html += '          </td>';
 
-        // 7. DATA DE CRIAÇÃO (Formatada DIA/MÊS/ANO)
+        // 7. DATA DE CRIAÇÃO
         html += '          <td style="padding: 10px 8px;" class="text-xs text-slate-400 font-semibold">' + formattedDate + '</td>';
 
         // 8. CRITICIDADE
@@ -357,7 +354,7 @@ var AutomacaoModule = window.AutomacaoModule = {
         html += '            <span class="badge text-[10px] px-2 py-0.5 border font-bold ' + critBadge + '">' + (item.criticality || 'Média') + '</span>';
         html += '          </td>';
 
-        // 9. AÇÕES (Editar e Excluir)
+        // 9. AÇÕES
         html += '          <td style="padding: 10px 8px; text-align: right;">';
         html += '            <div class="flex items-center justify-end gap-1">';
         html += '              <button onclick="app.openAutomacaoModal(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-1.5" title="Editar Demanda">';
