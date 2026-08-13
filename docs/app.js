@@ -119,7 +119,21 @@ const app = {
     ['dados', 'operacoes', 'rpa'].forEach(id => {
       this.state.backlogItems[id] = (this.state.backlogItems[id] || [])
         .filter(i => !ghostKeys.has(extractKey(i)))
-        .map(cleanItem);
+        .map(item => {
+          const cleaned = cleanItem(item);
+          if (cleaned) {
+            if (!cleaned.phase) {
+              if (cleaned.status === 'Em Andamento') {
+                cleaned.phase = 'em-andamento';
+              } else if (cleaned.status === 'Backlog') {
+                cleaned.phase = 'backlog';
+              } else if (cleaned.status === 'Bloqueado') {
+                cleaned.phase = 'em-andamento';
+              }
+            }
+          }
+          return cleaned;
+        });
 
       this.state.completedTasks[id] = (this.state.completedTasks[id] || [])
         .filter(i => !ghostKeys.has(extractKey(i)))
@@ -2415,6 +2429,7 @@ const app = {
       priority: item.priority || '2 - Alta',
       treatmentOrder: maxOrder + 1,
       status: 'Backlog',
+      phase: 'backlog',
       progress: 0
     });
 
@@ -2456,7 +2471,20 @@ const app = {
     const item = squadItems.find(i => i.id === itemId || i.gau === itemId || i.jiraKey === itemId);
     if (!item) return;
 
+    const oldStatus = item.status;
     item.status = newStatus;
+
+    if (newStatus === 'Em Andamento') {
+      item.phase = 'em-andamento';
+    } else if (newStatus === 'Backlog') {
+      item.phase = 'backlog';
+    } else if (newStatus === 'Bloqueado') {
+      if (!item.phase) {
+        item.phase = (oldStatus === 'Em Andamento') ? 'em-andamento' : 'backlog';
+      }
+    } else if (newStatus === 'Concluído' || newStatus === 'Concluido') {
+      item.phase = 'concluido';
+    }
 
     // Se alterado para Concluído, registra no histórico de entregas se não existir
     if (newStatus === 'Concluído' || newStatus === 'Concluido') {
@@ -3021,7 +3049,7 @@ const app = {
     }
 
     const allItems = this.state.backlogItems[this.activeSquad] || [];
-    const inProgressItems = allItems.filter(i => i.status === 'Em Andamento' || i.status === 'Bloqueado');
+    const inProgressItems = allItems.filter(i => i.status === 'Em Andamento' || (i.status === 'Bloqueado' && (i.phase === 'em-andamento' || !i.phase)));
 
     const searchTerm = (document.getElementById('search-board')?.value || '').toLowerCase();
     const teamFilter = document.getElementById('filter-team-board')?.value || '';
@@ -3103,7 +3131,7 @@ const app = {
     if (titleEl) titleEl.textContent = `Backlog - ${squadNames[this.activeSquad]}`;
 
     const allItems = this.state.backlogItems[this.activeSquad] || [];
-    const backlogItems = allItems.filter(i => i.status !== 'Em Andamento' && i.status !== 'Concluído' && i.status !== 'Concluido');
+    const backlogItems = allItems.filter(i => i.status === 'Backlog' || (i.status === 'Bloqueado' && i.phase === 'backlog'));
 
     // Função para extração de timestamp de criação para ordenação determinística
     const parseCreationTimestamp = (item) => {

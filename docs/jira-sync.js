@@ -326,6 +326,7 @@ const JiraSyncEngine = {
             priority: card.priority || '2 - Alta',
             category: card.category || 'Processos',
             status: defaultStatus,
+            phase: 'backlog',
             progress: 0,
             rawCreated: rawCreated || card.created
           });
@@ -404,6 +405,7 @@ const JiraSyncEngine = {
             priority: card.priority || '2 - Alta',
             category: card.category || 'Processos',
             status: defaultStatus,
+            phase: 'backlog',
             progress: 0,
             rawCreated: rawCreated || card.created
           });
