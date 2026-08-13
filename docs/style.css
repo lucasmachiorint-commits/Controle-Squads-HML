@@ -2087,6 +2087,57 @@ body.light-theme .metric-icon.bg-emerald-500\/20 {
   color: #059669 !important;
 }
 
+/* Fix para Módulo de Automação no Light Mode */
+body.light-theme #view-automacao h2,
+body.light-theme #view-automacao .text-white {
+  color: #0f172a !important;
+}
+
+body.light-theme #view-automacao .text-slate-400,
+body.light-theme #view-automacao .text-slate-500 {
+  color: #475569 !important;
+}
+
+body.light-theme .automacao-tab-btn {
+  color: #475569 !important;
+  background-color: transparent !important;
+}
+
+body.light-theme .automacao-tab-btn:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.light-theme .automacao-tab-btn.active-tab {
+  background-color: #f3e8ff !important;
+  color: #7c3aed !important;
+  border-color: #c4b5fd !important;
+}
+
+body.light-theme .metric-box-purple {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light-theme .metric-box-purple .metric-box-lbl {
+  color: #7c3aed !important;
+}
+
+body.light-theme .metric-box-purple .metric-box-val {
+  color: #6d28d9 !important;
+}
+
+body.light-theme #modal-automacao-edit .modal-content {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.light-theme #modal-automacao-edit h3,
+body.light-theme #modal-automacao-edit label {
+  color: #0f172a !important;
+}
+
 /* ============================================================
    @MEDIA PRINT — Impressão Direta (window.print)
    ============================================================ */

@@ -1544,6 +1544,90 @@
   </div>
 </div>
 
+<!-- MODAL DE CADASTRO E EDIÇÃO DE DEMANDAS DE AUTOMAÇÃO -->
+<div class="modal-backdrop hidden" id="modal-automacao-edit" style="display: none; align-items: center; justify-content: center; z-index: 99999;">
+  <div class="glass-panel modal-content" style="max-width: 620px; background: rgba(15, 23, 42, 0.96); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 16px; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);">
+    <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-violet-500/20 text-violet-400 border border-violet-500/30 flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-white tracking-tight" id="automacao-modal-title">Nova Demanda — Automação</h3>
+          <p class="text-xs text-slate-400">Cadastro de Demanda Interna de Desenvolvimento</p>
+        </div>
+      </div>
+      <button type="button" class="text-slate-400 hover:text-white transition-colors" onclick="app.closeAutomacaoModal()">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <form onsubmit="app.saveAutomacaoDemand(event); return false;">
+      <input type="hidden" id="auto-edit-id" />
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Solicitante <span class="text-violet-400">*</span></label>
+          <input type="text" id="auto-edit-requester" class="app-custom-input" placeholder="Nome do Solicitante" required />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Time Solicitante <span class="text-violet-400">*</span></label>
+          <select id="auto-edit-team" class="app-custom-select" required>
+            <option value="Conciliação">Conciliação</option>
+            <option value="Tesouraria">Tesouraria</option>
+            <option value="BackOffice">BackOffice</option>
+            <option value="Adquirência">Adquirência</option>
+            <option value="Atendimento">Atendimento</option>
+            <option value="Suporte Operacional">Suporte Operacional</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Data de Criação</label>
+          <input type="date" id="auto-edit-created-date" class="app-custom-input" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Aplicação <span class="text-violet-400">*</span></label>
+          <select id="auto-edit-application" class="app-custom-select" required>
+            <option value="Controle de Squads">Controle de Squads</option>
+            <option value="Sistema de Governança Operacional">Sistema de Governança Operacional</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Criticidade <span class="text-violet-400">*</span></label>
+          <select id="auto-edit-criticality" class="app-custom-select" required>
+            <option value="Alta">Alta</option>
+            <option value="Média" selected>Média</option>
+            <option value="Baixa">Baixa</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group mb-4">
+        <label class="block text-xs font-semibold text-gray-300 mb-1.5">Título da Demanda <span class="text-violet-400">*</span></label>
+        <input type="text" id="auto-edit-title" class="app-custom-input" placeholder="Resumo claro da solicitação" required />
+      </div>
+
+      <div class="form-group mb-6">
+        <label class="block text-xs font-semibold text-gray-300 mb-1.5">Descrição da Demanda</label>
+        <textarea id="auto-edit-description" class="app-custom-input" rows="4" placeholder="Detalhes, justificativa ou contexto da automação..."></textarea>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+        <button type="button" class="btn btn-secondary text-xs px-4 py-2" onclick="app.closeAutomacaoModal()">Cancelar</button>
+        <button type="submit" class="bg-violet-500 hover:bg-violet-600 text-white font-bold px-5 py-2 rounded-lg text-xs transition-all shadow-lg shadow-violet-500/20 flex items-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-floppy-disk"></i> Salvar Demanda
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- JIRA ENGINE MODULE & CORE APP LOGIC -->
 <script src="jira-sync.js?v=20260813_v6.81.0-hml"></script>
 <script src="app.js?v=20260813_v6.81.0-hml"></script>
