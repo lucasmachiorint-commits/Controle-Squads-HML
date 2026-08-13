@@ -1,7 +1,7 @@
 /* ==========================================================================
    Controle de Squads - Módulo Isolado de Automação (automacao.js)
    Demandas Internas de Desenvolvimento & Automação
-   Design System Harmonizado Impeccable (v1.7.0)
+   Design System Harmonizado Impeccable (v1.8.0)
    ========================================================================== */
 
 var AutomacaoModule = window.AutomacaoModule = {
@@ -269,24 +269,24 @@ var AutomacaoModule = window.AutomacaoModule = {
     }
     html += '  </div>';
 
-    // 4. TABELA DE DEMANDAS
-    html += '  <div class="table-responsive">';
-    html += '    <table class="custom-table w-full text-left">';
+    // 4. TABELA DE DEMANDAS (Compacta sem rolagem horizontal)
+    html += '  <div class="w-full overflow-hidden">';
+    html += '    <table class="custom-table w-full text-left" style="table-layout: auto;">';
     html += '      <thead>';
     html += '        <tr>';
-    html += '          <th style="width: 55px; white-space: nowrap;">ID</th>';
+    html += '          <th style="width: 45px; white-space: nowrap; padding: 10px 8px;">ID</th>';
 
     if (this.activeTab === 'backlog') {
-      html += '          <th style="width: 70px; white-space: nowrap;">ORDEM</th>';
+      html += '          <th style="width: 60px; white-space: nowrap; padding: 10px 8px;">ORDEM</th>';
     }
 
-    html += '          <th style="min-width: 220px;">TÍTULO DA DEMANDA</th>';
-    html += '          <th style="width: 140px; white-space: nowrap;">SOLICITANTE</th>';
-    html += '          <th style="width: 170px; white-space: nowrap;">TIME SOLICITANTE</th>';
-    html += '          <th style="width: 135px; white-space: nowrap;">STATUS</th>';
-    html += '          <th style="width: 120px; white-space: nowrap;">DATA DE CRIAÇÃO</th>';
-    html += '          <th style="width: 100px; white-space: nowrap;">CRITICIDADE</th>';
-    html += '          <th style="width: 90px; text-align: right; white-space: nowrap;">AÇÕES</th>';
+    html += '          <th style="min-width: 160px; padding: 10px 8px;">TÍTULO DA DEMANDA</th>';
+    html += '          <th style="width: 120px; white-space: nowrap; padding: 10px 8px;">SOLICITANTE</th>';
+    html += '          <th style="width: 160px; padding: 10px 8px;">TIME SOLICITANTE</th>';
+    html += '          <th style="width: 125px; white-space: nowrap; padding: 10px 8px;">STATUS</th>';
+    html += '          <th style="width: 95px; white-space: nowrap; padding: 10px 8px;">DATA DE CRIAÇÃO</th>';
+    html += '          <th style="width: 85px; white-space: nowrap; padding: 10px 8px;">CRITICIDADE</th>';
+    html += '          <th style="width: 65px; text-align: right; white-space: nowrap; padding: 10px 8px;">AÇÕES</th>';
     html += '        </tr>';
     html += '      </thead>';
     html += '      <tbody>';
@@ -294,11 +294,11 @@ var AutomacaoModule = window.AutomacaoModule = {
     if (filteredItems.length === 0) {
       var colSpan = this.activeTab === 'backlog' ? 9 : 8;
       html += '        <tr>';
-      html += '          <td colspan="' + colSpan + '" style="padding: 48px 16px; text-align: center;">';
-      html += '            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-slate-800/50 mb-3">';
-      html += '              <i class="fa-solid fa-inbox text-2xl text-slate-400"></i>';
+      html += '          <td colspan="' + colSpan + '" style="padding: 40px 16px; text-align: center;">';
+      html += '            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-800/50 mb-2">';
+      html += '              <i class="fa-solid fa-inbox text-xl text-slate-400"></i>';
       html += '            </div>';
-      html += '            <h4 class="font-bold text-slate-200 text-base mb-1">Nenhuma demanda encontrada</h4>';
+      html += '            <h4 class="font-bold text-slate-200 text-sm mb-1">Nenhuma demanda encontrada</h4>';
       html += '            <p class="text-xs text-slate-400 margin-0">Não há solicitações registradas nesta aba no momento.</p>';
       html += '          </td>';
       html += '        </tr>';
@@ -315,37 +315,34 @@ var AutomacaoModule = window.AutomacaoModule = {
         html += '        <tr class="hover:bg-white/5 transition-all">';
 
         // 1. COLUNA ID (sequencial)
-        html += '          <td style="padding: 12px 16px;" class="font-extrabold text-violet-400">#' + (item.seqId || (idx + 1)) + '</td>';
+        html += '          <td style="padding: 10px 8px;" class="font-extrabold text-violet-400 text-xs">#' + (item.seqId || (idx + 1)) + '</td>';
 
         // 2. COLUNA ORDEM (apenas no Backlog)
         if (AutomacaoModule.activeTab === 'backlog') {
-          html += '          <td style="padding: 12px 16px;">';
-          html += '            <input type="number" value="' + (item.treatmentOrder || 1) + '" onchange="app.changeAutomacaoOrder(\'' + item.id + '\', this.value)" class="order-input-field w-14 text-center" style="height: 32px; font-weight: 800;" />';
+          html += '          <td style="padding: 10px 8px;">';
+          html += '            <input type="number" value="' + (item.treatmentOrder || 1) + '" onchange="app.changeAutomacaoOrder(\'' + item.id + '\', this.value)" class="order-input-field w-12 text-center" style="height: 30px; font-weight: 800; font-size: 11px;" />';
           html += '          </td>';
         }
 
-        // 3. TÍTULO E APLICAÇÃO
-        html += '          <td style="padding: 12px 16px;">';
-        html += '            <span class="font-extrabold text-white text-xs block mb-0.5">' + (item.title || 'Sem título') + '</span>';
+        // 3. TÍTULO DA DEMANDA (Apenas Título e Aplicação, sem Descrição)
+        html += '          <td style="padding: 10px 8px;">';
+        html += '            <span class="font-extrabold text-white text-xs block mb-0.5" title="' + (item.title || '').replace(/"/g, '&quot;') + '">' + (item.title || 'Sem título') + '</span>';
         if (item.application) {
           html += '            <span class="text-[10px] text-slate-400 font-semibold block">' + item.application + '</span>';
-        }
-        if (item.description) {
-          html += '            <span class="text-[11px] text-slate-400 block mt-1 line-clamp-2" title="' + (item.description || '').replace(/"/g, '&quot;') + '">' + item.description + '</span>';
         }
         html += '          </td>';
 
         // 4. SOLICITANTE
-        html += '          <td style="padding: 12px 16px;" class="text-xs font-semibold text-slate-300">' + (item.requester || '-') + '</td>';
+        html += '          <td style="padding: 10px 8px;" class="text-xs font-semibold text-slate-300">' + (item.requester || '-') + '</td>';
 
-        // 5. TIME SOLICITANTE (Apenas texto simples, sem moldura)
-        html += '          <td style="padding: 12px 16px;" class="text-xs font-semibold text-slate-300">';
+        // 5. TIME SOLICITANTE (Apenas texto simples sem moldura)
+        html += '          <td style="padding: 10px 8px;" class="text-xs font-semibold text-slate-300">';
         html += '            ' + (item.team || 'Conciliação, Parâmetros, Processamento e Adquirência');
         html += '          </td>';
 
-        // 6. COLUNA STATUS (Dropdown interativo)
-        html += '          <td onclick="event.stopPropagation();" style="white-space:nowrap; width:135px; padding: 12px 16px;">';
-        html += '            <select class="status-select-dropdown ' + statusClass + '" onchange="app.moveAutomacaoTo(\'' + item.id + '\', this.value)">';
+        // 6. COLUNA STATUS (Dropdown interativo compacto)
+        html += '          <td onclick="event.stopPropagation();" style="white-space:nowrap; padding: 10px 8px;">';
+        html += '            <select class="status-select-dropdown ' + statusClass + '" style="width: 115px !important; min-width: 115px !important; max-width: 115px !important; font-size: 10px !important; padding: 4px 16px 4px 6px !important;" onchange="app.moveAutomacaoTo(\'' + item.id + '\', this.value)">';
         html += '              <option value="backlog" ' + (item.status === 'backlog' ? 'selected' : '') + '>Backlog</option>';
         html += '              <option value="em-andamento" ' + (item.status === 'em-andamento' ? 'selected' : '') + '>Em Andamento</option>';
         html += '              <option value="concluido" ' + (item.status === 'concluido' ? 'selected' : '') + '>Concluído</option>';
@@ -353,20 +350,20 @@ var AutomacaoModule = window.AutomacaoModule = {
         html += '          </td>';
 
         // 7. DATA DE CRIAÇÃO (Formatada DIA/MÊS/ANO)
-        html += '          <td style="padding: 12px 16px;" class="text-xs text-slate-400 font-semibold">' + formattedDate + '</td>';
+        html += '          <td style="padding: 10px 8px;" class="text-xs text-slate-400 font-semibold">' + formattedDate + '</td>';
 
         // 8. CRITICIDADE
-        html += '          <td style="padding: 12px 16px;">';
-        html += '            <span class="badge text-[10px] px-2.5 py-0.5 border font-bold ' + critBadge + '">' + (item.criticality || 'Média') + '</span>';
+        html += '          <td style="padding: 10px 8px;">';
+        html += '            <span class="badge text-[10px] px-2 py-0.5 border font-bold ' + critBadge + '">' + (item.criticality || 'Média') + '</span>';
         html += '          </td>';
 
         // 9. AÇÕES (Editar e Excluir)
-        html += '          <td style="padding: 12px 16px; text-align: right;">';
-        html += '            <div class="flex items-center justify-end gap-1.5">';
-        html += '              <button onclick="app.openAutomacaoModal(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-2" title="Editar Demanda">';
+        html += '          <td style="padding: 10px 8px; text-align: right;">';
+        html += '            <div class="flex items-center justify-end gap-1">';
+        html += '              <button onclick="app.openAutomacaoModal(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-1.5" title="Editar Demanda">';
         html += '                <i class="fa-solid fa-pen text-slate-300"></i>';
         html += '              </button>';
-        html += '              <button onclick="app.deleteAutomacaoDemand(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-2 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30" title="Excluir Demanda">';
+        html += '              <button onclick="app.deleteAutomacaoDemand(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-1.5 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30" title="Excluir Demanda">';
         html += '                <i class="fa-solid fa-trash-can"></i>';
         html += '              </button>';
         html += '            </div>';
