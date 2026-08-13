@@ -436,63 +436,6 @@
 
       </div>
 
-      <!-- PAINEL 2.5: INDICADORES EXECUTIVOS DA SQUAD RPA (PENDÊNCIAS RPA) -->
-      <div class="glass-panel mb-6" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 20px !important; margin-bottom: 28px !important;">
-        <div class="flex items-center justify-between mb-4">
-          <h3 style="font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; margin: 0; padding-top: 2px;" class="flex items-center gap-2">
-            <i class="fa-solid fa-robot text-emerald-400"></i> Indicadores da Squad RPA (Pendências RPA)
-          </h3>
-          <span class="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold px-2.5 py-0.5">Módulo RPA</span>
-        </div>
-        
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <!-- 1. Total Ocorrências -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-white" id="dash-rpa-kpi-total">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Total Ocorrências</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-list-ul"></i></div>
-          </div>
-
-          <!-- 2. Em Aberto -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-rose-400" id="dash-rpa-kpi-aberto">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Em Aberto</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-triangle-exclamation"></i></div>
-          </div>
-
-          <!-- 3. Em Validação -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-cyan-400" id="dash-rpa-kpi-validacao">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Em Validação</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-magnifying-glass"></i></div>
-          </div>
-
-          <!-- 4. Severidade Crítica -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-amber-400" id="dash-rpa-kpi-critica">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Severidade Crítica</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-fire-flame-curved"></i></div>
-          </div>
-
-          <!-- 5. Resolvidos -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-emerald-400" id="dash-rpa-kpi-resolvido">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Resolvidos</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-circle-check"></i></div>
-          </div>
-        </div>
-      </div>
-
       <!-- PAINEL 3: MATRIZ DE 4 GRÁFICOS INTERATIVOS (GRID 2x2) -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="margin-bottom: 28px !important; gap: 24px !important;">
         <!-- Gráfico 1: Distribuição por Squad -->
@@ -566,6 +509,63 @@
               <!-- Renderizado via app.js -->
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- PAINEL 5: INDICADORES EXECUTIVOS DA SQUAD RPA (PENDÊNCIAS RPA - ÚLTIMA INFORMAÇÃO) -->
+      <div class="glass-panel mb-6" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 20px !important; margin-bottom: 28px !important;">
+        <div class="flex items-center justify-between mb-4">
+          <h3 style="font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; margin: 0; padding-top: 2px;" class="flex items-center gap-2">
+            <i class="fa-solid fa-robot text-emerald-400"></i> Indicadores da Squad RPA (Pendências RPA)
+          </h3>
+          <span class="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold px-2.5 py-0.5">Módulo RPA</span>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <!-- 1. Total Ocorrências -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-white" id="dash-rpa-kpi-total">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Total Ocorrências</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-list-ul"></i></div>
+          </div>
+
+          <!-- 2. Em Aberto -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-rose-400" id="dash-rpa-kpi-aberto">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Em Aberto</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          </div>
+
+          <!-- 3. Em Validação -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-cyan-400" id="dash-rpa-kpi-validacao">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Em Validação</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-magnifying-glass"></i></div>
+          </div>
+
+          <!-- 4. Severidade Crítica -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-amber-400" id="dash-rpa-kpi-critica">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Severidade Crítica</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-fire-flame-curved"></i></div>
+          </div>
+
+          <!-- 5. Resolvidos -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
+            <div>
+              <div class="text-xl font-extrabold text-emerald-400" id="dash-rpa-kpi-resolvido">0</div>
+              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Resolvidos</div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
         </div>
       </div>
 
