@@ -758,6 +758,15 @@ const app = {
       } else if (window.RpaPendenciesModule && Array.isArray(window.RpaPendenciesModule.pendencies) && window.RpaPendenciesModule.pendencies.length > 0) {
         this.state.rpaPendencies = window.RpaPendenciesModule.pendencies;
       }
+      if (this.state.automacaoItems && Array.isArray(this.state.automacaoItems)) {
+        if (window.AutomacaoModule) {
+          window.AutomacaoModule.items = this.state.automacaoItems;
+          localStorage.setItem('cs_automacao_items_v1', JSON.stringify(this.state.automacaoItems));
+          if (window.AutomacaoModule.renderView) window.AutomacaoModule.renderView();
+        }
+      } else if (window.AutomacaoModule && Array.isArray(window.AutomacaoModule.items)) {
+        this.state.automacaoItems = window.AutomacaoModule.items;
+      }
       localStorage.setItem('cs_triage_items', JSON.stringify(this.state.triageItems || []));
       ['dados', 'operacoes', 'rpa'].forEach(id => {
         localStorage.setItem(`cs_backlog_${id}`, JSON.stringify(this.state.backlogItems?.[id] || []));
@@ -998,6 +1007,9 @@ const app = {
     } else if (viewId === 'gestao-acessos') {
       const activeNav = document.getElementById('nav-gestao-acessos');
       if (activeNav) activeNav.classList.add('active');
+    } else if (viewId === 'automacao') {
+      const activeNav = document.getElementById('nav-automacao');
+      if (activeNav) activeNav.classList.add('active');
     } else {
       // Para visões de squad (board, backlog, concluidos, rpa-pendencies)
       const activeSquadNav = document.getElementById(`nav-squad-${this.activeSquad}`);
@@ -1016,6 +1028,12 @@ const app = {
       }
     }
 
+    if (viewId === 'automacao') {
+      if (window.AutomacaoModule && window.AutomacaoModule.renderView) {
+        window.AutomacaoModule.renderView();
+      }
+    }
+
     // Atualizar título da página
     const squadNames = { dados: 'Squad de Dados', operacoes: 'Squad de Operações', rpa: 'Squad de RPA' };
     const titleMap = {
@@ -1025,6 +1043,7 @@ const app = {
       backlog: `Backlog - ${squadNames[this.activeSquad]}`,
       concluidos: `Concluídos - ${squadNames[this.activeSquad]}`,
       'rpa-pendencies': 'Pendências - Squad de RPA',
+      'automacao': 'Automação — Demandas Internas',
       'dpo-sync': 'Modo Reunião DPO',
       'dpo-logs': 'Histórico de Alinhamentos DPO',
       'gestao-acessos': 'Gestão de Perfis & Acessos Supabase'
@@ -1095,6 +1114,9 @@ const app = {
       });
       if (window.RpaPendenciesModule && Array.isArray(window.RpaPendenciesModule.pendencies)) {
         this.state.rpaPendencies = window.RpaPendenciesModule.pendencies;
+      }
+      if (window.AutomacaoModule && Array.isArray(window.AutomacaoModule.items)) {
+        this.state.automacaoItems = window.AutomacaoModule.items;
       }
     } catch (e) {
       console.warn('Erro ao salvar LocalStorage:', e);
