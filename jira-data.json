@@ -1,7 +1,36 @@
 {
-  "updatedAt": "2026-08-10T01:06:22.200Z",
-  "totalCards": 122,
+  "updatedAt": "2026-08-13T13:07:46.577Z",
+  "totalCards": 123,
   "cards": [
+    {
+      "id": "1414230",
+      "key": "GAU-141",
+      "jiraKey": "GAU-141",
+      "title": "Trafego arquivos de conciliação casas de recaudación argentina",
+      "summary": "Trafego arquivos de conciliação casas de recaudación argentina",
+      "status": "Aguardando Squad",
+      "categoriaStatus": "Itens Pendentes",
+      "customfield_12475": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+        "value": "Operações NPay",
+        "id": "16005"
+      },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+        "value": "Conciliação, Parâmetros, Processamento e Adquirência",
+        "id": "24154"
+      },
+      "squad": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+        "value": "Operações NPay",
+        "id": "16005"
+      },
+      "requester": "Luiz Paulo Marcelo Moreira - Natura Pay",
+      "priority": "Média",
+      "category": "Geral",
+      "createdDate": "12/08/2026",
+      "description": "Precisamos acessar SFTPs de casas de recaudación da Argentina, copiar arquivos e salva-los em um bucket da Natura Pay.\nO Processo deve ser executado diariamente, de segunda a sexta , e trazer todos os arquivos novos a cada execução.\nDentro Bucket,  criar uma “raiz” com nome de “Arquivos  casas de recaudación Arg”  e Subpastas por empresa:\n\nPs.  Há um bloqueio no firewall do zscaler para esses endereços, que pode boquear o acesso. \nA orientação que recebi foi de solicitar a exceção do proxy via TD :  , indicando o hostname.\n\nArquivos_Casas_Recaudación_Arg\nTinsa_Cobro_Express\nPagofacil_We\nGire_Rapipago\nCHAVES DE ACESSO:\n\nTinsa (Cobro Express):\nUSUARIO: sftp158\nCONTRASEÑA:   **************\nIP: 200.45.20.148\nPUERTO: 60022 \n**Directorio:   \\Recibe          \n\nPAGOFACIL:\nFile protocol: SFTP\n Host name: http://sftp.pagofacil.com.ar  \nPort number: 22\n User name:  u90063907\n Password: VACÍO (No se completa)\n**Dicha obtención de archivos de cobranza se realizará desde el directorio OUT\n\nGIRE ( em andamento) \n*** As contrasenhas e arquivos .ppk serão compartilhas diretamente com os responsáveis pelo desenvolvimento**"
+    },
     {
       "id": "1382861",
       "key": "GAU-140",
@@ -14,6 +43,11 @@
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
         "id": "16006"
+      },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+        "value": "Conciliação, Parâmetros, Processamento e Adquirência",
+        "id": "24154"
       },
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
@@ -39,6 +73,11 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+        "value": "Conciliação, Parâmetros, Processamento e Adquirência",
+        "id": "24154"
+      },
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -62,6 +101,11 @@
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
         "id": "16006"
+      },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+        "value": "Conciliação, Parâmetros, Processamento e Adquirência",
+        "id": "24154"
       },
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
@@ -87,6 +131,11 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+        "value": "Conciliação, Parâmetros, Processamento e Adquirência",
+        "id": "24154"
+      },
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -111,6 +160,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -135,6 +185,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -159,6 +210,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -183,6 +235,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -207,6 +260,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -231,6 +285,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -255,6 +310,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -279,6 +335,7 @@
         "value": "RPA",
         "id": "16007"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
         "value": "RPA",
@@ -303,6 +360,7 @@
         "value": "RPA",
         "id": "16007"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
         "value": "RPA",
@@ -327,6 +385,7 @@
         "value": "RPA",
         "id": "16007"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
         "value": "RPA",
@@ -351,6 +410,7 @@
         "value": "RPA",
         "id": "16007"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
         "value": "RPA",
@@ -375,6 +435,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -399,6 +460,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -423,6 +485,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -447,6 +510,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -471,6 +535,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -495,6 +560,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -519,6 +585,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -543,6 +610,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -567,6 +635,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -591,6 +660,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -615,6 +685,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -639,6 +710,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -663,6 +735,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -687,6 +760,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -711,6 +785,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -735,6 +810,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -759,6 +835,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -783,6 +860,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -807,6 +885,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -831,6 +910,7 @@
         "value": "RPA",
         "id": "16007"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
         "value": "RPA",
@@ -855,6 +935,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -879,6 +960,7 @@
         "value": "RPA",
         "id": "16007"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
         "value": "RPA",
@@ -903,6 +985,7 @@
         "value": "RPA",
         "id": "16007"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
         "value": "RPA",
@@ -927,6 +1010,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -951,6 +1035,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -975,6 +1060,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -999,6 +1085,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1023,6 +1110,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1047,6 +1135,7 @@
         "value": "RPA",
         "id": "16007"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
         "value": "RPA",
@@ -1071,6 +1160,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1095,6 +1185,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1119,6 +1210,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1143,6 +1235,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1167,6 +1260,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1191,6 +1285,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1215,6 +1310,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1239,6 +1335,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1263,6 +1360,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1287,6 +1385,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1311,6 +1410,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1335,6 +1435,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1359,6 +1460,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1383,6 +1485,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1407,6 +1510,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1431,6 +1535,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1455,6 +1560,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1479,6 +1585,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1503,6 +1610,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1527,6 +1635,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1551,6 +1660,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1575,6 +1685,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1599,6 +1710,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1623,6 +1735,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1647,6 +1760,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1671,6 +1785,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1695,6 +1810,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1719,6 +1835,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1743,6 +1860,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1767,6 +1885,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1791,6 +1910,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1815,6 +1935,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1839,6 +1960,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1863,6 +1985,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1887,6 +2010,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1911,6 +2035,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1935,6 +2060,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -1959,6 +2085,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1983,6 +2110,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2007,6 +2135,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2031,6 +2160,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2055,6 +2185,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2079,6 +2210,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2103,6 +2235,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2127,6 +2260,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2151,6 +2285,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2175,6 +2310,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2199,6 +2335,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2223,6 +2360,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2247,6 +2385,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2271,6 +2410,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2295,6 +2435,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2319,6 +2460,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2343,6 +2485,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2367,6 +2510,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2391,6 +2535,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2415,6 +2560,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2439,6 +2585,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2463,6 +2610,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2487,6 +2635,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2511,6 +2660,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2535,6 +2685,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2559,6 +2710,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2583,6 +2735,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2607,6 +2760,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2631,6 +2785,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2655,6 +2810,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2679,6 +2835,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2703,6 +2860,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2727,6 +2885,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2751,6 +2910,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2775,6 +2935,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2799,6 +2960,7 @@
         "value": "RPA",
         "id": "16007"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
         "value": "RPA",
@@ -2823,6 +2985,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2847,6 +3010,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2871,6 +3035,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
@@ -2895,6 +3060,7 @@
         "value": "Dados Operações",
         "id": "16006"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -2919,6 +3085,7 @@
         "value": "Operações NPay",
         "id": "16005"
       },
+      "customfield_11010": null,
       "squad": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
         "value": "Operações NPay",
