@@ -114,6 +114,7 @@ async function fetchJiraAndSaveJson() {
       status: statusName,
       categoriaStatus: catStatus,
       customfield_12475: cfSquad,
+      customfield_11010: fields.customfield_11010,
       squad: cfSquad,
       requester: reporter,
       priority: fields.priority?.name || '2 - Alta',
