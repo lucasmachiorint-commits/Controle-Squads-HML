@@ -928,6 +928,19 @@ const app = {
     if (navGestaoAcessos) {
       navGestaoAcessos.style.display = isAdmin ? '' : 'none';
     }
+
+    // 9. Time Solicitante select — somente Admin edita
+    document.querySelectorAll('.team-solicitante-select').forEach(el => {
+      if (isAdmin) {
+        el.removeAttribute('disabled');
+        el.style.opacity = '1';
+        el.style.pointerEvents = 'auto';
+      } else {
+        el.setAttribute('disabled', 'true');
+        el.style.opacity = '0.75';
+        el.style.pointerEvents = 'none';
+      }
+    });
   },
 
   setupKeyboardShortcuts() {
@@ -3062,6 +3075,22 @@ const app = {
     const tbody = document.getElementById('backlog-table-body');
     if (!tbody) return;
 
+    const isAdmin = this.userRole === 'admin';
+    const headEl = document.getElementById('backlog-table-head');
+    if (headEl) {
+      headEl.innerHTML = `
+        <tr>
+          <th style="width: 55px; white-space: nowrap;">Ordem</th>
+          <th style="width: 95px; white-space: nowrap;">GAU / Chave</th>
+          <th style="min-width: 170px;">Título da Demanda</th>
+          <th style="width: 130px; white-space: nowrap;">Solicitante</th>
+          <th style="width: 135px; white-space: nowrap;">Time Solicitante</th>
+          ${isAdmin ? '<th style="width: 130px; white-space: nowrap;">Status</th>' : ''}
+          <th style="width: 100px; white-space: nowrap;">Data de Criação</th>
+        </tr>
+      `;
+    }
+
     const squadNames = { dados: 'Squad de Dados', operacoes: 'Squad de Operações', rpa: 'Squad de RPA' };
     const titleEl = document.getElementById('backlog-squad-title');
     if (titleEl) titleEl.textContent = `Backlog - ${squadNames[this.activeSquad]}`;
@@ -3099,10 +3128,11 @@ const app = {
       return matchSearch && matchTeam;
     });
 
+    const colSpan = isAdmin ? 7 : 6;
     if (filteredItems.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda no backlog encontrada.</td>
+          <td colspan="${colSpan}" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda no backlog encontrada.</td>
         </tr>
       `;
       return;
@@ -3125,20 +3155,22 @@ const app = {
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
         <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requester || 'Solicitante Jira'}</td>
         <td onclick="event.stopPropagation();" style="white-space:nowrap; width:135px;">
-          <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)">
+          <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)" ${isAdmin ? '' : 'disabled="true" style="pointer-events:none; opacity:0.75;"'}>
             <option value="">— Selecione —</option>
             <option value="Atendimento" ${item.teamSolicitante === 'Atendimento' ? 'selected' : ''}>Atendimento</option>
             <option value="Conciliação" ${(item.teamSolicitante || '').startsWith('Conciliação') ? 'selected' : ''}>Conciliação</option>
             <option value="Suporte Operacional" ${item.teamSolicitante === 'Suporte Operacional' ? 'selected' : ''}>Suporte Operacional</option>
           </select>
         </td>
-        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:130px;">
-          <select class="status-select-dropdown status-backlog ${item.status === 'Bloqueado' ? 'status-bloqueado' : ''}" onchange="app.changeDemandStatus('${item.id}', this.value)">
-            <option value="Backlog" ${item.status === 'Backlog' ? 'selected' : ''}>Backlog</option>
-            <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
-            <option value="Bloqueado" ${item.status === 'Bloqueado' ? 'selected' : ''}>Bloqueado</option>
-          </select>
-        </td>
+        ${isAdmin ? `
+          <td onclick="event.stopPropagation();" style="white-space:nowrap; width:130px;">
+            <select class="status-select-dropdown status-backlog ${item.status === 'Bloqueado' ? 'status-bloqueado' : ''}" onchange="app.changeDemandStatus('${item.id}', this.value)">
+              <option value="Backlog" ${item.status === 'Backlog' ? 'selected' : ''}>Backlog</option>
+              <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
+              <option value="Bloqueado" ${item.status === 'Bloqueado' ? 'selected' : ''}>Bloqueado</option>
+            </select>
+          </td>
+        ` : ''}
         <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
       </tr>
     `).join('');

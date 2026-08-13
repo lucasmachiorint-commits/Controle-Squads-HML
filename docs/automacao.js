@@ -283,7 +283,12 @@ var AutomacaoModule = window.AutomacaoModule = {
     html += '          <th style="min-width: 160px; padding: 10px 8px;">TÍTULO DA DEMANDA</th>';
     html += '          <th style="width: 120px; white-space: nowrap; padding: 10px 8px;">SOLICITANTE</th>';
     html += '          <th style="width: 160px; padding: 10px 8px;">TIME SOLICITANTE</th>';
-    html += '          <th style="width: 125px; white-space: nowrap; padding: 10px 8px;">STATUS</th>';
+    var isAdminUser = window.app && window.app.userRole === 'admin';
+    var showStatusCol = (this.activeTab !== 'backlog') || isAdminUser;
+
+    if (showStatusCol) {
+      html += '          <th style="width: 125px; white-space: nowrap; padding: 10px 8px;">STATUS</th>';
+    }
     html += '          <th style="width: 95px; white-space: nowrap; padding: 10px 8px;">DATA DE CRIAÇÃO</th>';
     html += '          <th style="width: 85px; white-space: nowrap; padding: 10px 8px;">CRITICIDADE</th>';
     html += '          <th style="width: 65px; text-align: right; white-space: nowrap; padding: 10px 8px;">AÇÕES</th>';
@@ -292,7 +297,9 @@ var AutomacaoModule = window.AutomacaoModule = {
     html += '      <tbody>';
 
     if (filteredItems.length === 0) {
-      var colSpan = this.activeTab === 'backlog' ? 9 : 8;
+      var colSpan = 8;
+      if (this.activeTab === 'backlog') colSpan += 1;
+      if (!showStatusCol) colSpan -= 1;
       html += '        <tr>';
       html += '          <td colspan="' + colSpan + '" style="padding: 40px 16px; text-align: center;">';
       html += '            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-800/50 mb-2">';
@@ -337,14 +344,16 @@ var AutomacaoModule = window.AutomacaoModule = {
         html += '            ' + (item.team || 'Conciliação, Parâmetros, Processamento e Adquirência');
         html += '          </td>';
 
-        // 6. COLUNA STATUS
-        html += '          <td onclick="event.stopPropagation();" style="white-space:nowrap; padding: 10px 8px;">';
-        html += '            <select class="status-select-dropdown ' + statusClass + '" style="width: 115px !important; min-width: 115px !important; max-width: 115px !important; font-size: 10px !important; padding: 4px 16px 4px 6px !important;" onchange="app.moveAutomacaoTo(\'' + item.id + '\', this.value)">';
-        html += '              <option value="backlog" ' + (item.status === 'backlog' ? 'selected' : '') + '>Backlog</option>';
-        html += '              <option value="em-andamento" ' + (item.status === 'em-andamento' ? 'selected' : '') + '>Em Andamento</option>';
-        html += '              <option value="concluido" ' + (item.status === 'concluido' ? 'selected' : '') + '>Concluído</option>';
-        html += '            </select>';
-        html += '          </td>';
+        // 6. COLUNA STATUS (somente se showStatusCol)
+        if (showStatusCol) {
+          html += '          <td onclick="event.stopPropagation();" style="white-space:nowrap; padding: 10px 8px;">';
+          html += '            <select class="status-select-dropdown ' + statusClass + '" style="width: 115px !important; min-width: 115px !important; max-width: 115px !important; font-size: 10px !important; padding: 4px 16px 4px 6px !important;" onchange="app.moveAutomacaoTo(\'' + item.id + '\', this.value)">';
+          html += '              <option value="backlog" ' + (item.status === 'backlog' ? 'selected' : '') + '>Backlog</option>';
+          html += '              <option value="em-andamento" ' + (item.status === 'em-andamento' ? 'selected' : '') + '>Em Andamento</option>';
+          html += '              <option value="concluido" ' + (item.status === 'concluido' ? 'selected' : '') + '>Concluído</option>';
+          html += '            </select>';
+          html += '          </td>';
+        }
 
         // 7. DATA DE CRIAÇÃO
         html += '          <td style="padding: 10px 8px;" class="text-xs text-slate-400 font-semibold">' + formattedDate + '</td>';
