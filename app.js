@@ -3396,30 +3396,232 @@ const app = {
     this.saveState();
   },
 
-  // Exportar Tabela para Excel (.xlsx) com suporte para as 3 abas
+  // Exportar Tabela para Excel (.xlsx) com suporte para todas as visões e coluna Ordem preservada
   exportExcel() {
     let items = [];
     let viewLabel = 'Backlog';
+    let exportData = [];
 
-    if (this.activeView === 'board') {
-      const all = this.state.backlogItems[this.activeSquad] || [];
-      items = all.filter(i => i.status === 'Em Andamento');
-      viewLabel = 'EmAndamento';
-    } else if (this.activeView === 'concluidos') {
-      items = this.state.completedTasks[this.activeSquad] || [];
-      viewLabel = 'Concluidos';
-    } else {
-      const all = this.state.backlogItems[this.activeSquad] || [];
-      items = all.filter(i => i.status !== 'Em Andamento' && i.status !== 'Concluído' && i.status !== 'Concluido');
+    const parseCreationTimestamp = (item) => {
+      if (!item) return 0;
+      const raw = item.rawCreated || item.createdDate || item.createdAt || item.date || item.created;
+      if (!raw) return 0;
+      if (typeof raw === 'number') return raw;
+      const str = String(raw).trim();
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length >= 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          let rest = parts[2].trim();
+          let year = parseInt(rest.split(' ')[0], 10);
+          if (year < 100) year += 2000;
+          let hour = 0, min = 0, sec = 0;
+          if (rest.includes(' ')) {
+            const timeParts = rest.split(' ')[1].split(':');
+            if (timeParts.length >= 1) hour = parseInt(timeParts[0], 10) || 0;
+            if (timeParts.length >= 2) min = parseInt(timeParts[1], 10) || 0;
+            if (timeParts.length >= 3) sec = parseInt(timeParts[2], 10) || 0;
+          }
+          return new Date(year, month, day, hour, min, sec).getTime();
+        }
+      }
+      const parsed = new Date(str).getTime();
+      return isNaN(parsed) ? 0 : parsed;
+    };
+
+    if (this.activeView === 'backlog') {
       viewLabel = 'Backlog';
+      const all = this.state.backlogItems[this.activeSquad] || [];
+      items = all.filter(i => i.status === 'Backlog' || (i.status === 'Bloqueado' && i.phase === 'backlog'));
+
+      // Garantir atribuição de ordem para unassigned (ordenados por data de criação)
+      const unassigned = items.filter(i => !i.treatmentOrder || i.treatmentOrder <= 0);
+      if (unassigned.length > 0) {
+        unassigned.sort((a, b) => parseCreationTimestamp(a) - parseCreationTimestamp(b));
+        let maxOrd = 0;
+        items.forEach(i => {
+          if (i.treatmentOrder && typeof i.treatmentOrder === 'number' && i.treatmentOrder > maxOrd) {
+            maxOrd = i.treatmentOrder;
+          }
+        });
+        unassigned.forEach(item => {
+          maxOrd++;
+          item.treatmentOrder = maxOrd;
+        });
+      }
+
+      // Ordenar estritamente por treatmentOrder crescente (1, 2, 3, 4...)
+      items.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
+
+      // Aplicar filtro de busca ativo em tela (se houver)
+      const searchTerm = (document.getElementById('search-backlog')?.value || '').toLowerCase();
+      const teamFilter = document.getElementById('filter-team-backlog')?.value || '';
+
+      const filtered = items.filter(item => {
+        const matchSearch = !searchTerm ||
+          (item.title || '').toLowerCase().includes(searchTerm) ||
+          (item.gau || item.jiraKey || '').toLowerCase().includes(searchTerm) ||
+          (item.requester || '').toLowerCase().includes(searchTerm);
+        let matchTeam = true;
+        if (teamFilter === '__vazio__') {
+          matchTeam = !item.teamSolicitante;
+        } else if (teamFilter) {
+          matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
+        }
+        return matchSearch && matchTeam;
+      });
+
+      exportData = filtered.map((item) => ({
+        'Ordem': item.treatmentOrder || '',
+        'GAU / Chave': item.gau || item.jiraKey || 'GAU-000',
+        'Título da Demanda': item.title || '',
+        'Solicitante': item.requester || 'Solicitante Jira',
+        'Time Solicitante': item.teamSolicitante || '',
+        'Status': item.status || 'Backlog',
+        'Data de Criação': this.formatOnlyDate(item.createdDate || item.date || item.createdAt)
+      }));
+
+    } else if (this.activeView === 'board') {
+      viewLabel = 'EmAndamento';
+      const all = this.state.backlogItems[this.activeSquad] || [];
+      items = all.filter(i => i.status === 'Em Andamento' || (i.status === 'Bloqueado' && (i.phase === 'em-andamento' || !i.phase)));
+
+      const searchTerm = (document.getElementById('search-board')?.value || '').toLowerCase();
+      const teamFilter = document.getElementById('filter-team-board')?.value || '';
+
+      const filtered = items.filter(item => {
+        const matchSearch = !searchTerm ||
+          (item.title || '').toLowerCase().includes(searchTerm) ||
+          (item.gau || item.jiraKey || '').toLowerCase().includes(searchTerm) ||
+          (item.requester || '').toLowerCase().includes(searchTerm);
+        let matchTeam = true;
+        if (teamFilter === '__vazio__') {
+          matchTeam = !item.teamSolicitante;
+        } else if (teamFilter) {
+          matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
+        }
+        return matchSearch && matchTeam;
+      });
+
+      exportData = filtered.map((item, idx) => ({
+        'Item #': idx + 1,
+        'GAU / Chave': item.gau || item.jiraKey || 'GAU-000',
+        'Título da Demanda': item.title || '',
+        'Solicitante': item.requester || 'Solicitante Jira',
+        'Time Solicitante': item.teamSolicitante || '',
+        'Status': item.status || 'Em Andamento',
+        'Data de Criação': this.formatOnlyDate(item.createdDate || item.date || item.createdAt)
+      }));
+
+    } else if (this.activeView === 'concluidos') {
+      viewLabel = 'Concluidos';
+      items = this.state.completedTasks[this.activeSquad] || [];
+
+      const searchTerm = (document.getElementById('search-concluidos')?.value || '').toLowerCase();
+      const teamFilter = document.getElementById('filter-team-concluidos')?.value || '';
+
+      const filtered = items.filter(item => {
+        const matchSearch = !searchTerm ||
+          (item.taskTitle || '').toLowerCase().includes(searchTerm) ||
+          (item.completedBy || '').toLowerCase().includes(searchTerm) ||
+          (item.jiraKey || '').toLowerCase().includes(searchTerm);
+        let matchTeam = true;
+        if (teamFilter === '__vazio__') {
+          matchTeam = !item.teamSolicitante;
+        } else if (teamFilter) {
+          matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
+        }
+        return matchSearch && matchTeam;
+      });
+
+      exportData = filtered.map((item) => ({
+        'GAU / Chave': this.getItemGau(item),
+        'Título da Demanda': item.title || item.taskTitle || '',
+        'Solicitante': item.requester || item.completedBy || item.requesterName || 'Solicitante Jira',
+        'Time Solicitante': item.teamSolicitante || '',
+        'Data de Criação': this.formatOnlyDate(item.createdDate || item.date || item.createdAt),
+        'Data de Conclusão': this.formatOnlyDate(item.completionDate || item.completedAt),
+        'Ganhos / Entregáveis': item.gains || ''
+      }));
+
+    } else if (this.activeView === 'automacao' && window.AutomacaoModule) {
+      viewLabel = 'Automacao';
+      const activeTab = window.AutomacaoModule.activeTab || 'backlog';
+      items = (window.AutomacaoModule.items || []).filter(i => i.status === activeTab);
+
+      if (activeTab === 'backlog') {
+        const unassigned = items.filter(i => !i.treatmentOrder || i.treatmentOrder <= 0);
+        if (unassigned.length > 0) {
+          unassigned.sort((a, b) => parseCreationTimestamp(a) - parseCreationTimestamp(b));
+          let maxOrd = 0;
+          items.forEach(i => {
+            if (i.treatmentOrder && typeof i.treatmentOrder === 'number' && i.treatmentOrder > maxOrd) {
+              maxOrd = i.treatmentOrder;
+            }
+          });
+          unassigned.forEach(item => {
+            maxOrd++;
+            item.treatmentOrder = maxOrd;
+          });
+        }
+        items.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
+
+        exportData = items.map((item) => ({
+          'ID': item.seqId ? `#${item.seqId}` : '',
+          'Ordem': item.treatmentOrder || '',
+          'Título da Demanda': item.title || '',
+          'Solicitante': item.requester || '',
+          'Time Solicitante': item.team || '',
+          'Status': 'Backlog',
+          'Data de Criação': item.createdDate || '',
+          'Criticidade': item.criticality || ''
+        }));
+      } else {
+        exportData = items.map((item, idx) => ({
+          'ID': item.seqId ? `#${item.seqId}` : `#${idx + 1}`,
+          'Título da Demanda': item.title || '',
+          'Solicitante': item.requester || '',
+          'Time Solicitante': item.team || '',
+          'Status': item.status || '',
+          'Data de Criação': item.createdDate || '',
+          'Criticidade': item.criticality || ''
+        }));
+      }
+
+    } else if (this.activeView === 'rpa-pendencies' && window.RpaPendenciesModule) {
+      viewLabel = 'PendenciasRPA';
+      items = window.RpaPendenciesModule.pendencies || [];
+      exportData = items.map((item, idx) => ({
+        'ID': `#${item.seqId || (idx + 1)}`,
+        'Processo / Robô': item.robotName || '',
+        'Título da Pendência': item.title || '',
+        'Tipo': item.type || '',
+        'Prioridade': item.priority || '',
+        'Status': item.status || '',
+        'Responsável': item.assignedTo || '',
+        'Data de Criação': item.createdAt || ''
+      }));
+
+    } else {
+      viewLabel = 'Triagem';
+      items = this.state.triageItems || [];
+      exportData = items.map((item) => ({
+        'GAU / Chave': item.jiraKey || 'GAU-000',
+        'Título da Demanda': item.title || '',
+        'Solicitante': item.requesterName || item.requester || '',
+        'Time Solicitante': item.teamSolicitante || '',
+        'Status': item.status || 'Pendente',
+        'Data de Criação': this.formatOnlyDate(item.createdDate || item.createdAt || item.date)
+      }));
     }
 
-    if (!items.length) {
+    if (!exportData.length) {
       alert(`Nenhuma demanda na lista para exportar.`);
       return;
     }
 
-    const ws = XLSX.utils.json_to_sheet(items);
+    const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, viewLabel);
     XLSX.writeFile(wb, `${viewLabel}_${this.activeSquad}_${new Date().toISOString().split('T')[0]}.xlsx`);
