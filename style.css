@@ -2138,6 +2138,19 @@ body.light-theme #modal-automacao-edit label {
   color: #0f172a !important;
 }
 
+/* Badge de Time Solicitante do Módulo de Automação */
+.automacao-team-badge {
+  background-color: #1e293b !important;
+  color: #cbd5e1 !important;
+  border: 1px solid #334155 !important;
+}
+
+body.light-theme .automacao-team-badge {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
 /* ============================================================
    @MEDIA PRINT — Impressão Direta (window.print)
    ============================================================ */

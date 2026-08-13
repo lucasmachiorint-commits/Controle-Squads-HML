@@ -1,7 +1,7 @@
 /* ==========================================================================
    Controle de Squads - Módulo Isolado de Automação (automacao.js)
    Demandas Internas de Desenvolvimento & Automação
-   Design System Harmonizado Impeccable (v1.5.0)
+   Design System Harmonizado Impeccable (v1.6.0)
    ========================================================================== */
 
 var AutomacaoModule = window.AutomacaoModule = {
@@ -30,6 +30,24 @@ var AutomacaoModule = window.AutomacaoModule = {
     window.app.renderAutomacaoView = function() { self.renderView(); };
   },
 
+  ensureSequentialIds: function() {
+    if (!Array.isArray(this.items)) this.items = [];
+    var currentMax = 0;
+    this.items.forEach(function(item) {
+      if (item.seqId && typeof item.seqId === 'number') {
+        if (item.seqId > currentMax) currentMax = item.seqId;
+      }
+    });
+
+    // Atribuir IDs sequenciais de 1 em diante para itens sem seqId
+    this.items.forEach(function(item) {
+      if (!item.seqId) {
+        currentMax++;
+        item.seqId = currentMax;
+      }
+    });
+  },
+
   fetchItems: async function() {
     try {
       if (window.supabaseClient) {
@@ -43,13 +61,14 @@ var AutomacaoModule = window.AutomacaoModule = {
 
         if (res && res.data && res.data.data && Array.isArray(res.data.data.automacaoItems) && res.data.data.automacaoItems.length > 0) {
           this.items = res.data.data.automacaoItems;
+          this.ensureSequentialIds();
           this.saveLocal(false);
           this.renderView();
           return;
         }
       }
     } catch(err) {
-      console.warn("[AutomacaoModule] Falha ao ler Supabase, alternando para LocalStorage:", err);
+      console.warn("[AutomacaoModule] Falha ao ler Supabase, usando LocalStorage:", err);
     }
     this._loadFallback();
     this.renderView();
@@ -64,9 +83,11 @@ var AutomacaoModule = window.AutomacaoModule = {
         this.items = [];
       }
     }
+    this.ensureSequentialIds();
   },
 
   saveLocal: function(triggerSupabase = true) {
+    this.ensureSequentialIds();
     localStorage.setItem('cs_automacao_items_v1', JSON.stringify(this.items));
     if (window.app && window.app.state) {
       window.app.state.automacaoItems = this.items;
@@ -115,10 +136,41 @@ var AutomacaoModule = window.AutomacaoModule = {
     return { total: total, emAndamento: emAndamento, concluidos: concluidos };
   },
 
+  formatDatePtBr: function(dateStr) {
+    if (!dateStr) return new Date().toLocaleDateString('pt-BR');
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) return dateStr;
+    try {
+      var d = new Date(dateStr);
+      if (!isNaN(d.getTime())) {
+        var day = String(d.getDate()).padStart(2, '0');
+        var month = String(d.getMonth() + 1).padStart(2, '0');
+        var year = d.getFullYear();
+        return day + '/' + month + '/' + year;
+      }
+    } catch(e) {}
+    return dateStr;
+  },
+
+  formatDateIsoForPicker: function(dateStr) {
+    var todayIso = new Date().toISOString().split('T')[0];
+    if (!dateStr) return todayIso;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+      var parts = dateStr.split('/');
+      return parts[2] + '-' + parts[1] + '-' + parts[0];
+    }
+    try {
+      var d = new Date(dateStr);
+      if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+    } catch(e) {}
+    return todayIso;
+  },
+
   renderView: function() {
     var container = document.getElementById('view-automacao');
     if (!container) return;
 
+    this.ensureSequentialIds();
     var metrics = this.getMetrics();
     var filteredItems = this.items.filter(i => i.status === this.activeTab);
 
@@ -147,7 +199,7 @@ var AutomacaoModule = window.AutomacaoModule = {
     });
     html += '</div>';
 
-    // 2. TRÊS QUADROS DE MÉTRICAS DE RESUMO DAS DEMANDAS
+    // 2. TRÊS QUADROS DE MÉTRICAS
     html += '<div class="triage-metrics-row mb-6 flex items-center gap-4">';
     
     html += '<div class="metric-box-card metric-box-purple flex-1 p-4 rounded-xl glass-panel" style="margin-bottom: 0 !important;">';
@@ -197,27 +249,25 @@ var AutomacaoModule = window.AutomacaoModule = {
     html += '    <table class="custom-table w-full text-left">';
     html += '      <thead>';
     html += '        <tr>';
+    html += '          <th style="width: 55px; white-space: nowrap;">ID</th>';
 
     if (this.activeTab === 'backlog') {
       html += '          <th style="width: 70px; white-space: nowrap;">ORDEM</th>';
     }
 
     html += '          <th style="min-width: 220px;">TÍTULO DA DEMANDA</th>';
-    html += '          <th style="width: 150px; white-space: nowrap;">SOLICITANTE</th>';
-    html += '          <th style="width: 160px; white-space: nowrap;">TIME SOLICITANTE</th>';
+    html += '          <th style="width: 140px; white-space: nowrap;">SOLICITANTE</th>';
+    html += '          <th style="width: 170px; white-space: nowrap;">TIME SOLICITANTE</th>';
+    html += '          <th style="width: 135px; white-space: nowrap;">STATUS</th>';
     html += '          <th style="width: 120px; white-space: nowrap;">DATA DE CRIAÇÃO</th>';
-    html += '          <th style="width: 110px; white-space: nowrap;">CRITICIDADE</th>';
-
-    if (this.activeTab !== 'concluido') {
-      html += '          <th style="width: 130px; text-align: right; white-space: nowrap;">AÇÕES</th>';
-    }
-
+    html += '          <th style="width: 100px; white-space: nowrap;">CRITICIDADE</th>';
+    html += '          <th style="width: 90px; text-align: right; white-space: nowrap;">AÇÕES</th>';
     html += '        </tr>';
     html += '      </thead>';
     html += '      <tbody>';
 
     if (filteredItems.length === 0) {
-      var colSpan = this.activeTab === 'backlog' ? 7 : (this.activeTab === 'em-andamento' ? 6 : 5);
+      var colSpan = this.activeTab === 'backlog' ? 9 : 8;
       html += '        <tr>';
       html += '          <td colspan="' + colSpan + '" style="padding: 48px 16px; text-align: center;">';
       html += '            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-slate-800/50 mb-3">';
@@ -228,20 +278,28 @@ var AutomacaoModule = window.AutomacaoModule = {
       html += '          </td>';
       html += '        </tr>';
     } else {
-      filteredItems.forEach(function(item) {
+      filteredItems.forEach(function(item, idx) {
         var critBadge = '';
         if (item.criticality === 'Alta') critBadge = 'bg-rose-500/20 text-rose-400 border-rose-500/40';
         else if (item.criticality === 'Média') critBadge = 'bg-amber-500/20 text-amber-400 border-amber-500/40';
         else critBadge = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
 
+        var formattedDate = AutomacaoModule.formatDatePtBr(item.createdDate || item.createdAt);
+        var statusClass = item.status === 'em-andamento' ? 'status-em-andamento' : (item.status === 'concluido' ? 'status-concluido' : 'status-backlog');
+
         html += '        <tr class="hover:bg-white/5 transition-all">';
 
+        // 1. COLUNA ID (sequencial)
+        html += '          <td style="padding: 12px 16px;" class="font-extrabold text-violet-400">#' + (item.seqId || (idx + 1)) + '</td>';
+
+        // 2. COLUNA ORDEM (apenas no Backlog)
         if (AutomacaoModule.activeTab === 'backlog') {
           html += '          <td style="padding: 12px 16px;">';
           html += '            <input type="number" value="' + (item.treatmentOrder || 1) + '" onchange="app.changeAutomacaoOrder(\'' + item.id + '\', this.value)" class="order-input-field w-14 text-center" style="height: 32px; font-weight: 800;" />';
           html += '          </td>';
         }
 
+        // 3. TÍTULO E APLICAÇÃO
         html += '          <td style="padding: 12px 16px;">';
         html += '            <span class="font-extrabold text-white text-xs block mb-0.5">' + (item.title || 'Sem título') + '</span>';
         if (item.application) {
@@ -252,42 +310,42 @@ var AutomacaoModule = window.AutomacaoModule = {
         }
         html += '          </td>';
 
+        // 4. SOLICITANTE
         html += '          <td style="padding: 12px 16px;" class="text-xs font-semibold text-slate-300">' + (item.requester || '-') + '</td>';
 
+        // 5. TIME SOLICITANTE
         html += '          <td style="padding: 12px 16px;">';
-        html += '            <span class="badge text-[10px] px-2.5 py-0.5 bg-slate-800 text-slate-300 border border-slate-700 font-semibold">' + (item.team || 'Geral') + '</span>';
+        html += '            <span class="badge text-[10px] px-2.5 py-0.5 automacao-team-badge font-semibold">' + (item.team || 'Conciliação, Parâmetros, Processamento e Adquirência') + '</span>';
         html += '          </td>';
 
-        html += '          <td style="padding: 12px 16px;" class="text-xs text-slate-400">' + (item.createdDate || '-') + '</td>';
+        // 6. COLUNA STATUS (Dropdown interativo)
+        html += '          <td onclick="event.stopPropagation();" style="white-space:nowrap; width:135px; padding: 12px 16px;">';
+        html += '            <select class="status-select-dropdown ' + statusClass + '" onchange="app.moveAutomacaoTo(\'' + item.id + '\', this.value)">';
+        html += '              <option value="backlog" ' + (item.status === 'backlog' ? 'selected' : '') + '>Backlog</option>';
+        html += '              <option value="em-andamento" ' + (item.status === 'em-andamento' ? 'selected' : '') + '>Em Andamento</option>';
+        html += '              <option value="concluido" ' + (item.status === 'concluido' ? 'selected' : '') + '>Concluído</option>';
+        html += '            </select>';
+        html += '          </td>';
 
+        // 7. DATA DE CRIAÇÃO (DD/MM/YYYY)
+        html += '          <td style="padding: 12px 16px;" class="text-xs text-slate-400 font-semibold">' + formattedDate + '</td>';
+
+        // 8. CRITICIDADE
         html += '          <td style="padding: 12px 16px;">';
         html += '            <span class="badge text-[10px] px-2.5 py-0.5 border font-bold ' + critBadge + '">' + (item.criticality || 'Média') + '</span>';
         html += '          </td>';
 
-        if (AutomacaoModule.activeTab !== 'concluido') {
-          html += '          <td style="padding: 12px 16px; text-align: right;">';
-          html += '            <div class="flex items-center justify-end gap-1.5">';
-
-          if (AutomacaoModule.activeTab === 'backlog') {
-            html += '              <button onclick="app.moveAutomacaoTo(\'' + item.id + '\', \'em-andamento\')" class="btn btn-secondary text-xs py-1 px-2.5 hover:bg-violet-500/20 text-violet-400 border border-violet-500/30" title="Iniciar Demanda">';
-            html += '                <i class="fa-solid fa-play me-1"></i> Iniciar';
-            html += '              </button>';
-          } else if (AutomacaoModule.activeTab === 'em-andamento') {
-            html += '              <button onclick="app.moveAutomacaoTo(\'' + item.id + '\', \'concluido\')" class="btn btn-secondary text-xs py-1 px-2.5 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" title="Concluir Demanda">';
-            html += '                <i class="fa-solid fa-check me-1"></i> Concluir';
-            html += '              </button>';
-          }
-
-          html += '              <button onclick="app.openAutomacaoModal(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-2" title="Editar Demanda">';
-          html += '                <i class="fa-solid fa-pen text-slate-300"></i>';
-          html += '              </button>';
-          html += '              <button onclick="app.deleteAutomacaoDemand(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-2 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30" title="Excluir Demanda">';
-          html += '                <i class="fa-solid fa-trash-can"></i>';
-          html += '              </button>';
-
-          html += '            </div>';
-          html += '          </td>';
-        }
+        // 9. AÇÕES (Editar e Excluir)
+        html += '          <td style="padding: 12px 16px; text-align: right;">';
+        html += '            <div class="flex items-center justify-end gap-1.5">';
+        html += '              <button onclick="app.openAutomacaoModal(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-2" title="Editar Demanda">';
+        html += '                <i class="fa-solid fa-pen text-slate-300"></i>';
+        html += '              </button>';
+        html += '              <button onclick="app.deleteAutomacaoDemand(\'' + item.id + '\')" class="btn btn-secondary text-[11px] py-1 px-2 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30" title="Excluir Demanda">';
+        html += '                <i class="fa-solid fa-trash-can"></i>';
+        html += '              </button>';
+        html += '            </div>';
+        html += '          </td>';
 
         html += '        </tr>';
       });
@@ -321,19 +379,11 @@ var AutomacaoModule = window.AutomacaoModule = {
     if (id) {
       var item = this.items.find(i => i.id === id);
       if (item) {
-        if (titleEl) titleEl.textContent = 'Editar Demanda — Automação';
+        if (titleEl) titleEl.textContent = 'Editar Demanda #' + (item.seqId || '') + ' — Automação';
         if (idEl) idEl.value = item.id;
         if (reqEl) reqEl.value = item.requester || '';
-        if (teamEl) teamEl.value = item.team || 'Conciliação';
-        if (dateEl) {
-          try {
-            if (item.createdAt) {
-              dateEl.value = new Date(item.createdAt).toISOString().split('T')[0];
-            } else {
-              dateEl.value = todayIso;
-            }
-          } catch(e) { dateEl.value = todayIso; }
-        }
+        if (teamEl) teamEl.value = item.team || 'Conciliação, Parâmetros, Processamento e Adquirência';
+        if (dateEl) dateEl.value = this.formatDateIsoForPicker(item.createdDate || item.createdAt);
         if (appEl) appEl.value = item.application || 'Controle de Squads';
         if (critEl) critEl.value = item.criticality || 'Média';
         if (titleInput) titleInput.value = item.title || '';
@@ -343,7 +393,7 @@ var AutomacaoModule = window.AutomacaoModule = {
       if (titleEl) titleEl.textContent = 'Nova Demanda — Automação';
       if (idEl) idEl.value = '';
       if (reqEl) reqEl.value = '';
-      if (teamEl) teamEl.value = 'Conciliação';
+      if (teamEl) teamEl.value = 'Conciliação, Parâmetros, Processamento e Adquirência';
       if (dateEl) dateEl.value = todayIso;
       if (appEl) appEl.value = 'Controle de Squads';
       if (critEl) critEl.value = 'Média';
@@ -382,13 +432,9 @@ var AutomacaoModule = window.AutomacaoModule = {
     }
 
     var nowIso = new Date().toISOString();
-    var createdFormatted = new Date().toLocaleDateString('pt-BR');
-    if (createdDateInput) {
-      try {
-        var parts = createdDateInput.split('-');
-        if (parts.length === 3) createdFormatted = parts[2] + '/' + parts[1] + '/' + parts[0];
-      } catch(e) {}
-    }
+    var createdFormatted = this.formatDatePtBr(createdDateInput || nowIso);
+
+    this.ensureSequentialIds();
 
     if (id) {
       var item = this.items.find(i => i.id === id);
@@ -409,8 +455,14 @@ var AutomacaoModule = window.AutomacaoModule = {
         nextOrder = Math.max(...backlogItems.map(i => i.treatmentOrder || 0)) + 1;
       }
 
+      var maxSeq = 0;
+      this.items.forEach(function(i) {
+        if (i.seqId && i.seqId > maxSeq) maxSeq = i.seqId;
+      });
+
       var newItem = {
         id: 'auto-' + Date.now(),
+        seqId: maxSeq + 1,
         title: title,
         description: description,
         requester: requester,
