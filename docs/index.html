@@ -335,12 +335,13 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end;">
           <!-- 1. Filtro por Squad -->
           <div>
-            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Filtrar por Squad:</label>
+            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Filtrar por Squad / Módulo:</label>
             <select id="dash-filter-squad" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
-              <option value="all">Todas as Squads (Dados, Operações, RPA)</option>
+              <option value="all">Todas as Squads / Módulos</option>
               <option value="dados">Squad de Dados</option>
               <option value="operacoes">Squad de Operações</option>
               <option value="rpa">Squad de RPA</option>
+              <option value="automacao">🤖 Automação (Demandas Internas)</option>
             </select>
           </div>
 
@@ -362,7 +363,7 @@
             <select id="dash-filter-team" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
               <option value="">🏢 Todos os Times</option>
               <option value="Atendimento">Atendimento</option>
-              <option value="Conciliação">Conciliação</option>
+              <option value="Conciliação">Conciliação, Parâmetros, Processamento e Adquirência</option>
               <option value="Suporte Operacional">Suporte Operacional</option>
               <option value="__vazio__">⚠️ Sem Time Definido</option>
             </select>

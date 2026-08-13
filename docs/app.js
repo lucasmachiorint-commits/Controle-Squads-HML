@@ -2463,7 +2463,7 @@ const app = {
     return isNaN(d.getTime()) ? null : d;
   },
 
-  // Agrupar todos os chamados das 3 squads para análise consolidada
+  // Agrupar todos os chamados das 3 squads + módulo de automação para análise consolidada
   getAllDashboardDemands() {
     let allDemands = [];
     ['dados', 'operacoes', 'rpa'].forEach(squadId => {
@@ -2486,6 +2486,25 @@ const app = {
         });
       });
     });
+
+    // 3. Demandas do Módulo de Automação
+    const autoItems = window.AutomacaoModule?.items || this.state?.automacaoItems || [];
+    autoItems.forEach(item => {
+      let mappedStatus = 'Backlog';
+      if (item.status === 'em-andamento') mappedStatus = 'Em Andamento';
+      else if (item.status === 'concluido') mappedStatus = 'Concluído';
+
+      allDemands.push({
+        ...item,
+        squadId: 'automacao',
+        status: mappedStatus,
+        teamSolicitante: item.team || 'Conciliação, Parâmetros, Processamento e Adquirência',
+        requester: item.requester || 'Solicitante Automação',
+        createdDate: item.createdDate || item.createdAt,
+        itemType: item.status === 'concluido' ? 'completed' : 'active'
+      });
+    });
+
     return allDemands;
   },
 
@@ -2585,8 +2604,9 @@ const app = {
     const dashTeamFilter = document.getElementById('dash-filter-team')?.value || '';
     if (dashTeamFilter) {
       demands = demands.filter(d => {
-        if (dashTeamFilter === '__vazio__') return !d.teamSolicitante;
-        return (d.teamSolicitante || '').startsWith(dashTeamFilter);
+        const teamName = d.teamSolicitante || d.team || '';
+        if (dashTeamFilter === '__vazio__') return !teamName;
+        return teamName.toLowerCase().includes(dashTeamFilter.toLowerCase()) || teamName.startsWith(dashTeamFilter);
       });
     }
 
@@ -2652,14 +2672,15 @@ const app = {
       const countDados = demands.filter(d => d.squadId === 'dados').length;
       const countOperac = demands.filter(d => d.squadId === 'operacoes').length;
       const countRpa = demands.filter(d => d.squadId === 'rpa').length;
+      const countAutomacao = demands.filter(d => d.squadId === 'automacao').length;
 
       window.squadChart = new Chart(ctxSquad, {
         type: 'doughnut',
         data: {
-          labels: ['Squad de Dados', 'Squad de Operações', 'Squad de RPA'],
+          labels: ['Squad de Dados', 'Squad de Operações', 'Squad de RPA', 'Automação'],
           datasets: [{
-            data: [countDados, countOperac, countRpa],
-            backgroundColor: ['#10b981', '#f59e0b', '#f43f5e'],
+            data: [countDados, countOperac, countRpa, countAutomacao],
+            backgroundColor: ['#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'],
             borderWidth: 3,
             borderColor: chartBorder,
             hoverOffset: 6
@@ -2837,8 +2858,8 @@ const app = {
     }
 
     tbody.innerHTML = blocked.map((item, idx) => {
-      const squadName = item.squadId === 'dados' ? 'Squad de Dados' : item.squadId === 'operacoes' ? 'Squad de Operações' : 'Squad de RPA';
-      const squadColor = item.squadId === 'dados' ? 'text-emerald-400' : item.squadId === 'operacoes' ? 'text-amber-400' : 'text-rose-400';
+      const squadName = item.squadId === 'dados' ? 'Squad de Dados' : item.squadId === 'operacoes' ? 'Squad de Operações' : item.squadId === 'automacao' ? 'Automação' : 'Squad de RPA';
+      const squadColor = item.squadId === 'dados' ? 'text-emerald-400' : item.squadId === 'operacoes' ? 'text-amber-400' : item.squadId === 'automacao' ? 'text-violet-400' : 'text-rose-400';
 
       return `
         <tr class="hover:bg-white/5 transition-all">
