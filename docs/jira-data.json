@@ -1,7 +1,152 @@
 {
-  "updatedAt": "2026-08-13T13:07:46.577Z",
-  "totalCards": 123,
+  "updatedAt": "2026-08-14T19:16:26.852Z",
+  "totalCards": 128,
   "cards": [
+    {
+      "id": "1437529",
+      "key": "GAU-146",
+      "jiraKey": "GAU-146",
+      "title": "ID16 Pendência Jira",
+      "summary": "ID16 Pendência Jira",
+      "status": "Aguardando Squad",
+      "categoriaStatus": "Itens Pendentes",
+      "customfield_12475": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+        "value": "Suporte Operacional",
+        "id": "24152"
+      },
+      "squad": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "requester": "Jailton Gomes Dos Santos",
+      "priority": "Média",
+      "category": "Geral",
+      "createdDate": "14/08/2026",
+      "description": "Demanda para Squad de RPA"
+    },
+    {
+      "id": "1437527",
+      "key": "GAU-145",
+      "jiraKey": "GAU-145",
+      "title": "ID26 - Amortização Dispatcher",
+      "summary": "ID26 - Amortização Dispatcher",
+      "status": "Aguardando Squad",
+      "categoriaStatus": "Itens Pendentes",
+      "customfield_12475": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+        "value": "Suporte Operacional",
+        "id": "24152"
+      },
+      "squad": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "requester": "Jailton Gomes Dos Santos",
+      "priority": "Média",
+      "category": "Geral",
+      "createdDate": "14/08/2026",
+      "description": "Demanda para Squad de Dados"
+    },
+    {
+      "id": "1437521",
+      "key": "GAU-144",
+      "jiraKey": "GAU-144",
+      "title": "ID 06 - Análise de Baixas ",
+      "summary": "ID 06 - Análise de Baixas ",
+      "status": "Aguardando Squad",
+      "categoriaStatus": "Itens Pendentes",
+      "customfield_12475": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+        "value": "Suporte Operacional",
+        "id": "24152"
+      },
+      "squad": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "requester": "Jailton Gomes Dos Santos",
+      "priority": "Média",
+      "category": "Geral",
+      "createdDate": "14/08/2026",
+      "description": "Demanda para Squad de RPA"
+    },
+    {
+      "id": "1437519",
+      "key": "GAU-143",
+      "jiraKey": "GAU-143",
+      "title": "EqualsMapper",
+      "summary": "EqualsMapper",
+      "status": "Aguardando Squad",
+      "categoriaStatus": "Itens Pendentes",
+      "customfield_12475": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+        "value": "Suporte Operacional",
+        "id": "24152"
+      },
+      "squad": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "requester": "Jailton Gomes Dos Santos",
+      "priority": "Média",
+      "category": "Geral",
+      "createdDate": "14/08/2026",
+      "description": "Demanda para Squad de RPA"
+    },
+    {
+      "id": "1437483",
+      "key": "GAU-142",
+      "jiraKey": "GAU-142",
+      "title": "ID17 Amortização Reembolso Notas de Crédito",
+      "summary": "ID17 Amortização Reembolso Notas de Crédito",
+      "status": "Aguardando Squad",
+      "categoriaStatus": "Itens Pendentes",
+      "customfield_12475": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "customfield_11010": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+        "value": "Suporte Operacional",
+        "id": "24152"
+      },
+      "squad": {
+        "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+        "value": "RPA",
+        "id": "16007"
+      },
+      "requester": "Jailton Gomes Dos Santos",
+      "priority": "Média",
+      "category": "Geral",
+      "createdDate": "14/08/2026",
+      "description": "Demanda para squad de RPA"
+    },
     {
       "id": "1414230",
       "key": "GAU-141",
@@ -37,8 +182,8 @@
       "jiraKey": "GAU-140",
       "title": "sustentação - prd.trusted_gsurf_view.dview_settlement_items_snapshot",
       "summary": "sustentação - prd.trusted_gsurf_view.dview_settlement_items_snapshot",
-      "status": "Aguardando Squad",
-      "categoriaStatus": "Itens Pendentes",
+      "status": "Concluído",
+      "categoriaStatus": "Itens concluídos",
       "customfield_12475": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -66,8 +211,8 @@
       "jiraKey": "GAU-139",
       "title": "sustentação -  prd.trusted_gsurf_view.dview_transactions_snapshot",
       "summary": "sustentação -  prd.trusted_gsurf_view.dview_transactions_snapshot",
-      "status": "Aguardando Squad",
-      "categoriaStatus": "Itens Pendentes",
+      "status": "Concluído",
+      "categoriaStatus": "Itens concluídos",
       "customfield_12475": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -153,8 +298,8 @@
       "jiraKey": "GAU-131",
       "title": "SUSTENTAÇÃO - Type Person Legal Base Cadastral - Descasamento Dock x Base Cadastral",
       "summary": "SUSTENTAÇÃO - Type Person Legal Base Cadastral - Descasamento Dock x Base Cadastral",
-      "status": "Aguardando Squad",
-      "categoriaStatus": "Itens Pendentes",
+      "status": "Concluído",
+      "categoriaStatus": "Itens concluídos",
       "customfield_12475": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
@@ -1528,8 +1673,8 @@
       "jiraKey": "GAU-76",
       "title": "Squad Dados |  Cliente COTIT",
       "summary": "Squad Dados |  Cliente COTIT",
-      "status": "Aguardando Squad",
-      "categoriaStatus": "Itens Pendentes",
+      "status": "Concluído",
+      "categoriaStatus": "Itens concluídos",
       "customfield_12475": {
         "self": "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
         "value": "Dados Operações",
