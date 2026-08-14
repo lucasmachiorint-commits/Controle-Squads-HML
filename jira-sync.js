@@ -437,6 +437,14 @@ const JiraSyncEngine = {
       }
     });
 
+    // MERGE: Inserir novos cards de backlog no estado (crítico — sem isso os novos cards nunca aparecem)
+    ['dados', 'operacoes', 'rpa'].forEach(squadId => {
+      if (newBacklogItemsBySquad[squadId] && newBacklogItemsBySquad[squadId].length > 0) {
+        state.backlogItems[squadId] = (state.backlogItems[squadId] || []).concat(newBacklogItemsBySquad[squadId]);
+        console.log(`[Jira Sync] ${newBacklogItemsBySquad[squadId].length} novo(s) card(s) inserido(s) no backlog de ${squadId}.`);
+      }
+    });
+
     // Salvar estado e atualizar interface
     if (typeof saveStateCallback === 'function') saveStateCallback();
 
