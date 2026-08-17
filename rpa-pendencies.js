@@ -35,7 +35,10 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       window.app.closeRpaPendencyDetailsModal = function () { self.closeDetailsModal(); };
       window.app.renderRpaPendenciesView = function () { self.renderView(); };
       window.app.addRpaTimelineUpdate = function () { self.addTimelineUpdate(); };
+      window.app.editRpaTimelineUpdate = function (idx) { self.editTimelineUpdate(idx); };
       window.app.removeRpaTimelineUpdate = function (idx) { self.removeTimelineUpdate(idx); };
+      window.app.editRpaNote = function (idx) { self.editNote(idx); };
+      window.app.deleteRpaNote = function (idx) { self.deleteNote(idx); };
       window.app.printRpaReport = function () { self.printReport(); };
       window.app.printRpaPDF = function () { self.printReport(); };
       window.app.resetRpaFilters = function () { self.resetFilters(); };
@@ -807,10 +810,24 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       this.renderTimelineList();
     },
 
+    editTimelineUpdate(index) {
+      if (index >= 0 && index < this.selectedTimelineUpdates.length) {
+        const item = this.selectedTimelineUpdates[index];
+        const currentText = item.text || '';
+        const newText = prompt('Editar atualização semanal:', currentText);
+        if (newText !== null && newText.trim() !== '') {
+          item.text = newText.trim();
+          this.renderTimelineList();
+        }
+      }
+    },
+
     removeTimelineUpdate(index) {
       if (index >= 0 && index < this.selectedTimelineUpdates.length) {
-        this.selectedTimelineUpdates.splice(index, 1);
-        this.renderTimelineList();
+        if (confirm('Tem certeza que deseja remover esta atualização?')) {
+          this.selectedTimelineUpdates.splice(index, 1);
+          this.renderTimelineList();
+        }
       }
     },
 
@@ -834,9 +851,14 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
               </div>
               <p class="text-slate-200 text-[11px] leading-relaxed break-words margin-0">${item.text}</p>
             </div>
-            <button type="button" onclick="app.removeRpaTimelineUpdate(${idx})" class="text-slate-500 hover:text-rose-400 cursor-pointer text-xs p-1 transition-colors" title="Remover atualização">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
+            <div class="flex items-center gap-1 shrink-0">
+              <button type="button" onclick="app.editRpaTimelineUpdate(${idx})" class="text-slate-400 hover:text-sky-400 cursor-pointer text-xs p-1 transition-colors" title="Editar atualização">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" onclick="app.removeRpaTimelineUpdate(${idx})" class="text-slate-400 hover:text-rose-400 cursor-pointer text-xs p-1 transition-colors" title="Remover atualização">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
           </div>
         `;
       }).join('');
@@ -1464,15 +1486,80 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         return;
       }
 
-      listEl.innerHTML = notes.map(n => `
-        <div class="mb-2.5 pb-2.5 border-b border-white/5 last:border-none last:mb-0 last:pb-0">
-          <div class="flex items-center justify-between gap-2 mb-1">
-            <span class="text-[11px] font-bold text-emerald-400"><i class="fa-solid fa-user me-1"></i>${n.author || 'Usuário'}</span>
-            <span class="text-[10px] text-slate-400 font-mono">${new Date(n.date).toLocaleDateString('pt-BR')}</span>
+      listEl.innerHTML = notes.map((n, idx) => `
+        <div class="mb-2.5 pb-2.5 border-b border-white/5 last:border-none last:mb-0 last:pb-0 flex items-start justify-between gap-2">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span class="text-[11px] font-bold text-emerald-400"><i class="fa-solid fa-user me-1"></i>${n.author || 'Usuário'}</span>
+              <span class="text-[10px] text-slate-400 font-mono">${new Date(n.date).toLocaleDateString('pt-BR')}</span>
+            </div>
+            <p class="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">${n.text}</p>
           </div>
-          <p class="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap">${n.text}</p>
+          <div class="flex items-center gap-1 shrink-0 mt-0.5">
+            <button type="button" onclick="app.editRpaNote(${idx})" class="text-slate-400 hover:text-sky-400 cursor-pointer text-xs p-1 transition-colors" title="Editar nota">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button type="button" onclick="app.deleteRpaNote(${idx})" class="text-slate-400 hover:text-rose-400 cursor-pointer text-xs p-1 transition-colors" title="Excluir nota">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
         </div>
       `).join('');
+    },
+
+    async editNote(index) {
+      const id = this.activeId;
+      if (!id) return;
+
+      const item = this.pendencies.find(i => i.id === id);
+      if (!item || !Array.isArray(item.history_notes) || !item.history_notes[index]) return;
+
+      const currentText = item.history_notes[index].text || '';
+      const newText = prompt('Editar nota / cobrança:', currentText);
+
+      if (newText !== null && newText.trim() !== '') {
+        item.history_notes[index].text = newText.trim();
+        const nowIso = new Date().toISOString();
+        item.updated_at = nowIso;
+
+        this.saveLocal();
+        this.renderNotesList(item);
+
+        if (window.supabaseClient) {
+          try {
+            await window.supabaseClient.from('rpa_pendencies').update({
+              history_notes: item.history_notes,
+              updated_at: nowIso
+            }).eq('id', id);
+          } catch (_) {}
+        }
+      }
+    },
+
+    async deleteNote(index) {
+      const id = this.activeId;
+      if (!id) return;
+
+      const item = this.pendencies.find(i => i.id === id);
+      if (!item || !Array.isArray(item.history_notes) || !item.history_notes[index]) return;
+
+      if (!confirm('Tem certeza que deseja excluir esta nota de cobrança?')) return;
+
+      item.history_notes.splice(index, 1);
+      const nowIso = new Date().toISOString();
+      item.updated_at = nowIso;
+
+      this.saveLocal();
+      this.renderNotesList(item);
+
+      if (window.supabaseClient) {
+        try {
+          await window.supabaseClient.from('rpa_pendencies').update({
+            history_notes: item.history_notes,
+            updated_at: nowIso
+          }).eq('id', id);
+        } catch (_) {}
+      }
     },
 
     closeDetailsModal() {

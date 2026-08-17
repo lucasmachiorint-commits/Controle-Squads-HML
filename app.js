@@ -2416,7 +2416,44 @@ const app = {
     this.renderTimelineList(item);
   },
 
-  // Renderizar a lista em formato de Linha do Tempo com Scrollbar
+  // Editar entrada da linha do tempo da demanda
+  editTimelineEntry(idx) {
+    if (!this.activeDemandItemId) return;
+    const squadKey = this.activeDemandSquadKey || this.activeSquad;
+    const item = (this.state.backlogItems[squadKey] || []).find(i => i.id === this.activeDemandItemId || i.gau === this.activeDemandItemId || i.jiraKey === this.activeDemandItemId) ||
+                 (this.state.completedTasks[squadKey] || []).find(i => i.id === this.activeDemandItemId || i.jiraKey === this.activeDemandItemId) ||
+                 (this.state.triageItems || []).find(i => i.id === this.activeDemandItemId || i.jiraKey === this.activeDemandItemId);
+
+    if (!item || !Array.isArray(item.timelineEntries) || !item.timelineEntries[idx]) return;
+
+    const currentText = item.timelineEntries[idx].text || '';
+    const newText = prompt('Editar atualização da linha do tempo:', currentText);
+
+    if (newText !== null && newText.trim() !== '') {
+      item.timelineEntries[idx].text = newText.trim();
+      this.saveState();
+      this.renderTimelineList(item);
+    }
+  },
+
+  // Excluir entrada da linha do tempo da demanda
+  deleteTimelineEntry(idx) {
+    if (!this.activeDemandItemId) return;
+    const squadKey = this.activeDemandSquadKey || this.activeSquad;
+    const item = (this.state.backlogItems[squadKey] || []).find(i => i.id === this.activeDemandItemId || i.gau === this.activeDemandItemId || i.jiraKey === this.activeDemandItemId) ||
+                 (this.state.completedTasks[squadKey] || []).find(i => i.id === this.activeDemandItemId || i.jiraKey === this.activeDemandItemId) ||
+                 (this.state.triageItems || []).find(i => i.id === this.activeDemandItemId || i.jiraKey === this.activeDemandItemId);
+
+    if (!item || !Array.isArray(item.timelineEntries) || !item.timelineEntries[idx]) return;
+
+    if (confirm('Tem certeza que deseja excluir esta atualização da linha do tempo?')) {
+      item.timelineEntries.splice(idx, 1);
+      this.saveState();
+      this.renderTimelineList(item);
+    }
+  },
+
+  // Renderizar a lista em formato de Linha do Tempo com Scrollbar e botões de Editar e Excluir
   renderTimelineList(item) {
     const listEl = document.getElementById('followup-timeline-list');
     if (!listEl) return;
@@ -2428,11 +2465,23 @@ const app = {
       return;
     }
 
-    listEl.innerHTML = entries.map(entry => `
-      <div class="timeline-item">
-        <div class="timeline-dot"></div>
-        <div class="timeline-date">${entry.date}</div>
-        <div class="timeline-text">${entry.text}</div>
+    listEl.innerHTML = entries.map((entry, idx) => `
+      <div class="timeline-item" style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
+        <div style="flex:1; min-width:0;">
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
+            <span style="color:#34d399; font-weight:700; font-size:10px; font-family:monospace;">📅 ${entry.date}</span>
+            ${entry.author ? `<span style="color:#94a3b8; font-size:10px;">por ${entry.author}</span>` : ''}
+          </div>
+          <div style="color:#e2e8f0; font-size:11px; line-height:1.4; word-break:break-word;">${entry.text}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:4px; shrink:0;">
+          <button type="button" onclick="app.editTimelineEntry(${idx})" style="background:none; border:none; color:#60a5fa; cursor:pointer; font-size:11px; padding:2px 4px;" title="Editar atualização">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+          <button type="button" onclick="app.deleteTimelineEntry(${idx})" style="background:none; border:none; color:#f87171; cursor:pointer; font-size:11px; padding:2px 4px;" title="Excluir atualização">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
       </div>
     `).join('');
   },
