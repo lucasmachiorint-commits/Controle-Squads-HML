@@ -152,7 +152,7 @@ var AutomacaoModule = window.AutomacaoModule = {
 
   getMetrics: function() {
     var total = this.items.length;
-    var emAndamento = this.items.filter(i => i.status === 'em-andamento').length;
+    var emAndamento = this.items.filter(i => i.status === 'backlog' || i.status === 'em-andamento').length;
     var concluidos = this.items.filter(i => i.status === 'concluido').length;
     return { total: total, emAndamento: emAndamento, concluidos: concluidos };
   },
@@ -269,14 +269,9 @@ var AutomacaoModule = window.AutomacaoModule = {
     });
     html += '</div>';
 
-    // 2. TRÊS QUADROS DE MÉTRICAS
+    // 2. TRÊS QUADROS DE MÉTRICAS (1. Em Andamento [Backlog + Em Andamento], 2. Concluídas, 3. Total de Demandas)
     html += '<div class="triage-metrics-row mb-6 flex items-center gap-4">';
     
-    html += '<div class="metric-box-card metric-box-purple flex-1 p-4 rounded-xl glass-panel" style="margin-bottom: 0 !important;">';
-    html += '  <span class="metric-box-lbl text-violet-400 text-xs font-bold block mb-1">TOTAL DE DEMANDAS</span>';
-    html += '  <div class="metric-box-val text-violet-300 text-2xl font-black">' + metrics.total + ' solicitações</div>';
-    html += '</div>';
-
     html += '<div class="metric-box-card metric-box-amber flex-1 p-4 rounded-xl glass-panel" style="margin-bottom: 0 !important;">';
     html += '  <span class="metric-box-lbl text-amber-500 text-xs font-bold block mb-1">EM ANDAMENTO</span>';
     html += '  <div class="metric-box-val text-amber-400 text-2xl font-black">' + metrics.emAndamento + ' ativas</div>';
@@ -285,6 +280,11 @@ var AutomacaoModule = window.AutomacaoModule = {
     html += '<div class="metric-box-card metric-box-emerald flex-1 p-4 rounded-xl glass-panel" style="margin-bottom: 0 !important;">';
     html += '  <span class="metric-box-lbl text-emerald-400 text-xs font-bold block mb-1">CONCLUÍDAS</span>';
     html += '  <div class="metric-box-val text-emerald-400 text-2xl font-black">' + metrics.concluidos + ' finalizadas</div>';
+    html += '</div>';
+
+    html += '<div class="metric-box-card metric-box-purple flex-1 p-4 rounded-xl glass-panel" style="margin-bottom: 0 !important;">';
+    html += '  <span class="metric-box-lbl text-violet-400 text-xs font-bold block mb-1">TOTAL DE DEMANDAS</span>';
+    html += '  <div class="metric-box-val text-violet-300 text-2xl font-black">' + metrics.total + ' solicitações</div>';
     html += '</div>';
 
     html += '</div>';
