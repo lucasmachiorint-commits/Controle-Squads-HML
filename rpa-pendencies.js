@@ -1826,20 +1826,22 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
             <h1 class="rpa-print-title">${reportTitle}</h1>
           </div>
 
-          <div class="rpa-print-kpi-grid">
-            <div class="rpa-print-kpi-box">
-              <div class="rpa-print-kpi-num text-rose-600">${openCount}</div>
-              <div class="rpa-print-kpi-label">EM ABERTO / CRÍTICAS</div>
+          ${isSingle ? '' : `
+            <div class="rpa-print-kpi-grid">
+              <div class="rpa-print-kpi-box">
+                <div class="rpa-print-kpi-num text-rose-600">${openCount}</div>
+                <div class="rpa-print-kpi-label">EM ABERTO / CRÍTICAS</div>
+              </div>
+              <div class="rpa-print-kpi-box">
+                <div class="rpa-print-kpi-num text-emerald-600">${resolvedCount}</div>
+                <div class="rpa-print-kpi-label">RESOLVIDAS / MONITORADAS</div>
+              </div>
+              <div class="rpa-print-kpi-box">
+                <div class="rpa-print-kpi-num text-amber-600">${totalCount}</div>
+                <div class="rpa-print-kpi-label">TOTAL DE PENDÊNCIAS</div>
+              </div>
             </div>
-            <div class="rpa-print-kpi-box">
-              <div class="rpa-print-kpi-num text-emerald-600">${resolvedCount}</div>
-              <div class="rpa-print-kpi-label">RESOLVIDAS / MONITORADAS</div>
-            </div>
-            <div class="rpa-print-kpi-box">
-              <div class="rpa-print-kpi-num text-amber-600">${totalCount}</div>
-              <div class="rpa-print-kpi-label">TOTAL DE PENDÊNCIAS</div>
-            </div>
-          </div>
+          `}
 
           <div class="rpa-print-cards-list">
             ${cardsHtml}
