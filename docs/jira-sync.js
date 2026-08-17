@@ -445,6 +445,39 @@ const JiraSyncEngine = {
       }
     });
 
+    // ATRIBUIÇÃO DE ID SEQUENCIAL POR SQUAD (baseado na Data de Criação)
+    const parseCreationTs = (item) => {
+      if (!item) return 0;
+      const raw = item.rawCreated || item.createdDate || item.createdAt || item.date || item.created;
+      if (!raw) return 0;
+      if (typeof raw === 'number') return raw;
+      const str = String(raw).trim();
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length >= 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          let rest = parts[2].trim();
+          let year = parseInt(rest.split(' ')[0], 10);
+          if (year < 100) year += 2000;
+          return new Date(year, month, day).getTime();
+        }
+      }
+      const parsed = new Date(str).getTime();
+      return isNaN(parsed) ? 0 : parsed;
+    };
+
+    ['dados', 'operacoes', 'rpa'].forEach(squadId => {
+      const backlog = state.backlogItems[squadId] || [];
+      const completed = state.completedTasks[squadId] || [];
+      const allSquadItems = [].concat(backlog, completed);
+      if (allSquadItems.length === 0) return;
+      allSquadItems.sort((a, b) => parseCreationTs(a) - parseCreationTs(b));
+      allSquadItems.forEach((item, idx) => {
+        item.seqId = idx + 1;
+      });
+    });
+
     // Salvar estado e atualizar interface
     if (typeof saveStateCallback === 'function') saveStateCallback();
 

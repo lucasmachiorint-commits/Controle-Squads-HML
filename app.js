@@ -415,6 +415,7 @@ const app = {
             await this.loadStateFromSupabase();
             this.loadUsersState();
             this.seedDefaultDataIfEmpty();
+            this.ensureSquadSeqIds();
             this.setupRealtimeSync();
             this.restoreLastSyncTime();
             this.render();
@@ -976,6 +977,44 @@ const app = {
         if (searchInput) searchInput.focus();
       }
     });
+  },
+
+  // Garantir IDs sequenciais por squad baseados na Data de Criação (mais antigo = 1)
+  ensureSquadSeqIds() {
+    const parseCreationTs = (item) => {
+      if (!item) return 0;
+      const raw = item.rawCreated || item.createdDate || item.createdAt || item.date || item.created;
+      if (!raw) return 0;
+      if (typeof raw === 'number') return raw;
+      const str = String(raw).trim();
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length >= 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          let rest = parts[2].trim();
+          let year = parseInt(rest.split(' ')[0], 10);
+          if (year < 100) year += 2000;
+          return new Date(year, month, day).getTime();
+        }
+      }
+      const parsed = new Date(str).getTime();
+      return isNaN(parsed) ? 0 : parsed;
+    };
+
+    ['dados', 'operacoes', 'rpa'].forEach(squadId => {
+      const backlog = this.state.backlogItems[squadId] || [];
+      const completed = this.state.completedTasks[squadId] || [];
+      const allItems = [].concat(backlog, completed);
+      if (allItems.length === 0) return;
+      allItems.sort((a, b) => parseCreationTs(a) - parseCreationTs(b));
+      allItems.forEach((item, idx) => {
+        item.seqId = idx + 1;
+      });
+    });
+
+    this.saveState();
+    console.log('[SeqId] IDs sequenciais atribuídos a todas as squads.');
   },
 
   restoreLastSyncTime() {
@@ -3080,7 +3119,7 @@ const app = {
 
     tbody.innerHTML = filteredItems.map((item, idx) => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
-        <td class="font-bold text-slate-400" style="white-space:nowrap; width:40px;">${idx + 1}</td>
+        <td class="font-black text-sky-400" style="white-space:nowrap; width:50px;">${item.seqId ? '#' + item.seqId : '—'}</td>
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
         <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requester || 'Solicitante Jira'}</td>
@@ -3115,6 +3154,7 @@ const app = {
     if (headEl) {
       headEl.innerHTML = `
         <tr>
+          <th style="width: 50px; white-space: nowrap;">ID</th>
           <th style="width: 55px; white-space: nowrap;">Ordem</th>
           <th style="width: 95px; white-space: nowrap;">GAU / Chave</th>
           <th style="min-width: 170px;">Título da Demanda</th>
@@ -3202,7 +3242,7 @@ const app = {
       return matchSearch && matchTeam;
     });
 
-    const colSpan = isAdmin ? 7 : 6;
+    const colSpan = isAdmin ? 8 : 7;
     if (filteredItems.length === 0) {
       tbody.innerHTML = `
         <tr>
@@ -3214,6 +3254,7 @@ const app = {
 
     tbody.innerHTML = filteredItems.map((item) => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
+        <td class="font-black text-sky-400" style="white-space:nowrap; width:50px;">${item.seqId ? '#' + item.seqId : '—'}</td>
         <td onclick="event.stopPropagation();" style="white-space:nowrap; width:55px;">
           <input type="number" min="1" value="${item.treatmentOrder}"
             class="order-input-field"
@@ -3374,12 +3415,13 @@ const app = {
     document.getElementById('completed-count-badge').textContent = `${filteredItems.length} entregas`;
 
     if (filteredItems.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-500 font-semibold">Nenhuma entrega concluída encontrada.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-500 font-semibold">Nenhuma entrega concluída encontrada.</td></tr>`;
       return;
     }
 
     tbody.innerHTML = filteredItems.map(item => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
+        <td class="font-black text-sky-400" style="white-space:nowrap; width:50px;">${item.seqId ? '#' + item.seqId : '—'}</td>
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${this.getItemGau(item)}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title || item.taskTitle}</td>
         <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requester || item.completedBy || item.requesterName || 'Solicitante Jira'}</td>
@@ -3473,6 +3515,7 @@ const app = {
       });
 
       exportData = filtered.map((item) => ({
+        'ID': item.seqId ? `#${item.seqId}` : '',
         'Ordem': item.treatmentOrder || '',
         'GAU / Chave': item.gau || item.jiraKey || 'GAU-000',
         'Título da Demanda': item.title || '',
@@ -3505,8 +3548,8 @@ const app = {
         return matchSearch && matchTeam;
       });
 
-      exportData = filtered.map((item, idx) => ({
-        'Item #': idx + 1,
+      exportData = filtered.map((item) => ({
+        'ID': item.seqId ? `#${item.seqId}` : '',
         'GAU / Chave': item.gau || item.jiraKey || 'GAU-000',
         'Título da Demanda': item.title || '',
         'Descrição Completa do Chamado': item.notes || item.description || item.taskDescription || '',
@@ -3538,6 +3581,7 @@ const app = {
       });
 
       exportData = filtered.map((item) => ({
+        'ID': item.seqId ? `#${item.seqId}` : '',
         'GAU / Chave': this.getItemGau(item),
         'Título da Demanda': item.title || item.taskTitle || '',
         'Descrição Completa do Chamado': item.description || item.notes || item.taskDescription || '',
