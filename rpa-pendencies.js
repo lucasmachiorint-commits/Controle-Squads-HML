@@ -1306,6 +1306,10 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         }
       };
 
+      this.activeId = id || null;
+      const pdfBtn = document.getElementById('btn-rpa-edit-export-pdf');
+      if (pdfBtn) pdfBtn.style.display = id ? 'inline-flex' : 'none';
+
       if (id) {
         const item = this.pendencies.find(i => i.id === id);
         if (item) {

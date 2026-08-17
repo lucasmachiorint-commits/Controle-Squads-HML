@@ -3994,7 +3994,7 @@ const app = {
   // Exportar Pendência RPA do Modal para PDF
   exportRpaPendencyModalPDF() {
     if (window.RpaPendenciesModule) {
-      const activeId = window.RpaPendenciesModule.activeId;
+      const activeId = window.RpaPendenciesModule.activeId || document.getElementById('rpa-edit-id')?.value;
       window.RpaPendenciesModule.printReport(activeId);
     }
   },

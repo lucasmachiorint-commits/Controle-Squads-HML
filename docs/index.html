@@ -1390,9 +1390,14 @@
           <p class="text-xs text-slate-400">Cadastro de Incidente ou Ocorrência Técnica</p>
         </div>
       </div>
-      <button class="text-slate-400 hover:text-white transition-colors" onclick="app.closeRpaPendencyModal()">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
+      <div class="flex items-center gap-2">
+        <button type="button" class="btn btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" id="btn-rpa-edit-export-pdf" onclick="app.exportRpaPendencyModalPDF()" title="Exportar Histórico Completo em PDF" style="display: none;">
+          <i class="fa-solid fa-file-pdf" style="color:#a855f7;"></i> Exportar PDF
+        </button>
+        <button type="button" class="text-slate-400 hover:text-white transition-colors" onclick="app.closeRpaPendencyModal()">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
     </div>
 
     <form onsubmit="app.saveRpaPendency(event); return false;">
