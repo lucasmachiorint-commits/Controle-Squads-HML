@@ -388,13 +388,43 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
 
     normalizeResponsible(respStr) {
       if (!respStr) return 'Redesign';
+      const cleanPersonName = (name) => {
+        if (!name || typeof name !== 'string') return name || '';
+        let str = name.trim();
+        if (!str) return '';
+
+        const sepMatch = str.match(/[\-–—]/);
+        if (sepMatch) {
+          const parts = str.split(/[\-–—]/);
+          if (parts[0] && parts[0].trim()) str = parts[0].trim();
+        }
+
+        const lowerWords = new Set(['de', 'da', 'do', 'dos', 'das', 'e', 'del']);
+        const acronyms = new Set(['RPA', 'TI', 'BKO', 'PJ', 'SCD', 'GAU', 'CRM', 'API']);
+        const subParts = str.split(/([;/])/);
+
+        return subParts.map(sub => {
+          if (sub === ';' || sub === '/') return sub;
+          const words = sub.trim().split(/\s+/).filter(Boolean);
+          if (!words.length) return '';
+
+          return words.map((w, idx) => {
+            const upperW = w.toUpperCase();
+            if (acronyms.has(upperW)) return upperW;
+            const cleanW = w.toLowerCase();
+            if (idx > 0 && lowerWords.has(cleanW)) return cleanW;
+            return cleanW.replace(/[a-zà-ú]/i, letter => letter.toUpperCase());
+          }).join(' ');
+        }).join(' ');
+      };
+
       const parts = String(respStr).split(/;|;/).map(s => s.trim()).filter(Boolean);
       const mapped = parts.map(p => {
         const lower = p.toLowerCase();
         if (lower.includes('redesign')) return 'Redesign';
         if (lower.includes('caio')) return 'Caio';
         if (lower.includes('skytel') || lower.includes('ambos') || lower.includes('emanapay') || lower.includes('squad rpa')) return 'Emanapay';
-        return p;
+        return cleanPersonName(p);
       });
       return [...new Set(mapped)].join('; ');
     },

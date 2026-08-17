@@ -131,16 +131,35 @@ const JiraSyncEngine = {
       const catStatusLower = rawCatStatus.toLowerCase();
 
       const cleanRequesterName = (name) => {
-        if (!name || typeof name !== 'string') return name;
+        if (!name || typeof name !== 'string') return name || '';
         let str = name.trim();
+        if (!str) return '';
+
         const sepMatch = str.match(/[\-–—]/);
         if (sepMatch) {
           const parts = str.split(/[\-–—]/);
           if (parts[0] && parts[0].trim()) {
-            return parts[0].trim();
+            str = parts[0].trim();
           }
         }
-        return str;
+
+        const lowerWords = new Set(['de', 'da', 'do', 'dos', 'das', 'e', 'del']);
+        const acronyms = new Set(['RPA', 'TI', 'BKO', 'PJ', 'SCD', 'GAU', 'CRM', 'API']);
+        const subParts = str.split(/([;/])/);
+
+        return subParts.map(sub => {
+          if (sub === ';' || sub === '/') return sub;
+          const words = sub.trim().split(/\s+/).filter(Boolean);
+          if (!words.length) return '';
+
+          return words.map((w, idx) => {
+            const upperW = w.toUpperCase();
+            if (acronyms.has(upperW)) return upperW;
+            const cleanW = w.toLowerCase();
+            if (idx > 0 && lowerWords.has(cleanW)) return cleanW;
+            return cleanW.replace(/[a-zà-ú]/i, letter => letter.toUpperCase());
+          }).join(' ');
+        }).join(' ');
       };
 
       const rawJiraKey = card.key || card.jiraKey || (card.id && card.id.toString().startsWith('GAU-') ? card.id : `GAU-${100 + idx}`);
