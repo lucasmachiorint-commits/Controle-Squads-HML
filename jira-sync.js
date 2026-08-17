@@ -130,11 +130,25 @@ const JiraSyncEngine = {
       const statusLower = rawStatus.toLowerCase();
       const catStatusLower = rawCatStatus.toLowerCase();
 
+      const cleanRequesterName = (name) => {
+        if (!name || typeof name !== 'string') return name;
+        let str = name.trim();
+        const sepMatch = str.match(/[\-–—]/);
+        if (sepMatch) {
+          const parts = str.split(/[\-–—]/);
+          if (parts[0] && parts[0].trim()) {
+            return parts[0].trim();
+          }
+        }
+        return str;
+      };
+
       const rawJiraKey = card.key || card.jiraKey || (card.id && card.id.toString().startsWith('GAU-') ? card.id : `GAU-${100 + idx}`);
       const jiraKey = extractJiraKey({ jiraKey: rawJiraKey }) || `GAU-${100 + idx}`;
       const title = card.title || card.summary || card.nome || 'Demanda do Jira';
       const description = card.description || card.descricao || card.notes || 'Sincronizado via Jira API';
-      const requester = card.requester || card.reporter || card.solicitante || 'Solicitante Jira';
+      const rawRequester = card.requester || card.reporter || card.solicitante || 'Solicitante Jira';
+      const requester = cleanRequesterName(rawRequester);
 
       // Extração do campo Time Solicitante (customfield_11010)
       const cfTeam = card.customfield_11010 || card.fields?.customfield_11010;

@@ -98,6 +98,19 @@ const app = {
         .replace(/Ã/g, 'À'); // Fallback final para 'Ã' isolado que não foi pego pelo decode
     };
 
+    const cleanRequesterNameHelper = (name) => {
+      if (!name || typeof name !== 'string') return name;
+      let str = name.trim();
+      const sepMatch = str.match(/[\-–—]/);
+      if (sepMatch) {
+        const parts = str.split(/[\-–—]/);
+        if (parts[0] && parts[0].trim()) {
+          return parts[0].trim();
+        }
+      }
+      return str;
+    };
+
     const cleanItem = (item) => {
       if (!item) return item;
       if (item.title) item.title = fixText(item.title);
@@ -105,9 +118,9 @@ const app = {
       if (item.description) item.description = fixText(item.description);
       if (item.taskDescription) item.taskDescription = fixText(item.taskDescription);
       if (item.notes) item.notes = fixText(item.notes);
-      if (item.requester) item.requester = fixText(item.requester);
-      if (item.requesterName) item.requesterName = fixText(item.requesterName);
-      if (item.completedBy) item.completedBy = fixText(item.completedBy);
+      if (item.requester) item.requester = cleanRequesterNameHelper(fixText(item.requester));
+      if (item.requesterName) item.requesterName = cleanRequesterNameHelper(fixText(item.requesterName));
+      if (item.completedBy && item.completedBy !== 'Analista Squad') item.completedBy = cleanRequesterNameHelper(fixText(item.completedBy));
       if (item.gains) item.gains = fixText(item.gains);
       return item;
     };
@@ -1015,6 +1028,20 @@ const app = {
 
     this.saveState();
     console.log('[SeqId] IDs sequenciais atribuídos a todas as squads.');
+  },
+
+  // Higienizar nome do solicitante descartando partes após hífen (ex: "- Natura Pay", "- Natura & Co")
+  cleanRequesterName(name) {
+    if (!name || typeof name !== 'string') return name || '';
+    let str = name.trim();
+    const sepMatch = str.match(/[\-–—]/);
+    if (sepMatch) {
+      const parts = str.split(/[\-–—]/);
+      if (parts[0] && parts[0].trim()) {
+        return parts[0].trim();
+      }
+    }
+    return str;
   },
 
   restoreLastSyncTime() {
@@ -3125,7 +3152,7 @@ const app = {
         <td class="font-black text-sky-400" style="white-space:nowrap; width:50px;">${item.seqId ? '#' + item.seqId : '—'}</td>
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requester || 'Solicitante Jira'}</td>
+        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${this.cleanRequesterName(item.requester || 'Solicitante Jira')}</td>
         <td onclick="event.stopPropagation();" style="white-space:nowrap; width:135px;">
           <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)">
             <option value="">— Selecione —</option>
@@ -3274,7 +3301,7 @@ const app = {
         </td>
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requester || 'Solicitante Jira'}</td>
+        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${this.cleanRequesterName(item.requester || 'Solicitante Jira')}</td>
         <td onclick="event.stopPropagation();" style="white-space:nowrap; width:135px;">
           <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)" ${isAdmin ? '' : 'disabled="true" style="pointer-events:none; opacity:0.75;"'}>
             <option value="">— Selecione —</option>
@@ -3430,7 +3457,7 @@ const app = {
         <td class="font-black text-sky-400" style="white-space:nowrap; width:50px;">${item.seqId ? '#' + item.seqId : '—'}</td>
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${this.getItemGau(item)}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title || item.taskTitle}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${item.requester || item.completedBy || item.requesterName || 'Solicitante Jira'}</td>
+        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${this.cleanRequesterName(item.requester || item.completedBy || item.requesterName || 'Solicitante Jira')}</td>
         <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:135px;">${item.teamSolicitante || '—'}</td>
         <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
         <td class="text-slate-300 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.completionDate || item.completedAt)}</td>
@@ -3526,7 +3553,7 @@ const app = {
         'GAU / Chave': item.gau || item.jiraKey || 'GAU-000',
         'Título da Demanda': item.title || '',
         'Descrição Completa do Chamado': item.notes || item.description || item.taskDescription || '',
-        'Solicitante': item.requester || 'Solicitante Jira',
+        'Solicitante': this.cleanRequesterName(item.requester || 'Solicitante Jira'),
         'Time Solicitante': item.teamSolicitante || '',
         'Status': item.status || 'Backlog',
         'Data de Criação': this.formatOnlyDate(item.createdDate || item.date || item.createdAt)
@@ -3559,7 +3586,7 @@ const app = {
         'GAU / Chave': item.gau || item.jiraKey || 'GAU-000',
         'Título da Demanda': item.title || '',
         'Descrição Completa do Chamado': item.notes || item.description || item.taskDescription || '',
-        'Solicitante': item.requester || 'Solicitante Jira',
+        'Solicitante': this.cleanRequesterName(item.requester || 'Solicitante Jira'),
         'Time Solicitante': item.teamSolicitante || '',
         'Status': item.status || 'Em Andamento',
         'Data de Criação': this.formatOnlyDate(item.createdDate || item.date || item.createdAt)
@@ -3591,7 +3618,7 @@ const app = {
         'GAU / Chave': this.getItemGau(item),
         'Título da Demanda': item.title || item.taskTitle || '',
         'Descrição Completa do Chamado': item.description || item.notes || item.taskDescription || '',
-        'Solicitante': item.requester || item.completedBy || item.requesterName || 'Solicitante Jira',
+        'Solicitante': this.cleanRequesterName(item.requester || item.completedBy || item.requesterName || 'Solicitante Jira'),
         'Time Solicitante': item.teamSolicitante || '',
         'Data de Criação': this.formatOnlyDate(item.createdDate || item.date || item.createdAt),
         'Data de Conclusão': this.formatOnlyDate(item.completionDate || item.completedAt),
