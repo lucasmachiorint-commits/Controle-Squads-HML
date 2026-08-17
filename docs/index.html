@@ -1108,7 +1108,6 @@
     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px; margin-bottom: 16px;">
       <div style="display: flex; align-items: center; gap: 8px;">
         <span class="badge badge-medium" style="font-size: 12px; font-weight: 800;" id="detail-gau-key">GAU-128</span>
-        <span class="badge badge-high" style="font-size: 11px;" id="detail-priority">2 - Alta</span>
       </div>
       <div style="display: flex; align-items: center; gap: 8px;">
         <button type="button" class="btn btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" onclick="app.exportDemandModalPDF()" title="Exportar Histórico Completo em PDF" style="display: inline-flex; margin-right: 4px;">
@@ -1595,7 +1594,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1.5">Data de Criação</label>
           <div class="relative flex items-center">
@@ -1610,15 +1609,6 @@
           <select id="auto-edit-application" class="app-custom-select" required>
             <option value="Controle de Squads">Controle de Squads</option>
             <option value="Sistema de Governança Operacional">Sistema de Governança Operacional</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Criticidade <span class="text-violet-400">*</span></label>
-          <select id="auto-edit-criticality" class="app-custom-select" required>
-            <option value="Alta">Alta</option>
-            <option value="Média" selected>Média</option>
-            <option value="Baixa">Baixa</option>
           </select>
         </div>
       </div>

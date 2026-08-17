@@ -2142,7 +2142,8 @@ const app = {
     this.activeDemandItemId = item.id;
 
     document.getElementById('detail-gau-key').textContent = item.jiraKey || item.gau || 'GAU-000';
-    document.getElementById('detail-priority').textContent = item.priority || '2 - Alta';
+    const priorityEl = document.getElementById('detail-priority');
+    if (priorityEl) priorityEl.style.display = 'none';
     document.getElementById('detail-title').textContent = item.title || item.taskTitle || 'Demanda do Jira';
     document.getElementById('detail-requester').textContent = item.requesterName || item.requester || item.completedBy || item.requesterArea || 'Solicitante Jira';
     
@@ -3850,7 +3851,6 @@ const app = {
     const requester = this.cleanRequesterName(item?.requesterName || item?.requester || item?.completedBy || document.getElementById('detail-requester')?.textContent || 'Solicitante Jira');
     const team = item?.teamSolicitante || document.getElementById('detail-team-solicitante')?.textContent || '—';
     const status = item?.status || document.getElementById('detail-status')?.textContent || 'Acompanhamento';
-    const criticidade = item?.criticidade || item?.priority || document.getElementById('detail-criticidade')?.textContent || 'Média';
     const createdDate = this.formatOnlyDate(item?.createdDate || item?.date || item?.createdAt || document.getElementById('detail-created-date')?.textContent);
     const completionDate = (item?.completionDate || item?.completedAt) ? this.formatOnlyDate(item.completionDate || item.completedAt) : null;
     const squadName = document.getElementById('detail-squad')?.textContent || 'Squad Operacional';
@@ -3935,7 +3935,6 @@ const app = {
               <span class="rpa-print-badge-partner">${key}</span>
               <span class="rpa-print-badge-analysis">${gauKey}</span>
               <span class="rpa-print-badge-resolved">${status}</span>
-              <span class="rpa-print-badge-critical">${criticidade}</span>
             </div>
           </div>
 
