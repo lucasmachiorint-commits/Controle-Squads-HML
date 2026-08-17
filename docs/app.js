@@ -3108,6 +3108,9 @@ const app = {
       return matchSearch && matchTeam;
     });
 
+    const boardBadge = document.getElementById('board-count-badge');
+    if (boardBadge) boardBadge.textContent = `${filteredItems.length} demandas`;
+
     if (filteredItems.length === 0) {
       tbody.innerHTML = `
         <tr>
@@ -3241,6 +3244,9 @@ const app = {
       }
       return matchSearch && matchTeam;
     });
+
+    const backlogBadge = document.getElementById('backlog-count-badge');
+    if (backlogBadge) backlogBadge.textContent = `${filteredItems.length} demandas`;
 
     const colSpan = isAdmin ? 8 : 7;
     if (filteredItems.length === 0) {
