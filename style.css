@@ -2778,6 +2778,78 @@ body[data-squad="rpa"] .rpa-only-tab-btn,
     font-size: 10px !important;
     color: #64748b !important;
   }
+
+  /* MODO CLARO DE IMPRESSÃO (LIGHT THEME PRINTING) */
+  body.printing-rpa-report.printing-light-theme,
+  body.printing-rpa-report.light-theme {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  body.printing-rpa-report.printing-light-theme #rpa-print-report-container,
+  body.printing-rpa-report.light-theme #rpa-print-report-container {
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-header,
+  body.printing-rpa-report.light-theme .rpa-print-header {
+    border-bottom: 2px solid #cbd5e1 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-logo-sub,
+  body.printing-rpa-report.light-theme .rpa-print-logo-sub {
+    color: #475569 !important;
+    border-left-color: #cbd5e1 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-meta,
+  body.printing-rpa-report.light-theme .rpa-print-meta {
+    color: #475569 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-title,
+  body.printing-rpa-report.light-theme .rpa-print-title {
+    color: #0f172a !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-kpi-box,
+  body.printing-rpa-report.light-theme .rpa-print-kpi-box {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-card,
+  body.printing-rpa-report.light-theme .rpa-print-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-card-title,
+  body.printing-rpa-report.light-theme .rpa-print-card-title {
+    color: #0f172a !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-timeline-box,
+  body.printing-rpa-report.light-theme .rpa-print-timeline-box {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-timeline-title,
+  body.printing-rpa-report.light-theme .rpa-print-timeline-title {
+    color: #059669 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-timeline-text,
+  body.printing-rpa-report.light-theme .rpa-print-timeline-text {
+    color: #1e293b !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-timeline-item,
+  body.printing-rpa-report.light-theme .rpa-print-timeline-item {
+    border-bottom: 1px dashed #cbd5e1 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-label,
+  body.printing-rpa-report.light-theme .rpa-print-label {
+    color: #475569 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-footer,
+  body.printing-rpa-report.light-theme .rpa-print-footer {
+    border-top: 1px solid #e2e8f0 !important;
+    color: #64748b !important;
+  }
 }
 
 

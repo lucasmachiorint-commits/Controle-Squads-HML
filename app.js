@@ -3804,13 +3804,18 @@ const app = {
              (this.state.completedTasks?.rpa || []).find(i => i.id === itemId || i.jiraKey === itemId);
     }
 
-    const key = item?.seqId ? `#${item.seqId}` : (document.getElementById('detail-gau-key')?.textContent || 'GAU-000');
+    const isLightTheme = document.body.classList.contains('light-theme');
+    const key = item?.seqId ? `#${item.seqId}` : (document.getElementById('detail-gau-key')?.textContent || item?.gau || item?.jiraKey || 'GAU-000');
+    const gauKey = item?.gau || item?.jiraKey || document.getElementById('detail-gau-key')?.textContent || 'GAU-000';
     const title = item?.title || item?.taskTitle || document.getElementById('detail-title')?.textContent || 'Demanda do Jira';
-    const requester = item?.requesterName || item?.requester || document.getElementById('detail-requester')?.textContent || 'Solicitante Jira';
+    const requester = this.cleanRequesterName(item?.requesterName || item?.requester || item?.completedBy || document.getElementById('detail-requester')?.textContent || 'Solicitante Jira');
     const team = item?.teamSolicitante || document.getElementById('detail-team-solicitante')?.textContent || '—';
     const status = item?.status || document.getElementById('detail-status')?.textContent || 'Acompanhamento';
+    const criticidade = item?.criticidade || item?.priority || document.getElementById('detail-criticidade')?.textContent || 'Média';
     const createdDate = this.formatOnlyDate(item?.createdDate || item?.date || item?.createdAt || document.getElementById('detail-created-date')?.textContent);
+    const completionDate = (item?.completionDate || item?.completedAt) ? this.formatOnlyDate(item.completionDate || item.completedAt) : null;
     const squadName = document.getElementById('detail-squad')?.textContent || 'Squad Operacional';
+    const treatmentOrder = item?.treatmentOrder ? `Ordem #${item.treatmentOrder}` : '—';
     
     let description = item?.description || item?.notes || item?.taskDescription || document.getElementById('detail-description')?.textContent || 'Sem descrição fornecida.';
     
@@ -3832,12 +3837,17 @@ const app = {
       }
     } catch (_) {}
 
-    const gains = item?.gains || document.getElementById('detail-gains')?.value || '—';
+    const gains = item?.gains || document.getElementById('detail-gains')?.value || '';
 
-    // Coletar histórico de comentários/anotações do card se existir
-    const historyNotes = item?.history_notes || item?.comments || item?.timeline || [];
+    // Coletar histórico completo de comentários / anotações / linha do tempo
+    const historyNotes = [].concat(
+      item?.timelineEntries || [],
+      item?.history_notes || [],
+      item?.comments || [],
+      item?.timeline || []
+    ).filter(Boolean);
+
     let historyHtml = '';
-
     if (Array.isArray(historyNotes) && historyNotes.length > 0) {
       historyHtml = historyNotes.map(n => `
         <div class="rpa-print-timeline-item">
@@ -3845,11 +3855,11 @@ const app = {
             <span class="rpa-print-timeline-date">📅 ${n.displayDate || n.date || ''}</span>
             <span class="rpa-print-timeline-author">por ${n.author || 'Usuário'}</span>
           </div>
-          <div class="rpa-print-timeline-text">${n.text || n.comment || ''}</div>
+          <div class="rpa-print-timeline-text" style="white-space: pre-wrap; word-break: break-word;">${n.text || n.comment || ''}</div>
         </div>
       `).join('');
     } else {
-      historyHtml = `<div class="rpa-print-timeline-text" style="white-space: pre-wrap; font-size:12px; color:#94a3b8; font-style:italic;">Sem observações adicionais registradas no histórico.</div>`;
+      historyHtml = `<div class="rpa-print-timeline-text" style="white-space: pre-wrap; font-size:12px; opacity:0.7; font-style:italic;">Sem observações adicionais registradas no histórico.</div>`;
     }
 
     let printContainer = document.getElementById('rpa-print-report-container');
@@ -3876,36 +3886,40 @@ const app = {
               <div><strong>Gerado por:</strong> ${authorStr}</div>
             </div>
           </div>
-          <h1 class="rpa-print-title">Histórico Completo da Demanda — ${key}</h1>
+          <h1 class="rpa-print-title">Histórico Completo da Demanda — ${key} (${gauKey})</h1>
         </div>
 
         <div class="rpa-print-card" style="margin-top: 16px;">
           <div class="rpa-print-card-header">
             <div class="rpa-print-card-robots"><span class="rpa-print-pill-robot">📌 ${squadName}</span></div>
-            <div class="rpa-print-card-badges">
-              <span class="rpa-print-badge-critical">${key}</span>
+            <div class="rpa-print-card-badges" style="display:flex; gap:6px;">
+              <span class="rpa-print-badge-partner">${key}</span>
+              <span class="rpa-print-badge-analysis">${gauKey}</span>
               <span class="rpa-print-badge-resolved">${status}</span>
+              <span class="rpa-print-badge-critical">${criticidade}</span>
             </div>
           </div>
 
-          <h2 class="rpa-print-card-title" style="font-size: 16px; margin: 14px 0 16px 0; color: #fff;">${title}</h2>
+          <h2 class="rpa-print-card-title" style="font-size: 16px; margin: 14px 0 16px 0;">${title}</h2>
 
-          <div class="rpa-print-card-resp-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+          <div class="rpa-print-card-resp-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; padding: 12px; border-radius: 8px; border: 1px solid rgba(128,128,128,0.2);">
             <div><span class="rpa-print-label">Solicitante:</span> <strong>${requester}</strong></div>
             <div><span class="rpa-print-label">Time Solicitante:</span> <strong>${team}</strong></div>
-            <div><span class="rpa-print-label">Data de Criação:</span> <strong>${createdDate}</strong></div>
             <div><span class="rpa-print-label">Squad Alvo:</span> <strong>${squadName}</strong></div>
+            <div><span class="rpa-print-label">Data de Criação:</span> <strong>${createdDate}</strong></div>
+            ${completionDate ? `<div><span class="rpa-print-label">Data de Conclusão:</span> <strong>${completionDate}</strong></div>` : ''}
+            <div><span class="rpa-print-label">Prioridade / Ordem:</span> <strong>${treatmentOrder}</strong></div>
           </div>
 
           <div class="rpa-print-timeline-box" style="margin-top: 16px;">
             <div class="rpa-print-timeline-title">📄 Descrição Completa do Chamado:</div>
-            <div class="rpa-print-timeline-text" style="white-space: pre-wrap; font-size: 12px; line-height: 1.6; color: #f8fafc; margin-top: 8px;">${description}</div>
+            <div class="rpa-print-timeline-text" style="white-space: pre-wrap; word-break: break-word; font-size: 12px; line-height: 1.6; margin-top: 8px;">${description}</div>
           </div>
 
           ${gains && gains !== '—' ? `
             <div class="rpa-print-timeline-box" style="margin-top: 14px;">
               <div class="rpa-print-timeline-title">🎁 Ganhos & Entregáveis Registrados:</div>
-              <div class="rpa-print-timeline-text" style="white-space: pre-wrap; font-size: 12px; line-height: 1.5; color: #34d399; margin-top: 6px;">${gains}</div>
+              <div class="rpa-print-timeline-text" style="white-space: pre-wrap; word-break: break-word; font-size: 12px; line-height: 1.5; margin-top: 6px;">${gains}</div>
             </div>
           ` : ''}
 
@@ -3923,10 +3937,17 @@ const app = {
 
     const originalTitle = document.title;
     document.title = `Demanda_${key.replace('#', '')}_${new Date().toISOString().split('T')[0]}`;
+
     document.body.classList.add('printing-rpa-report');
+    if (isLightTheme) {
+      document.body.classList.add('printing-light-theme');
+    }
+
     window.print();
+
     setTimeout(() => {
       document.body.classList.remove('printing-rpa-report');
+      document.body.classList.remove('printing-light-theme');
       document.title = originalTitle;
       if (printContainer) printContainer.innerHTML = '';
     }, 500);

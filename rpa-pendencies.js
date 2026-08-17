@@ -1677,6 +1677,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         document.body.appendChild(printContainer);
       }
 
+      const isLightTheme = document.body.classList.contains('light-theme');
       const nowStr = new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
       let items = [];
       let isSingle = false;
@@ -1703,7 +1704,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         : 'Relatório Executivo de Pendências de Robôs em Produção';
 
       const cardsHtml = items.map((item, idx) => {
-        const robotList = (item.robo_name || '').split(',').map(s => s.trim()).filter(Boolean);
+        const robotList = (item.robo_name || item.robotName || '').split(',').map(s => s.trim()).filter(Boolean);
         const robotPills = robotList.map(r => `<span class="rpa-print-pill-robot">🤖 ${r}</span>`).join(' ');
 
         const respList = (item.responsible || '').split(/;|;/).map(s => s.trim()).filter(Boolean);
@@ -1720,6 +1721,9 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         if (item.status === 'EM_VALIDACAO') { statusLabel = 'Em Validação'; statusClass = 'rpa-print-badge-analysis'; }
         else if (item.status === 'RESOLVIDO') { statusLabel = 'Resolvido'; statusClass = 'rpa-print-badge-resolved'; }
 
+        const createdDate = item.created_at ? new Date(item.created_at).toLocaleDateString('pt-BR') : '—';
+        const updatedDate = item.updated_at ? new Date(item.updated_at).toLocaleDateString('pt-BR') : createdDate;
+
         const notes = item.history_notes || [];
         let timelineRows = '';
         if (Array.isArray(notes) && notes.length > 0) {
@@ -1731,14 +1735,12 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
                   <span class="rpa-print-timeline-date">📅 ${dStr}</span>
                   <span class="rpa-print-timeline-author">por ${n.author || 'Usuário'}</span>
                 </div>
-                <div class="rpa-print-timeline-text">${n.text}</div>
+                <div class="rpa-print-timeline-text" style="white-space: pre-wrap; word-break: break-word;">${n.text || ''}</div>
               </div>
             `;
           }).join('');
-        } else if (item.description) {
-          timelineRows = `<div class="rpa-print-timeline-text">${item.description}</div>`;
         } else {
-          timelineRows = `<div style="color:#94a3b8; font-style:italic; font-size:11px;">Sem atualizações registradas</div>`;
+          timelineRows = `<div style="opacity:0.7; font-style:italic; font-size:11px;">Sem observações ou notas de cobrança adicionais.</div>`;
         }
 
         return `
@@ -1753,13 +1755,21 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
 
             <h3 class="rpa-print-card-title">${idx + 1}. ${item.title}</h3>
 
-            <div class="rpa-print-card-resp-row">
-              <span class="rpa-print-label">Responsável(is):</span>
-              <div class="rpa-print-resps">${respPills || item.responsible}</div>
+            <div class="rpa-print-card-resp-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; padding: 10px; border-radius: 8px; border: 1px solid rgba(128,128,128,0.2);">
+              <div><span class="rpa-print-label">Responsável(is):</span> <strong>${item.responsible || '—'}</strong></div>
+              <div><span class="rpa-print-label">Data Ocorrência:</span> <strong>${createdDate}</strong></div>
+              <div><span class="rpa-print-label">Última Atualização:</span> <strong>${updatedDate}</strong></div>
             </div>
 
+            ${item.description ? `
+              <div class="rpa-print-timeline-box" style="margin-bottom: 12px;">
+                <div class="rpa-print-timeline-title">📄 Descrição / Ocorrência Detalhada:</div>
+                <div class="rpa-print-timeline-text" style="white-space: pre-wrap; word-break: break-word; font-size: 12px; line-height: 1.5;">${item.description}</div>
+              </div>
+            ` : ''}
+
             <div class="rpa-print-timeline-box">
-              <div class="rpa-print-timeline-title">🕒 Linha do Tempo de Evolução:</div>
+              <div class="rpa-print-timeline-title">🕒 Linha do Tempo & Histórico de Cobrança:</div>
               ${timelineRows}
             </div>
           </div>
@@ -1807,10 +1817,20 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         </div>
       `;
 
+      const originalTitle = document.title;
+      document.title = `Relatorio_Executivo_RPA_${new Date().toISOString().split('T')[0]}`;
+
       document.body.classList.add('printing-rpa-report');
+      if (isLightTheme) {
+        document.body.classList.add('printing-light-theme');
+      }
+
       window.print();
+
       setTimeout(() => {
         document.body.classList.remove('printing-rpa-report');
+        document.body.classList.remove('printing-light-theme');
+        document.title = originalTitle;
         if (printContainer) printContainer.innerHTML = '';
       }, 500);
     },
