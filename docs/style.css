@@ -2850,6 +2850,83 @@ body[data-squad="rpa"] .rpa-only-tab-btn,
     border-top: 1px solid #e2e8f0 !important;
     color: #64748b !important;
   }
+
+  /* BADGES & PILLS EM MODO CLARO DE IMPRESSÃO (TEXTO PRETO DE ALTO CONTRASTE) */
+  body.printing-rpa-report.printing-light-theme .rpa-print-pill-robot,
+  body.printing-rpa-report.light-theme .rpa-print-pill-robot {
+    background: #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-pill-resp,
+  body.printing-rpa-report.light-theme .rpa-print-pill-resp {
+    background: #e0e7ff !important;
+    border: 1px solid #c7d2fe !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-badge-critical,
+  body.printing-rpa-report.light-theme .rpa-print-badge-critical {
+    background: #fecdd3 !important;
+    border: 1px solid #fda4af !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-badge-high,
+  body.printing-rpa-report.light-theme .rpa-print-badge-high {
+    background: #fef08a !important;
+    border: 1px solid #fde047 !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-badge-medium,
+  body.printing-rpa-report.light-theme .rpa-print-badge-medium {
+    background: #fef08a !important;
+    border: 1px solid #fde047 !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-badge-low,
+  body.printing-rpa-report.light-theme .rpa-print-badge-low {
+    background: #e2e8f0 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-badge-open,
+  body.printing-rpa-report.light-theme .rpa-print-badge-open {
+    background: #fecdd3 !important;
+    border: 1px solid #fda4af !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-badge-analysis,
+  body.printing-rpa-report.light-theme .rpa-print-badge-analysis {
+    background: #fef08a !important;
+    border: 1px solid #fde047 !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-badge-partner,
+  body.printing-rpa-report.light-theme .rpa-print-badge-partner {
+    background: #e9d5ff !important;
+    border: 1px solid #d8b4fe !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-badge-resolved,
+  body.printing-rpa-report.light-theme .rpa-print-badge-resolved {
+    background: #a7f3d0 !important;
+    border: 1px solid #6ee7b7 !important;
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report.printing-light-theme .rpa-print-card-badges span,
+  body.printing-rpa-report.light-theme .rpa-print-card-badges span {
+    color: #0f172a !important;
+    font-weight: 800 !important;
+  }
 }
 
 
