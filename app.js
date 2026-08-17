@@ -3237,11 +3237,11 @@ const app = {
 
     tbody.innerHTML = filteredItems.map((item, idx) => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
-        <td class="font-black text-sky-400" style="white-space:nowrap; width:50px;">${item.seqId ? '#' + item.seqId : '—'}</td>
-        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
+        <td class="font-black text-sky-400" style="white-space:nowrap; width:48px;">${item.seqId ? '#' + item.seqId : '—'}</td>
+        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:85px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${this.cleanRequesterName(item.requester || 'Solicitante Jira')}</td>
-        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:135px;">
+        <td class="text-slate-300" style="white-space:nowrap; width:115px;">${this.cleanRequesterName(item.requester || 'Solicitante Jira')}</td>
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:118px;">
           <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)">
             <option value="">— Selecione —</option>
             <option value="Atendimento" ${item.teamSolicitante === 'Atendimento' ? 'selected' : ''}>Atendimento</option>
@@ -3249,7 +3249,7 @@ const app = {
             <option value="Suporte Operacional" ${item.teamSolicitante === 'Suporte Operacional' ? 'selected' : ''}>Suporte Operacional</option>
           </select>
         </td>
-        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:130px;">
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:105px;">
           <select class="status-select-dropdown status-em-andamento ${item.status === 'Bloqueado' ? 'status-bloqueado' : ''}" onchange="app.changeDemandStatus('${item.id}', this.value)">
             <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
             <option value="Bloqueado" ${item.status === 'Bloqueado' ? 'selected' : ''}>Bloqueado</option>
@@ -3257,7 +3257,7 @@ const app = {
             <option value="Concluído" ${item.status === 'Concluído' ? 'selected' : ''}>Concluído</option>
           </select>
         </td>
-        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
+        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:90px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
       </tr>
     `).join('');
   },
@@ -3272,14 +3272,14 @@ const app = {
     if (headEl) {
       headEl.innerHTML = `
         <tr>
-          <th style="width: 50px; white-space: nowrap;">ID</th>
-          <th style="width: 55px; white-space: nowrap;">Ordem</th>
-          <th style="width: 95px; white-space: nowrap;">GAU / Chave</th>
-          <th style="min-width: 170px;">Título da Demanda</th>
-          <th style="width: 130px; white-space: nowrap;">Solicitante</th>
-          <th style="width: 135px; white-space: nowrap;">Time Solicitante</th>
-          ${isAdmin ? '<th style="width: 130px; white-space: nowrap;">Status</th>' : ''}
-          <th style="width: 100px; white-space: nowrap;">Data de Criação</th>
+          <th style="width: 48px; white-space: nowrap;">ID</th>
+          <th style="width: 50px; white-space: nowrap;">Ordem</th>
+          <th style="width: 85px; white-space: nowrap;">GAU / Chave</th>
+          <th style="min-width: 150px;">Título da Demanda</th>
+          <th style="width: 115px; white-space: nowrap;">Solicitante</th>
+          <th style="width: 118px; white-space: nowrap;">Time Solicitante</th>
+          ${isAdmin ? '<th style="width: 105px; white-space: nowrap;">Status</th>' : ''}
+          <th style="width: 90px; white-space: nowrap;">Data de Criação</th>
         </tr>
       `;
     }
@@ -3387,10 +3387,10 @@ const app = {
             autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other"
           />
         </td>
-        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
+        <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:85px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
-        <td class="text-slate-300" style="white-space:nowrap; width:130px;">${this.cleanRequesterName(item.requester || 'Solicitante Jira')}</td>
-        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:135px;">
+        <td class="text-slate-300" style="white-space:nowrap; width:115px;">${this.cleanRequesterName(item.requester || 'Solicitante Jira')}</td>
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:118px;">
           <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)" ${isAdmin ? '' : 'disabled="true" style="pointer-events:none; opacity:0.75;"'}>
             <option value="">— Selecione —</option>
             <option value="Atendimento" ${item.teamSolicitante === 'Atendimento' ? 'selected' : ''}>Atendimento</option>
@@ -3399,7 +3399,7 @@ const app = {
           </select>
         </td>
         ${isAdmin ? `
-          <td onclick="event.stopPropagation();" style="white-space:nowrap; width:130px;">
+          <td onclick="event.stopPropagation();" style="white-space:nowrap; width:105px;">
             <select class="status-select-dropdown status-backlog ${item.status === 'Bloqueado' ? 'status-bloqueado' : ''}" onchange="app.changeDemandStatus('${item.id}', this.value)">
               <option value="Backlog" ${item.status === 'Backlog' ? 'selected' : ''}>Backlog</option>
               <option value="Em Andamento" ${item.status === 'Em Andamento' ? 'selected' : ''}>Em Andamento</option>
@@ -3407,7 +3407,7 @@ const app = {
             </select>
           </td>
         ` : ''}
-        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
+        <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:90px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
       </tr>
     `).join('');
   },
