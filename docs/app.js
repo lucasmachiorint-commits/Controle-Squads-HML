@@ -3713,6 +3713,157 @@ const app = {
     document.title = originalTitle;
   },
 
+  // Exportar Detalhes da Demanda Ativa no Modal para PDF (Com Histórico Completo)
+  exportDemandModalPDF() {
+    const itemId = this.activeDemandItemId;
+    let item = null;
+
+    if (itemId) {
+      item = (this.state.triageItems || []).find(i => i.id === itemId || i.jiraKey === itemId) || 
+             (this.state.backlogItems?.dados || []).find(i => i.id === itemId || i.gau === itemId || i.jiraKey === itemId) ||
+             (this.state.backlogItems?.operacoes || []).find(i => i.id === itemId || i.gau === itemId || i.jiraKey === itemId) ||
+             (this.state.backlogItems?.rpa || []).find(i => i.id === itemId || i.gau === itemId || i.jiraKey === itemId) ||
+             (this.state.completedTasks?.dados || []).find(i => i.id === itemId || i.jiraKey === itemId) ||
+             (this.state.completedTasks?.operacoes || []).find(i => i.id === itemId || i.jiraKey === itemId) ||
+             (this.state.completedTasks?.rpa || []).find(i => i.id === itemId || i.jiraKey === itemId);
+    }
+
+    const key = item?.seqId ? `#${item.seqId}` : (document.getElementById('detail-gau-key')?.textContent || 'GAU-000');
+    const title = item?.title || item?.taskTitle || document.getElementById('detail-title')?.textContent || 'Demanda do Jira';
+    const requester = item?.requesterName || item?.requester || document.getElementById('detail-requester')?.textContent || 'Solicitante Jira';
+    const team = item?.teamSolicitante || document.getElementById('detail-team-solicitante')?.textContent || '—';
+    const status = item?.status || document.getElementById('detail-status')?.textContent || 'Acompanhamento';
+    const createdDate = this.formatOnlyDate(item?.createdDate || item?.date || item?.createdAt || document.getElementById('detail-created-date')?.textContent);
+    const squadName = document.getElementById('detail-squad')?.textContent || 'Squad Operacional';
+    
+    let description = item?.description || item?.notes || item?.taskDescription || document.getElementById('detail-description')?.textContent || 'Sem descrição fornecida.';
+    
+    // Suporte para parse de ADF JSON (Jira v3) caso ainda venha no formato bruto
+    try {
+      const docPrefix = String.fromCharCode(123) + '"type":"doc"';
+      if (typeof description === 'string' && description.startsWith(docPrefix)) {
+        const doc = JSON.parse(description);
+        if (doc.type === 'doc' && Array.isArray(doc.content)) {
+          let texts = [];
+          function traverse(node) {
+            if (node.type === 'text' && node.text) texts.push(node.text);
+            if (node.type === 'hardBreak' || node.type === 'paragraph') texts.push('\n');
+            if (Array.isArray(node.content)) node.content.forEach(traverse);
+          }
+          doc.content.forEach(traverse);
+          description = texts.join('').trim().replace(/\n{3,}/g, '\n\n') || 'Sem descrição';
+        }
+      }
+    } catch (_) {}
+
+    const gains = item?.gains || document.getElementById('detail-gains')?.value || '—';
+
+    // Coletar histórico de comentários/anotações do card se existir
+    const historyNotes = item?.history_notes || item?.comments || item?.timeline || [];
+    let historyHtml = '';
+
+    if (Array.isArray(historyNotes) && historyNotes.length > 0) {
+      historyHtml = historyNotes.map(n => `
+        <div class="rpa-print-timeline-item">
+          <div class="rpa-print-timeline-header">
+            <span class="rpa-print-timeline-date">📅 ${n.displayDate || n.date || ''}</span>
+            <span class="rpa-print-timeline-author">por ${n.author || 'Usuário'}</span>
+          </div>
+          <div class="rpa-print-timeline-text">${n.text || n.comment || ''}</div>
+        </div>
+      `).join('');
+    } else {
+      historyHtml = `<div class="rpa-print-timeline-text" style="white-space: pre-wrap; font-size:12px; color:#94a3b8; font-style:italic;">Sem observações adicionais registradas no histórico.</div>`;
+    }
+
+    let printContainer = document.getElementById('rpa-print-report-container');
+    if (!printContainer) {
+      printContainer = document.createElement('div');
+      printContainer.id = 'rpa-print-report-container';
+      printContainer.className = 'rpa-print-only-container';
+      document.body.appendChild(printContainer);
+    }
+
+    const nowStr = new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const authorStr = this.userName || 'Visitante';
+
+    printContainer.innerHTML = `
+      <div class="rpa-print-report-page">
+        <div class="rpa-print-header">
+          <div class="rpa-print-logo-row">
+            <div class="rpa-print-logo">
+              <img src="assets/emanapay-logo.png" alt="Natura Avon EmanaPay Logo" class="rpa-print-logo-img" />
+              <span class="rpa-print-logo-sub">Gestão de Squads & Governança Jira</span>
+            </div>
+            <div class="rpa-print-meta">
+              <div><strong>Emissão:</strong> ${nowStr}</div>
+              <div><strong>Gerado por:</strong> ${authorStr}</div>
+            </div>
+          </div>
+          <h1 class="rpa-print-title">Histórico Completo da Demanda — ${key}</h1>
+        </div>
+
+        <div class="rpa-print-card" style="margin-top: 16px;">
+          <div class="rpa-print-card-header">
+            <div class="rpa-print-card-robots"><span class="rpa-print-pill-robot">📌 ${squadName}</span></div>
+            <div class="rpa-print-card-badges">
+              <span class="rpa-print-badge-critical">${key}</span>
+              <span class="rpa-print-badge-resolved">${status}</span>
+            </div>
+          </div>
+
+          <h2 class="rpa-print-card-title" style="font-size: 16px; margin: 14px 0 16px 0; color: #fff;">${title}</h2>
+
+          <div class="rpa-print-card-resp-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px;">
+            <div><span class="rpa-print-label">Solicitante:</span> <strong>${requester}</strong></div>
+            <div><span class="rpa-print-label">Time Solicitante:</span> <strong>${team}</strong></div>
+            <div><span class="rpa-print-label">Data de Criação:</span> <strong>${createdDate}</strong></div>
+            <div><span class="rpa-print-label">Squad Alvo:</span> <strong>${squadName}</strong></div>
+          </div>
+
+          <div class="rpa-print-timeline-box" style="margin-top: 16px;">
+            <div class="rpa-print-timeline-title">📄 Descrição Completa do Chamado:</div>
+            <div class="rpa-print-timeline-text" style="white-space: pre-wrap; font-size: 12px; line-height: 1.6; color: #f8fafc; margin-top: 8px;">${description}</div>
+          </div>
+
+          ${gains && gains !== '—' ? `
+            <div class="rpa-print-timeline-box" style="margin-top: 14px;">
+              <div class="rpa-print-timeline-title">🎁 Ganhos & Entregáveis Registrados:</div>
+              <div class="rpa-print-timeline-text" style="white-space: pre-wrap; font-size: 12px; line-height: 1.5; color: #34d399; margin-top: 6px;">${gains}</div>
+            </div>
+          ` : ''}
+
+          <div class="rpa-print-timeline-box" style="margin-top: 16px;">
+            <div class="rpa-print-timeline-title">🕒 Linha do Tempo & Histórico de Evolução:</div>
+            ${historyHtml}
+          </div>
+        </div>
+
+        <div class="rpa-print-footer">
+          EmanaPay Control Squads · Relatório Executivo de Acompanhamento da Demanda ${key}
+        </div>
+      </div>
+    `;
+
+    const originalTitle = document.title;
+    document.title = `Demanda_${key.replace('#', '')}_${new Date().toISOString().split('T')[0]}`;
+    document.body.classList.add('printing-rpa-report');
+    window.print();
+    setTimeout(() => {
+      document.body.classList.remove('printing-rpa-report');
+      document.title = originalTitle;
+      if (printContainer) printContainer.innerHTML = '';
+    }, 500);
+  },
+
+  // Exportar Pendência RPA do Modal para PDF
+  exportRpaPendencyModalPDF() {
+    if (window.RpaPendenciesModule) {
+      const activeId = window.RpaPendenciesModule.activeId;
+      window.RpaPendenciesModule.printReport(activeId);
+    }
+  },
+
   // Modais Handlers
   openModal(id) {
     const modal = document.getElementById(id);

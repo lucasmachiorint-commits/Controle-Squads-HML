@@ -1109,9 +1109,14 @@
         <span class="badge badge-medium" style="font-size: 12px; font-weight: 800;" id="detail-gau-key">GAU-128</span>
         <span class="badge badge-high" style="font-size: 11px;" id="detail-priority">2 - Alta</span>
       </div>
-      <button type="button" class="detail-close-btn" title="Fechar Modal" onclick="app.closeModal('modal-demand-details', event)">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button type="button" class="btn btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" onclick="app.exportDemandModalPDF()" title="Exportar Histórico Completo em PDF" style="display: inline-flex; margin-right: 4px;">
+          <i class="fa-solid fa-file-pdf" style="color:#a855f7;"></i> Exportar PDF
+        </button>
+        <button type="button" class="detail-close-btn" title="Fechar Modal" onclick="app.closeModal('modal-demand-details', event)">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
     </div>
 
     <!-- Título da Demanda -->
@@ -1534,9 +1539,14 @@
           <p class="text-xs text-slate-400" id="rpa-det-sub">Histórico e Evolução do Robô</p>
         </div>
       </div>
-      <button class="text-slate-400 hover:text-white transition-colors" onclick="app.closeRpaPendencyDetailsModal()">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
+      <div class="flex items-center gap-2">
+        <button type="button" class="btn btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5" onclick="app.exportRpaPendencyModalPDF()" title="Exportar Histórico Completo em PDF">
+          <i class="fa-solid fa-file-pdf" style="color:#a855f7;"></i> Exportar PDF
+        </button>
+        <button class="text-slate-400 hover:text-white transition-colors" onclick="app.closeRpaPendencyDetailsModal()">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
     </div>
 
     <div id="rpa-det-content"></div>

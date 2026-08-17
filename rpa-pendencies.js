@@ -1581,7 +1581,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       this.renderView();
     },
 
-    printReport() {
+    printReport(targetId = null) {
       let printContainer = document.getElementById('rpa-print-report-container');
       if (!printContainer) {
         printContainer = document.createElement('div');
@@ -1591,11 +1591,29 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       }
 
       const nowStr = new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      const items = this.getFilteredPendencies();
+      let items = [];
+      let isSingle = false;
+
+      if (targetId) {
+        const found = this.pendencies.find(i => i.id === targetId || i.seqId === targetId);
+        if (found) {
+          items = [found];
+          isSingle = true;
+        }
+      }
+
+      if (!items.length) {
+        items = this.getFilteredPendencies();
+      }
+
       const totalCount = items.length;
       const openCount = items.filter(i => i.status !== 'RESOLVIDO').length;
       const resolvedCount = items.filter(i => i.status === 'RESOLVIDO').length;
       const authorStr = window.app?.userName || 'Administrador';
+
+      const reportTitle = isSingle 
+        ? `Relatório Executivo de Ocorrência — Robô: ${items[0]?.robo_name || items[0]?.robotName || items[0]?.title}`
+        : 'Relatório Executivo de Pendências de Robôs em Produção';
 
       const cardsHtml = items.map((item, idx) => {
         const robotList = (item.robo_name || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -1674,7 +1692,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
                 <div><strong>Gerado por:</strong> ${authorStr}</div>
               </div>
             </div>
-            <h1 class="rpa-print-title">Relatório Executivo de Pendências de Robôs em Produção</h1>
+            <h1 class="rpa-print-title">${reportTitle}</h1>
           </div>
 
           <div class="rpa-print-kpi-grid">
