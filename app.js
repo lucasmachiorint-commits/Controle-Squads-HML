@@ -2481,6 +2481,7 @@ const app = {
     if (textInput) textInput.value = '';
     this.saveState();
     this.renderTimelineList(item);
+    this.renderDashboardView();
   },
 
   // Editar entrada da linha do tempo da demanda
@@ -2500,6 +2501,7 @@ const app = {
       item.timelineEntries[idx].text = newText.trim();
       this.saveState();
       this.renderTimelineList(item);
+      this.renderDashboardView();
     }
   },
 
@@ -2517,6 +2519,7 @@ const app = {
       item.timelineEntries.splice(idx, 1);
       this.saveState();
       this.renderTimelineList(item);
+      this.renderDashboardView();
     }
   },
 
@@ -3151,16 +3154,24 @@ const app = {
       const squadName = item.squadId === 'dados' ? 'Squad de Dados' : item.squadId === 'operacoes' ? 'Squad de Operações' : item.squadId === 'automacao' ? 'Automação' : 'Squad de RPA';
       const squadColor = item.squadId === 'dados' ? 'text-emerald-400' : item.squadId === 'operacoes' ? 'text-amber-400' : item.squadId === 'automacao' ? 'text-violet-400' : 'text-rose-400';
 
+      let latestReason = '';
+      const entries = (item.timelineEntries && item.timelineEntries.length) ? item.timelineEntries : (this.state.backlogItems[item.squadId] || []).find(i => i.id === item.id || i.gau === item.gau || i.jiraKey === item.jiraKey)?.timelineEntries || [];
+      if (entries.length > 0 && entries[0].text) {
+        latestReason = entries[0].text;
+      } else {
+        latestReason = item.reason || item.bloqueioMotivo || item.impediment || item.notes || 'Aguardando insumo/dependência externa';
+      }
+
       return `
         <tr class="hover:bg-white/5 transition-all">
           <td class="text-slate-400 text-xs font-mono py-3.5 px-4">${idx + 1}</td>
           <td class="text-xs font-bold text-slate-200 font-mono py-3.5 px-4">${item.gau || item.key || 'N/A'}</td>
           <td class="py-3.5 px-4">
             <span class="font-bold text-white text-xs block">${item.title || item.nome}</span>
-            <span class="text-[10px] text-rose-400 block mt-0.5"><i class="fa-solid fa-triangle-exclamation me-1"></i> ${item.reason || item.bloqueioMotivo || 'Aguardando insumo/dependência externa'}</span>
+            <span class="text-[10px] text-rose-400 block mt-0.5"><i class="fa-solid fa-triangle-exclamation me-1"></i> ${latestReason}</span>
           </td>
           <td class="text-xs font-semibold ${squadColor} py-3.5 px-4">${squadName}</td>
-          <td class="text-xs text-slate-300 py-3.5 px-4">${item.requester || item.solicitante || 'N/A'}</td>
+          <td class="text-xs text-slate-300 py-3.5 px-4">${this.cleanRequesterName(item.requester || item.solicitante || 'N/A')}</td>
           <td class="text-xs text-sky-300 font-semibold py-3.5 px-4">${item.teamSolicitante || '—'}</td>
           <td class="py-3.5 px-4">
             <span class="badge bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] px-2.5 py-1 rounded-full font-bold">
@@ -3304,11 +3315,19 @@ const app = {
       });
 
       bloqueados.forEach(d => {
+        let latestReason = '';
+        const entries = (d.timelineEntries && d.timelineEntries.length) ? d.timelineEntries : (this.state.backlogItems[squad.id] || []).find(i => i.id === d.id || i.gau === d.gau || i.jiraKey === d.jiraKey)?.timelineEntries || [];
+        if (entries.length > 0 && entries[0].text) {
+          latestReason = entries[0].text;
+        } else {
+          latestReason = d.reason || d.bloqueioMotivo || d.impediment || d.notes || 'Aguardando insumo/dependência externa';
+        }
+
         bloqueios.push({
           squad: squad,
           gau: d.gau || d.jiraKey || d.key || '',
           title: d.title || d.taskTitle || d.nome || '',
-          reason: d.reason || d.bloqueioMotivo || 'Aguardando insumo/dependência externa'
+          reason: latestReason
         });
       });
 
@@ -3368,7 +3387,7 @@ const app = {
       conquistasHtml = '<div style="padding: 16px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda concluída neste período.</div>';
     }
 
-    // Seção de Bloqueios com Badge de Squad
+    // Seção de Bloqueios com Badge de Squad e Motivo Atualizado da Timeline
     let bloqueiosHtml = '';
     if (bloqueios.length > 0) {
       bloqueiosHtml = bloqueios.map(b => `
@@ -3378,7 +3397,7 @@ const app = {
           </span>
           <div style="flex: 1;">
             <strong style="color: #e11d48;">${b.gau}</strong> — <span>${b.title}</span>
-            <div style="color: #be123c; font-size: 11px; margin-top: 3px; font-weight: 600;"><i class="fa-solid fa-triangle-exclamation text-rose-500 me-1"></i> ${b.reason}</div>
+            <div style="color: #be123c; font-size: 11px; margin-top: 3px; font-weight: 600; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation text-rose-500 me-1.5"></i><strong>Motivo:</strong> ${b.reason}</div>
           </div>
         </div>
       `).join('');
