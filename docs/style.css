@@ -2467,7 +2467,12 @@ body.light-theme .squad-badge-automacao {
   }
 
   /* 6. TIPOGRAFIA E TEXTO COM QUEBRA ADAPTÁVEL */
-  h1, h2, h3, h4, h5, h6 {
+  body:not(.printing-rpa-report) h1,
+  body:not(.printing-rpa-report) h2,
+  body:not(.printing-rpa-report) h3,
+  body:not(.printing-rpa-report) h4,
+  body:not(.printing-rpa-report) h5,
+  body:not(.printing-rpa-report) h6 {
     color: #0f172a !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
@@ -2475,7 +2480,9 @@ body.light-theme .squad-badge-automacao {
     page-break-after: avoid !important;
   }
 
-  p, span, label {
+  body:not(.printing-rpa-report) p,
+  body:not(.printing-rpa-report) span,
+  body:not(.printing-rpa-report) label {
     color: #1e293b !important;
     word-break: break-word !important;
     overflow-wrap: break-word !important;
@@ -2959,6 +2966,103 @@ body[data-squad="rpa"] .rpa-only-tab-btn,
     text-align: center !important;
     font-size: 10px !important;
     color: #64748b !important;
+  }
+
+  /* MODO DARK DE IMPRESSÃO DO REPORT (DARK THEME PRINTING - ALTO CONTRASTE) */
+  body.printing-rpa-report:not(.printing-light-theme) {
+    background: #0b0f19 !important;
+    color: #f8fafc !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) #rpa-print-report-container {
+    background: #0b0f19 !important;
+    color: #f8fafc !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-squad-card {
+    background: #111827 !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-kpi-col {
+    background: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-conquistas-box {
+    background: rgba(6, 78, 59, 0.3) !important;
+    border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-conquistas-header {
+    background: rgba(16, 185, 129, 0.25) !important;
+    color: #34d399 !important;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.4) !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-bloqueios-box {
+    background: rgba(136, 19, 55, 0.3) !important;
+    border: 1px solid rgba(244, 63, 94, 0.4) !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-bloqueios-header {
+    background: rgba(244, 63, 94, 0.25) !important;
+    color: #fb7185 !important;
+    border-bottom: 1px solid rgba(244, 63, 94, 0.4) !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-item-row {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #f1f5f9 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-item-row strong {
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-conquistas-box strong {
+    color: #34d399 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-bloqueios-box strong {
+    color: #fb7185 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-item-row span {
+    color: #e2e8f0 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .squad-badge-operacoes {
+    background: rgba(56, 189, 248, 0.25) !important;
+    color: #7dd3fc !important;
+    border: 1px solid rgba(56, 189, 248, 0.5) !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .squad-badge-operacoes i {
+    color: #38bdf8 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .squad-badge-rpa {
+    background: rgba(249, 115, 22, 0.25) !important;
+    color: #fdba74 !important;
+    border: 1px solid rgba(249, 115, 22, 0.5) !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .squad-badge-rpa i {
+    color: #fb923c !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .squad-badge-dados {
+    background: rgba(234, 179, 8, 0.25) !important;
+    color: #fde047 !important;
+    border: 1px solid rgba(234, 179, 8, 0.5) !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .squad-badge-dados i {
+    color: #facc15 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .squad-badge-automacao {
+    background: rgba(168, 85, 247, 0.25) !important;
+    color: #d8b4fe !important;
+    border: 1px solid rgba(168, 85, 247, 0.5) !important;
+    font-weight: 800 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .squad-badge-automacao i {
+    color: #c084fc !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-conquistas-box .text-emerald-700 {
+    color: #34d399 !important;
+  }
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-bloqueios-box .text-rose-500,
+  body.printing-rpa-report:not(.printing-light-theme) .monthly-bloqueios-box div[style*="color: #be123c"] {
+    color: #fca5a5 !important;
   }
 
   /* MODO CLARO DE IMPRESSÃO (LIGHT THEME PRINTING) */

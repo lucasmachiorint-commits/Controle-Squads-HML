@@ -3402,6 +3402,15 @@ const app = {
       }
     });
 
+    if (!isLight) {
+      cloned.querySelectorAll('.text-emerald-700').forEach(el => {
+        el.style.setProperty('color', '#34d399', 'important');
+      });
+      cloned.querySelectorAll('.text-slate-500').forEach(el => {
+        el.style.setProperty('color', '#94a3b8', 'important');
+      });
+    }
+
     printContainer.innerHTML = `
       <div class="rpa-print-report-page">
         <div class="rpa-print-header">
