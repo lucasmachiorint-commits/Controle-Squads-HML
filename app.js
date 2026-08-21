@@ -3249,28 +3249,28 @@ const app = {
       });
 
       cardsHtml += `
-        <div style="display: flex; align-items: stretch; background: var(--monthly-card-bg, rgba(241,245,249,0.05)); border-radius: 12px; border: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08)); margin-bottom: 12px; overflow: hidden;">
+        <div class="monthly-squad-card">
           <div style="width: 5px; min-height: 100%; background: ${squad.barColor}; flex-shrink: 0;"></div>
-          <div style="flex: 1; display: grid; grid-template-columns: 220px 1fr 1fr 1fr 1fr; align-items: center; padding: 16px 20px; gap: 8px;">
+          <div style="flex: 1; display: grid; grid-template-columns: 240px repeat(4, 1fr); align-items: center; padding: 14px 18px; gap: 12px;">
             <div>
-              <div style="font-size: 16px; font-weight: 800; color: var(--text-primary, #fff);">${squad.name}</div>
-              <div style="font-size: 10px; color: var(--text-secondary, #94a3b8); margin-top: 2px; line-height: 1.4;">${squad.desc}</div>
+              <div style="font-size: 15px; font-weight: 800; color: var(--text-primary, #fff);">${squad.name}</div>
+              <div style="font-size: 11px; color: var(--text-secondary, #94a3b8); margin-top: 2px; line-height: 1.3;">${squad.desc}</div>
             </div>
-            <div style="text-align: center;">
+            <div class="monthly-kpi-col">
               <div style="font-size: 11px; font-weight: 800; color: var(--text-primary, #fff);">${monthLabel}</div>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary, #94a3b8);">${totalEntradas} Demandas</div>
+              <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary, #94a3b8); margin-top: 2px;">${totalEntradas} Demandas</div>
             </div>
-            <div style="text-align: center;">
+            <div class="monthly-kpi-col">
               <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary, #94a3b8);">Concluído</div>
-              <div style="font-size: 22px; font-weight: 900; color: var(--text-primary, #fff);">${concluidosMes.length}</div>
+              <div style="font-size: 20px; font-weight: 900; color: #10b981; margin-top: 2px;">${concluidosMes.length}</div>
             </div>
-            <div style="text-align: center;">
+            <div class="monthly-kpi-col">
               <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary, #94a3b8);">Em desenvolvimento</div>
-              <div style="font-size: 22px; font-weight: 900; color: var(--text-primary, #fff);">${emDesenvolvimento.length}</div>
+              <div style="font-size: 20px; font-weight: 900; color: #0284c7; margin-top: 2px;">${emDesenvolvimento.length}</div>
             </div>
-            <div style="text-align: center;">
+            <div class="monthly-kpi-col">
               <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary, #94a3b8);">Bloqueio</div>
-              <div style="font-size: 22px; font-weight: 900; color: var(--text-primary, #fff);">${bloqueados.length}</div>
+              <div style="font-size: 20px; font-weight: 900; color: #e11d48; margin-top: 2px;">${bloqueados.length}</div>
             </div>
           </div>
         </div>
@@ -3281,51 +3281,51 @@ const app = {
     let conquistasHtml = '';
     if (conquistas.length > 0) {
       conquistasHtml = conquistas.map(c => `
-        <div style="padding: 10px 14px; border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.06)); font-size: 12px; color: var(--text-primary, #e2e8f0); line-height: 1.5; display: flex; align-items: flex-start; gap: 10px;">
-          <span style="background: ${c.squad.badgeBg}; color: ${c.squad.badgeText}; border: 1px solid ${c.squad.badgeBorder}; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
+        <div class="monthly-item-row">
+          <span class="squad-badge-${c.squad.id}" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
             <i class="${c.squad.icon}"></i> ${c.squad.shortName}
           </span>
           <div style="flex: 1;">
-            <strong style="color: var(--text-accent-emerald, #34d399);">${c.gau}</strong> — ${c.title}
-            ${c.gains ? `<div style="color: var(--text-secondary, #94a3b8); font-size: 11px; margin-top: 3px;"><i class="fa-solid fa-gift text-emerald-400 me-1"></i> <strong>Ganho:</strong> ${c.gains}</div>` : ''}
+            <strong style="color: #059669;">${c.gau}</strong> — <span>${c.title}</span>
+            ${c.gains ? `<div style="color: #15803d; font-size: 11px; margin-top: 3px; font-weight: 600;"><i class="fa-solid fa-gift text-emerald-500 me-1"></i> Ganho: ${c.gains}</div>` : ''}
           </div>
         </div>
       `).join('');
     } else {
-      conquistasHtml = '<div style="padding: 14px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda concluída neste período.</div>';
+      conquistasHtml = '<div style="padding: 16px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda concluída neste período.</div>';
     }
 
     // Seção de Bloqueios com Badge de Squad
     let bloqueiosHtml = '';
     if (bloqueios.length > 0) {
       bloqueiosHtml = bloqueios.map(b => `
-        <div style="padding: 10px 14px; border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.06)); font-size: 12px; color: var(--text-primary, #e2e8f0); line-height: 1.5; display: flex; align-items: flex-start; gap: 10px;">
-          <span style="background: ${b.squad.badgeBg}; color: ${b.squad.badgeText}; border: 1px solid ${b.squad.badgeBorder}; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
+        <div class="monthly-item-row">
+          <span class="squad-badge-${b.squad.id}" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
             <i class="${b.squad.icon}"></i> ${b.squad.shortName}
           </span>
           <div style="flex: 1;">
-            <strong style="color: var(--text-accent-rose, #fb7185);">${b.gau}</strong> — ${b.title}
-            <div style="color: #fca5a5; font-size: 11px; margin-top: 3px;"><i class="fa-solid fa-triangle-exclamation text-rose-400 me-1"></i> ${b.reason}</div>
+            <strong style="color: #e11d48;">${b.gau}</strong> — <span>${b.title}</span>
+            <div style="color: #be123c; font-size: 11px; margin-top: 3px; font-weight: 600;"><i class="fa-solid fa-triangle-exclamation text-rose-500 me-1"></i> ${b.reason}</div>
           </div>
         </div>
       `).join('');
     } else {
-      bloqueiosHtml = '<div style="padding: 14px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda bloqueada neste período.</div>';
+      bloqueiosHtml = '<div style="padding: 16px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda bloqueada neste período.</div>';
     }
 
     container.innerHTML = `
       ${cardsHtml}
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
-        <div style="background: var(--monthly-card-bg, rgba(241,245,249,0.05)); border-radius: 12px; border: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08)); overflow: hidden;">
-          <div style="padding: 14px 16px; font-size: 13px; font-weight: 800; color: var(--text-primary, #fff); border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08));">
-            🏆 Principais conquistas
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px;">
+        <div class="monthly-conquistas-box">
+          <div class="monthly-conquistas-header">
+            <span>🏆</span> Principais Conquistas
           </div>
           ${conquistasHtml}
         </div>
-        <div style="background: var(--monthly-card-bg, rgba(241,245,249,0.05)); border-radius: 12px; border: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08)); overflow: hidden;">
-          <div style="padding: 14px 16px; font-size: 13px; font-weight: 800; color: var(--text-primary, #fff); border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08));">
-            🛑 Bloqueios e Riscos
+        <div class="monthly-bloqueios-box">
+          <div class="monthly-bloqueios-header">
+            <span>🛑</span> Bloqueios e Riscos
           </div>
           ${bloqueiosHtml}
         </div>
