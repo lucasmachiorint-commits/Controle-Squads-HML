@@ -3182,9 +3182,39 @@ const app = {
     };
 
     const squads = [
-      { id: 'operacoes', name: 'Squad Operações', desc: 'Centralização de atividades e Expansão via Zord', color: '#3b82f6' },
-      { id: 'rpa', name: 'Squad RPA', desc: 'Automação de processos', color: '#f59e0b' },
-      { id: 'dados', name: 'Squad Dados', desc: 'Ingestão de Dados via Databricks e Criação de Dashboard via Tableau', color: '#f59e0b' }
+      {
+        id: 'operacoes',
+        name: 'Squad Operações',
+        shortName: 'Operações',
+        desc: 'Centralização de atividades e Expansão via Zord',
+        barColor: '#38bdf8',
+        badgeBg: 'rgba(56, 189, 248, 0.15)',
+        badgeBorder: 'rgba(56, 189, 248, 0.4)',
+        badgeText: '#38bdf8',
+        icon: 'fa-solid fa-gears'
+      },
+      {
+        id: 'rpa',
+        name: 'Squad RPA',
+        shortName: 'RPA',
+        desc: 'Automação de processos',
+        barColor: '#f97316',
+        badgeBg: 'rgba(249, 115, 22, 0.15)',
+        badgeBorder: 'rgba(249, 115, 22, 0.4)',
+        badgeText: '#fb923c',
+        icon: 'fa-solid fa-robot'
+      },
+      {
+        id: 'dados',
+        name: 'Squad Dados',
+        shortName: 'Dados',
+        desc: 'Ingestão de Dados via Databricks e Criação de Dashboard via Tableau',
+        barColor: '#eab308',
+        badgeBg: 'rgba(234, 179, 8, 0.15)',
+        badgeBorder: 'rgba(234, 179, 8, 0.4)',
+        badgeText: '#facc15',
+        icon: 'fa-solid fa-chart-pie'
+      }
     ];
 
     let conquistas = [];
@@ -3202,6 +3232,7 @@ const app = {
 
       concluidosMes.forEach(d => {
         conquistas.push({
+          squad: squad,
           gau: d.gau || d.jiraKey || d.key || '',
           title: d.title || d.taskTitle || d.nome || '',
           gains: d.gains || ''
@@ -3210,17 +3241,16 @@ const app = {
 
       bloqueados.forEach(d => {
         bloqueios.push({
+          squad: squad,
           gau: d.gau || d.jiraKey || d.key || '',
           title: d.title || d.taskTitle || d.nome || '',
           reason: d.reason || d.bloqueioMotivo || 'Aguardando insumo/dependência externa'
         });
       });
 
-      const borderColor = squad.id === 'operacoes' ? '#3b82f6' : squad.id === 'rpa' ? '#f59e0b' : '#f59e0b';
-
       cardsHtml += `
         <div style="display: flex; align-items: stretch; background: var(--monthly-card-bg, rgba(241,245,249,0.05)); border-radius: 12px; border: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08)); margin-bottom: 12px; overflow: hidden;">
-          <div style="width: 5px; min-height: 100%; background: ${borderColor}; flex-shrink: 0;"></div>
+          <div style="width: 5px; min-height: 100%; background: ${squad.barColor}; flex-shrink: 0;"></div>
           <div style="flex: 1; display: grid; grid-template-columns: 220px 1fr 1fr 1fr 1fr; align-items: center; padding: 16px 20px; gap: 8px;">
             <div>
               <div style="font-size: 16px; font-weight: 800; color: var(--text-primary, #fff);">${squad.name}</div>
@@ -3247,28 +3277,40 @@ const app = {
       `;
     });
 
-    // Seção de Conquistas
+    // Seção de Conquistas com Badge de Squad
     let conquistasHtml = '';
     if (conquistas.length > 0) {
       conquistasHtml = conquistas.map(c => `
-        <div style="padding: 8px 14px; border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.06)); font-size: 12px; color: var(--text-primary, #e2e8f0); line-height: 1.6;">
-          <strong style="color: var(--text-accent-emerald, #34d399);">${c.gau}</strong> — ${c.title}${c.gains ? ` <span style="color: var(--text-secondary, #94a3b8); font-size:11px;">• Ganho: ${c.gains}</span>` : ''}
+        <div style="padding: 10px 14px; border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.06)); font-size: 12px; color: var(--text-primary, #e2e8f0); line-height: 1.5; display: flex; align-items: flex-start; gap: 10px;">
+          <span style="background: ${c.squad.badgeBg}; color: ${c.squad.badgeText}; border: 1px solid ${c.squad.badgeBorder}; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
+            <i class="${c.squad.icon}"></i> ${c.squad.shortName}
+          </span>
+          <div style="flex: 1;">
+            <strong style="color: var(--text-accent-emerald, #34d399);">${c.gau}</strong> — ${c.title}
+            ${c.gains ? `<div style="color: var(--text-secondary, #94a3b8); font-size: 11px; margin-top: 3px;"><i class="fa-solid fa-gift text-emerald-400 me-1"></i> <strong>Ganho:</strong> ${c.gains}</div>` : ''}
+          </div>
         </div>
       `).join('');
     } else {
-      conquistasHtml = '<div style="padding: 12px 14px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda concluída neste período.</div>';
+      conquistasHtml = '<div style="padding: 14px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda concluída neste período.</div>';
     }
 
-    // Seção de Bloqueios
+    // Seção de Bloqueios com Badge de Squad
     let bloqueiosHtml = '';
     if (bloqueios.length > 0) {
       bloqueiosHtml = bloqueios.map(b => `
-        <div style="padding: 8px 14px; border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.06)); font-size: 12px; color: var(--text-primary, #e2e8f0); line-height: 1.6;">
-          <strong style="color: var(--text-accent-rose, #fb7185);">${b.gau}</strong> — ${b.title} <span style="color: var(--text-secondary, #94a3b8); font-size:11px;">• ${b.reason}</span>
+        <div style="padding: 10px 14px; border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.06)); font-size: 12px; color: var(--text-primary, #e2e8f0); line-height: 1.5; display: flex; align-items: flex-start; gap: 10px;">
+          <span style="background: ${b.squad.badgeBg}; color: ${b.squad.badgeText}; border: 1px solid ${b.squad.badgeBorder}; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
+            <i class="${b.squad.icon}"></i> ${b.squad.shortName}
+          </span>
+          <div style="flex: 1;">
+            <strong style="color: var(--text-accent-rose, #fb7185);">${b.gau}</strong> — ${b.title}
+            <div style="color: #fca5a5; font-size: 11px; margin-top: 3px;"><i class="fa-solid fa-triangle-exclamation text-rose-400 me-1"></i> ${b.reason}</div>
+          </div>
         </div>
       `).join('');
     } else {
-      bloqueiosHtml = '<div style="padding: 12px 14px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda bloqueada neste período.</div>';
+      bloqueiosHtml = '<div style="padding: 14px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda bloqueada neste período.</div>';
     }
 
     container.innerHTML = `
