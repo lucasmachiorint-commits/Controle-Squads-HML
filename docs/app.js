@@ -2407,11 +2407,37 @@ const app = {
     const progressSelect = document.getElementById('followup-dev-progress');
     const gainsTextarea = document.getElementById('followup-ganhos');
 
-    if (roleSelect) item.devRole = roleSelect.value;
-    if (nameInput) item.devName = nameInput.value;
-    if (dateInput) item.targetDeliveryDate = dateInput.value;
-    if (progressSelect) item.devProgress = progressSelect.value;
-    if (gainsTextarea) item.gains = gainsTextarea.value;
+    const devRoleVal = roleSelect ? roleSelect.value : (item.devRole || '');
+    const devNameVal = nameInput ? nameInput.value : (item.devName || '');
+    const targetDeliveryDateVal = dateInput ? dateInput.value : (item.targetDeliveryDate || '');
+    const devProgressVal = progressSelect ? progressSelect.value : (item.devProgress || '0%');
+    const gainsVal = gainsTextarea ? gainsTextarea.value : (item.gains || '');
+
+    item.devRole = devRoleVal;
+    item.devName = devNameVal;
+    item.targetDeliveryDate = targetDeliveryDateVal;
+    item.devProgress = devProgressVal;
+    item.gains = gainsVal;
+
+    // Sincronizar em todos os arrays onde o item possa existir
+    for (const sq of ['dados', 'operacoes', 'rpa']) {
+      const bItem = (this.state.backlogItems[sq] || []).find(i => i.id === this.activeDemandItemId || i.gau === this.activeDemandItemId || i.jiraKey === this.activeDemandItemId);
+      if (bItem && bItem !== item) {
+        bItem.devRole = devRoleVal;
+        bItem.devName = devNameVal;
+        bItem.targetDeliveryDate = targetDeliveryDateVal;
+        bItem.devProgress = devProgressVal;
+        bItem.gains = gainsVal;
+      }
+      const cItem = (this.state.completedTasks[sq] || []).find(i => i.id === this.activeDemandItemId || i.gau === this.activeDemandItemId || i.jiraKey === this.activeDemandItemId);
+      if (cItem && cItem !== item) {
+        cItem.devRole = devRoleVal;
+        cItem.devName = devNameVal;
+        cItem.targetDeliveryDate = targetDeliveryDateVal;
+        cItem.devProgress = devProgressVal;
+        cItem.gains = gainsVal;
+      }
+    }
 
     this.saveState();
     this.renderCompletedView();
@@ -2715,24 +2741,29 @@ const app = {
   getAllDashboardDemands() {
     let allDemands = [];
     ['dados', 'operacoes', 'rpa'].forEach(squadId => {
-      // 1. Demanda em Backlog / Em Andamento / Bloqueado
-      (this.state.backlogItems[squadId] || []).forEach(item => {
+      // 1. Demandas Concluídas (Prioridade de dados para itens concluídos como ganhos e data de conclusão)
+      (this.state.completedTasks[squadId] || []).forEach(item => {
         allDemands.push({
           ...item,
           squadId,
-          itemType: (item.status === 'Concluído' || item.status === 'Concluido' || item.phase === 'concluido') ? 'completed' : 'active'
+          status: 'Concluído',
+          itemType: 'completed',
+          gains: item.gains || item.ganhos || item.results || item.beneficios || ''
         });
       });
 
-      // 2. Demandas Concluídas
-      (this.state.completedTasks[squadId] || []).forEach(item => {
-        const exists = allDemands.some(d => (d.id && d.id === item.id) || (d.gau && item.gau && d.gau === item.gau));
-        if (!exists) {
+      // 2. Demanda em Backlog / Em Andamento / Bloqueado
+      (this.state.backlogItems[squadId] || []).forEach(item => {
+        const matchingCompleted = allDemands.find(d => (d.id && d.id === item.id) || (d.gau && item.gau && d.gau === item.gau) || (d.jiraKey && item.jiraKey && d.jiraKey === item.jiraKey));
+        if (matchingCompleted) {
+          if (!matchingCompleted.teamSolicitante && item.teamSolicitante) matchingCompleted.teamSolicitante = item.teamSolicitante;
+          if (!matchingCompleted.gains && item.gains) matchingCompleted.gains = item.gains;
+        } else {
           allDemands.push({
             ...item,
             squadId,
-            status: 'Concluído',
-            itemType: 'completed'
+            itemType: (item.status === 'Concluído' || item.status === 'Concluido' || item.phase === 'concluido') ? 'completed' : 'active',
+            gains: item.gains || item.ganhos || item.results || item.beneficios || ''
           });
         }
       });
@@ -2752,6 +2783,7 @@ const app = {
         teamSolicitante: item.team || 'Conciliação, Parâmetros, Processamento e Adquirência',
         requester: item.requester || 'Solicitante Automação',
         createdDate: item.createdDate || item.createdAt,
+        gains: item.gains || item.ganhos || item.results || item.beneficios || '',
         completionDate: item.completionDate || item.concludedAt || item.completedAt || (mappedStatus === 'Concluído' ? (item.updatedAt || item.createdDate || item.createdAt) : null),
         itemType: mappedStatus === 'Concluído' ? 'completed' : 'active'
       });
@@ -3256,11 +3288,18 @@ const app = {
       const bloqueados = squadDemands.filter(d => d.status === 'Bloqueado');
 
       concluidosMes.forEach(d => {
+        let finalGains = d.gains || d.ganhos || d.beneficios || d.businessValue || d.impact || d.results || '';
+        if (!finalGains && squad.id !== 'automacao') {
+          const ctMatch = (this.state.completedTasks[squad.id] || []).find(ct => (ct.id && ct.id === d.id) || (ct.gau && d.gau && ct.gau === d.gau) || (ct.jiraKey && d.jiraKey && ct.jiraKey === d.jiraKey));
+          if (ctMatch && (ctMatch.gains || ctMatch.ganhos)) {
+            finalGains = ctMatch.gains || ctMatch.ganhos;
+          }
+        }
         conquistas.push({
           squad: squad,
           gau: d.gau || d.jiraKey || d.key || '',
           title: d.title || d.taskTitle || d.nome || '',
-          gains: d.gains || d.ganhos || d.beneficios || d.businessValue || d.impact || d.results || ''
+          gains: finalGains
         });
       });
 
