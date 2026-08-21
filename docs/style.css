@@ -2571,25 +2571,39 @@ body[data-squad="rpa"] .rpa-only-tab-btn,
   }
   body.printing-rpa-report {
     background: #0f172a !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
-  body.printing-rpa-report * {
-    visibility: hidden !important;
+  body.printing-rpa-report > *:not(#rpa-print-report-container) {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
   }
-  body.printing-rpa-report #rpa-print-report-container,
-  body.printing-rpa-report #rpa-print-report-container * {
-    visibility: visible !important;
+  body.printing-rpa-report .app-container,
+  body.printing-rpa-report #hml-banner-fixed,
+  body.printing-rpa-report .sidebar,
+  body.printing-rpa-report .modal-backdrop {
+    display: none !important;
   }
   body.printing-rpa-report #rpa-print-report-container {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
+    display: block !important;
+    position: static !important;
     width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     background: #0f172a !important;
     color: #f8fafc !important;
     font-family: system-ui, -apple-system, sans-serif !important;
-    padding: 24px !important;
+    padding: 16px !important;
     box-sizing: border-box !important;
-    display: block !important;
+    overflow: visible !important;
   }
   .rpa-print-report-page {
     width: 100% !important;
