@@ -2639,6 +2639,9 @@ const app = {
       }
     } else if (newStatus === 'Concluído' || newStatus === 'Concluido') {
       item.phase = 'concluido';
+      if (!item.completionDate) {
+        item.completionDate = new Date().toLocaleDateString('pt-BR');
+      }
     }
 
     // Se alterado para Concluído, registra no histórico de entregas se não existir
@@ -2716,18 +2719,21 @@ const app = {
         allDemands.push({
           ...item,
           squadId,
-          itemType: 'active'
+          itemType: (item.status === 'Concluído' || item.status === 'Concluido' || item.phase === 'concluido') ? 'completed' : 'active'
         });
       });
 
       // 2. Demandas Concluídas
       (this.state.completedTasks[squadId] || []).forEach(item => {
-        allDemands.push({
-          ...item,
-          squadId,
-          status: 'Concluído',
-          itemType: 'completed'
-        });
+        const exists = allDemands.some(d => (d.id && d.id === item.id) || (d.gau && item.gau && d.gau === item.gau));
+        if (!exists) {
+          allDemands.push({
+            ...item,
+            squadId,
+            status: 'Concluído',
+            itemType: 'completed'
+          });
+        }
       });
     });
 
@@ -2736,7 +2742,7 @@ const app = {
     autoItems.forEach(item => {
       let mappedStatus = 'Backlog';
       if (item.status === 'em-andamento') mappedStatus = 'Em Andamento';
-      else if (item.status === 'concluido') mappedStatus = 'Concluído';
+      else if (item.status === 'concluido' || item.status === 'Concluído' || item.status === 'Concluido') mappedStatus = 'Concluído';
 
       allDemands.push({
         ...item,
@@ -2745,7 +2751,8 @@ const app = {
         teamSolicitante: item.team || 'Conciliação, Parâmetros, Processamento e Adquirência',
         requester: item.requester || 'Solicitante Automação',
         createdDate: item.createdDate || item.createdAt,
-        itemType: item.status === 'concluido' ? 'completed' : 'active'
+        completionDate: item.completionDate || item.concludedAt || item.completedAt || (mappedStatus === 'Concluído' ? (item.updatedAt || item.createdDate || item.createdAt) : null),
+        itemType: mappedStatus === 'Concluído' ? 'completed' : 'active'
       });
     });
 
@@ -3174,9 +3181,16 @@ const app = {
 
     const allDemands = this.getAllDashboardDemands();
 
-    // Filtrar demandas que existiram dentro do mês selecionado
-    const isInMonth = (d) => {
-      const dateObj = this.parseItemDate(d.createdDate || d.date || d.createdAt || d.completionDate);
+    // Filtrar se demanda foi criada no mês
+    const isCreatedInMonth = (d) => {
+      const dateObj = this.parseItemDate(d.createdDate || d.createdAt || d.date);
+      if (!dateObj) return false;
+      return dateObj >= monthStart && dateObj <= monthEnd;
+    };
+
+    // Filtrar se demanda foi concluída no mês
+    const isCompletedInMonth = (d) => {
+      const dateObj = this.parseItemDate(d.completionDate || d.completedAt || d.concludedAt || d.dateConcluded || d.updatedAt || d.date || d.createdDate || d.createdAt);
       if (!dateObj) return false;
       return dateObj >= monthStart && dateObj <= monthEnd;
     };
@@ -3234,10 +3248,9 @@ const app = {
 
     squads.forEach(squad => {
       const squadDemands = allDemands.filter(d => d.squadId === squad.id);
-      const monthDemands = squadDemands.filter(isInMonth);
-      const totalEntradas = monthDemands.length;
-      const concluidos = squadDemands.filter(d => d.status === 'Concluído' || d.status === 'Concluido' || d.itemType === 'completed');
-      const concluidosMes = concluidos.filter(isInMonth);
+      const totalEntradas = squadDemands.filter(isCreatedInMonth).length;
+      const concluidos = squadDemands.filter(d => d.status === 'Concluído' || d.status === 'Concluido' || d.itemType === 'completed' || d.phase === 'concluido');
+      const concluidosMes = concluidos.filter(isCompletedInMonth);
       const emDesenvolvimento = squadDemands.filter(d => d.status === 'Em Andamento');
       const bloqueados = squadDemands.filter(d => d.status === 'Bloqueado');
 
