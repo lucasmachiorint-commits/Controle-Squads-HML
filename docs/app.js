@@ -2899,6 +2899,12 @@ const app = {
     // Renderizar a Matriz de 4 Gráficos & Tabela de Bloqueados
     this.renderCharts(demands);
     this.renderDashboardBlockedTable(demands);
+
+    // Renderizar Report Mensal Executivo
+    if (!document.getElementById('monthly-report-month')?.options?.length) {
+      this.populateMonthlyReportMonthSelect();
+    }
+    this.renderMonthlyReportPanel();
   },
 
   renderCharts(demands) {
@@ -3129,6 +3135,237 @@ const app = {
         </tr>
       `;
     }).join('');
+  },
+
+  // Popula o seletor de meses do Report Mensal
+  populateMonthlyReportMonthSelect() {
+    const sel = document.getElementById('monthly-report-month');
+    if (!sel) return;
+    const now = new Date();
+    const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    sel.innerHTML = '';
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = `${months[d.getMonth()]} ${d.getFullYear()}`;
+      const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const opt = document.createElement('option');
+      opt.value = val;
+      opt.textContent = label;
+      sel.appendChild(opt);
+    }
+  },
+
+  // RENDER: Report Mensal Executivo de Status das Squads
+  renderMonthlyReportPanel() {
+    const container = document.getElementById('monthly-report-content');
+    if (!container) return;
+
+    const selVal = document.getElementById('monthly-report-month')?.value;
+    if (!selVal) { this.populateMonthlyReportMonthSelect(); return; }
+
+    const [yearStr, monthStr] = selVal.split('-');
+    const year = parseInt(yearStr);
+    const month = parseInt(monthStr) - 1;
+    const monthStart = new Date(year, month, 1, 0, 0, 0);
+    const monthEnd = new Date(year, month + 1, 0, 23, 59, 59);
+
+    const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const monthLabel = months[month];
+
+    const allDemands = this.getAllDashboardDemands();
+
+    // Filtrar demandas que existiram dentro do mês selecionado
+    const isInMonth = (d) => {
+      const dateObj = this.parseItemDate(d.createdDate || d.date || d.createdAt || d.completionDate);
+      if (!dateObj) return false;
+      return dateObj >= monthStart && dateObj <= monthEnd;
+    };
+
+    const squads = [
+      { id: 'operacoes', name: 'Squad Operações', desc: 'Centralização de atividades e Expansão via Zord', color: '#3b82f6' },
+      { id: 'rpa', name: 'Squad RPA', desc: 'Automação de processos', color: '#f59e0b' },
+      { id: 'dados', name: 'Squad Dados', desc: 'Ingestão de Dados via Databricks e Criação de Dashboard via Tableau', color: '#f59e0b' }
+    ];
+
+    let conquistas = [];
+    let bloqueios = [];
+    let cardsHtml = '';
+
+    squads.forEach(squad => {
+      const squadDemands = allDemands.filter(d => d.squadId === squad.id);
+      const monthDemands = squadDemands.filter(isInMonth);
+      const totalEntradas = monthDemands.length;
+      const concluidos = squadDemands.filter(d => d.status === 'Concluído' || d.status === 'Concluido' || d.itemType === 'completed');
+      const concluidosMes = concluidos.filter(isInMonth);
+      const emDesenvolvimento = squadDemands.filter(d => d.status === 'Em Andamento');
+      const bloqueados = squadDemands.filter(d => d.status === 'Bloqueado');
+
+      concluidosMes.forEach(d => {
+        conquistas.push({
+          gau: d.gau || d.jiraKey || d.key || '',
+          title: d.title || d.taskTitle || d.nome || '',
+          gains: d.gains || ''
+        });
+      });
+
+      bloqueados.forEach(d => {
+        bloqueios.push({
+          gau: d.gau || d.jiraKey || d.key || '',
+          title: d.title || d.taskTitle || d.nome || '',
+          reason: d.reason || d.bloqueioMotivo || 'Aguardando insumo/dependência externa'
+        });
+      });
+
+      const borderColor = squad.id === 'operacoes' ? '#3b82f6' : squad.id === 'rpa' ? '#f59e0b' : '#f59e0b';
+
+      cardsHtml += `
+        <div style="display: flex; align-items: stretch; background: var(--monthly-card-bg, rgba(241,245,249,0.05)); border-radius: 12px; border: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08)); margin-bottom: 12px; overflow: hidden;">
+          <div style="width: 5px; min-height: 100%; background: ${borderColor}; flex-shrink: 0;"></div>
+          <div style="flex: 1; display: grid; grid-template-columns: 220px 1fr 1fr 1fr 1fr; align-items: center; padding: 16px 20px; gap: 8px;">
+            <div>
+              <div style="font-size: 16px; font-weight: 800; color: var(--text-primary, #fff);">${squad.name}</div>
+              <div style="font-size: 10px; color: var(--text-secondary, #94a3b8); margin-top: 2px; line-height: 1.4;">${squad.desc}</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 11px; font-weight: 800; color: var(--text-primary, #fff);">${monthLabel}</div>
+              <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary, #94a3b8);">${totalEntradas} Demandas</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary, #94a3b8);">Concluído</div>
+              <div style="font-size: 22px; font-weight: 900; color: var(--text-primary, #fff);">${concluidosMes.length}</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary, #94a3b8);">Em desenvolvimento</div>
+              <div style="font-size: 22px; font-weight: 900; color: var(--text-primary, #fff);">${emDesenvolvimento.length}</div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary, #94a3b8);">Bloqueio</div>
+              <div style="font-size: 22px; font-weight: 900; color: var(--text-primary, #fff);">${bloqueados.length}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    // Seção de Conquistas
+    let conquistasHtml = '';
+    if (conquistas.length > 0) {
+      conquistasHtml = conquistas.map(c => `
+        <div style="padding: 8px 14px; border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.06)); font-size: 12px; color: var(--text-primary, #e2e8f0); line-height: 1.6;">
+          <strong style="color: var(--text-accent-emerald, #34d399);">${c.gau}</strong> — ${c.title}${c.gains ? ` <span style="color: var(--text-secondary, #94a3b8); font-size:11px;">• Ganho: ${c.gains}</span>` : ''}
+        </div>
+      `).join('');
+    } else {
+      conquistasHtml = '<div style="padding: 12px 14px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda concluída neste período.</div>';
+    }
+
+    // Seção de Bloqueios
+    let bloqueiosHtml = '';
+    if (bloqueios.length > 0) {
+      bloqueiosHtml = bloqueios.map(b => `
+        <div style="padding: 8px 14px; border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.06)); font-size: 12px; color: var(--text-primary, #e2e8f0); line-height: 1.6;">
+          <strong style="color: var(--text-accent-rose, #fb7185);">${b.gau}</strong> — ${b.title} <span style="color: var(--text-secondary, #94a3b8); font-size:11px;">• ${b.reason}</span>
+        </div>
+      `).join('');
+    } else {
+      bloqueiosHtml = '<div style="padding: 12px 14px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda bloqueada neste período.</div>';
+    }
+
+    container.innerHTML = `
+      ${cardsHtml}
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+        <div style="background: var(--monthly-card-bg, rgba(241,245,249,0.05)); border-radius: 12px; border: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08)); overflow: hidden;">
+          <div style="padding: 14px 16px; font-size: 13px; font-weight: 800; color: var(--text-primary, #fff); border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08));">
+            🏆 Principais conquistas
+          </div>
+          ${conquistasHtml}
+        </div>
+        <div style="background: var(--monthly-card-bg, rgba(241,245,249,0.05)); border-radius: 12px; border: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08)); overflow: hidden;">
+          <div style="padding: 14px 16px; font-size: 13px; font-weight: 800; color: var(--text-primary, #fff); border-bottom: 1px solid var(--monthly-card-border, rgba(255,255,255,0.08));">
+            🛑 Bloqueios e Riscos
+          </div>
+          ${bloqueiosHtml}
+        </div>
+      </div>
+    `;
+  },
+
+  // Exportar Report Mensal como PDF para Impressão
+  exportMonthlyReportPDF() {
+    const container = document.getElementById('monthly-report-content');
+    if (!container) return;
+
+    const selVal = document.getElementById('monthly-report-month')?.value;
+    const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    let monthLabel = 'Mês';
+    if (selVal) {
+      const [y, m] = selVal.split('-');
+      monthLabel = `${months[parseInt(m) - 1]} ${y}`;
+    }
+
+    const isLight = document.body.classList.contains('light-theme');
+    const nowStr = new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const authorStr = this.userName || 'Administrador';
+
+    let printContainer = document.getElementById('rpa-print-report-container');
+    if (!printContainer) {
+      printContainer = document.createElement('div');
+      printContainer.id = 'rpa-print-report-container';
+      printContainer.className = 'rpa-print-only-container';
+      document.body.appendChild(printContainer);
+    }
+
+    // Clonar o conteúdo do report e forçar cores para impressão
+    const cloned = container.cloneNode(true);
+    // Forçar cores sólidas para impressão
+    cloned.querySelectorAll('*').forEach(el => {
+      const cs = el.style;
+      if (cs.color && cs.color.indexOf('var' + String.fromCharCode(40)) >= 0) {
+        cs.color = isLight ? '#0f172a' : '#e2e8f0';
+      }
+    });
+
+    printContainer.innerHTML = `
+      <div class="rpa-print-report-page">
+        <div class="rpa-print-header">
+          <div class="rpa-print-logo-row">
+            <div class="rpa-print-logo">
+              <img src="assets/emanapay-logo.png" alt="EmanaPay Logo" class="rpa-print-logo-img" />
+              <span class="rpa-print-logo-sub">Gestão de Squads & Governança</span>
+            </div>
+            <div class="rpa-print-meta">
+              <div><strong>Emissão:</strong> ${nowStr}</div>
+              <div><strong>Gerado por:</strong> ${authorStr}</div>
+            </div>
+          </div>
+          <h1 class="rpa-print-title">Report Mensal — Status das Squads — ${monthLabel}</h1>
+        </div>
+
+        <div style="margin-top: 20px;">
+          ${cloned.innerHTML}
+        </div>
+
+        <div class="rpa-print-footer">
+          EmanaPay Control Squads · Report Mensal Executivo · ${monthLabel}
+        </div>
+      </div>
+    `;
+
+    const originalTitle = document.title;
+    document.title = `Report_Mensal_Squads_${selVal || 'atual'}`;
+
+    document.body.classList.add('printing-rpa-report');
+    if (isLight) document.body.classList.add('printing-light-theme');
+
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => {
+        document.body.classList.remove('printing-rpa-report', 'printing-light-theme');
+        document.title = originalTitle;
+        if (printContainer) printContainer.innerHTML = '';
+      }, 600);
+    }, 300);
   },
 
   // RENDER: Aba "Em Andamento"
