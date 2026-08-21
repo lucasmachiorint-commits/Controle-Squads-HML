@@ -2417,6 +2417,7 @@ const app = {
     this.renderCompletedView();
     this.renderBoardView();
     this.renderBacklogView();
+    this.renderDashboardView();
   },
 
   // Adicionar entrada na linha do tempo com auto-save no localStorage
@@ -3259,7 +3260,7 @@ const app = {
           squad: squad,
           gau: d.gau || d.jiraKey || d.key || '',
           title: d.title || d.taskTitle || d.nome || '',
-          gains: d.gains || ''
+          gains: d.gains || d.ganhos || d.beneficios || d.businessValue || d.impact || d.results || ''
         });
       });
 
@@ -3301,20 +3302,29 @@ const app = {
       `;
     });
 
-    // Seção de Conquistas com Badge de Squad
+    // Seção de Conquistas com Badge de Squad e Exibição Enriquecida de Ganhos
     let conquistasHtml = '';
     if (conquistas.length > 0) {
-      conquistasHtml = conquistas.map(c => `
-        <div class="monthly-item-row">
-          <span class="squad-badge-${c.squad.id}" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
-            <i class="${c.squad.icon}"></i> ${c.squad.shortName}
-          </span>
-          <div style="flex: 1;">
-            <strong style="color: #059669;">${c.gau}</strong> — <span>${c.title}</span>
-            ${c.gains ? `<div style="color: #15803d; font-size: 11px; margin-top: 3px; font-weight: 600;"><i class="fa-solid fa-gift text-emerald-500 me-1"></i> Ganho: ${c.gains}</div>` : ''}
+      conquistasHtml = conquistas.map(c => {
+        const hasGains = c.gains && String(c.gains).trim().length > 0;
+        const gainText = hasGains ? c.gains : 'Entrega concluída e homologada com sucesso';
+        const gainClass = hasGains ? 'text-emerald-700 font-semibold' : 'text-slate-500 italic';
+        const gainIcon = hasGains ? 'fa-solid fa-gift text-emerald-500' : 'fa-solid fa-circle-check text-emerald-500/70';
+
+        return `
+          <div class="monthly-item-row">
+            <span class="squad-badge-${c.squad.id}" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
+              <i class="${c.squad.icon}"></i> ${c.squad.shortName}
+            </span>
+            <div style="flex: 1;">
+              <strong style="color: #059669;">${c.gau}</strong> — <span>${c.title}</span>
+              <div style="font-size: 11px; margin-top: 3px; line-height: 1.4;" class="${gainClass}">
+                <i class="${gainIcon} me-1.5"></i><strong>Ganho:</strong> ${gainText}
+              </div>
+            </div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } else {
       conquistasHtml = '<div style="padding: 16px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda concluída neste período.</div>';
     }
