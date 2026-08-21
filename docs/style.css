@@ -2308,6 +2308,17 @@ body.light-theme .squad-badge-dados {
   border-color: #fde047 !important;
 }
 
+.squad-badge-automacao {
+  background: rgba(168, 85, 247, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+body.light-theme .squad-badge-automacao {
+  background: #f3e8ff !important;
+  color: #7e22ce !important;
+  border-color: #d8b4fe !important;
+}
+
 /* ============================================================
    @MEDIA PRINT — Impressão Direta (window.print)
    ============================================================ */

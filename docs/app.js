@@ -3214,6 +3214,17 @@ const app = {
         badgeBorder: 'rgba(234, 179, 8, 0.4)',
         badgeText: '#facc15',
         icon: 'fa-solid fa-chart-pie'
+      },
+      {
+        id: 'automacao',
+        name: 'Automação (Demandas Internas)',
+        shortName: 'Automação',
+        desc: 'Demandas Internas e Soluções de Automação',
+        barColor: '#a855f7',
+        badgeBg: 'rgba(168, 85, 247, 0.15)',
+        badgeBorder: 'rgba(168, 85, 247, 0.4)',
+        badgeText: '#c084fc',
+        icon: 'fa-solid fa-wand-magic-sparkles'
       }
     ];
 
