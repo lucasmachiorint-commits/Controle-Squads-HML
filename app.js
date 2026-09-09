@@ -3583,8 +3583,60 @@ const app = {
       }
     }
 
+    const isAdmin = this.userRole === 'admin';
+    const isGerencial = this.userRole === 'gerencial';
+    const canEdit = isAdmin || isGerencial;
+
     const allItems = this.state.backlogItems[this.activeSquad] || [];
     const inProgressItems = allItems.filter(i => i.status === 'Em Andamento' || (i.status === 'Bloqueado' && (i.phase === 'em-andamento' || !i.phase)));
+
+    // Função para extração de timestamp de criação para ordenação determinística
+    const parseCreationTimestamp = (item) => {
+      if (!item) return 0;
+      const raw = item.rawCreated || item.createdDate || item.createdAt || item.date || item.created;
+      if (!raw) return 0;
+      if (typeof raw === 'number') return raw;
+      const str = String(raw).trim();
+      if (str.includes('/')) {
+        const parts = str.split('/');
+        if (parts.length >= 3) {
+          const day = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          let rest = parts[2].trim();
+          let year = parseInt(rest.split(' ')[0], 10);
+          if (year < 100) year += 2000;
+          let hour = 0, min = 0, sec = 0;
+          if (rest.includes(' ')) {
+            const timeParts = rest.split(' ')[1].split(':');
+            if (timeParts.length >= 1) hour = parseInt(timeParts[0], 10) || 0;
+            if (timeParts.length >= 2) min = parseInt(timeParts[1], 10) || 0;
+            if (timeParts.length >= 3) sec = parseInt(timeParts[2], 10) || 0;
+          }
+          return new Date(year, month, day, hour, min, sec).getTime();
+        }
+      }
+      const parsed = new Date(str).getTime();
+      return isNaN(parsed) ? 0 : parsed;
+    };
+
+    // Atribuir ordens aos itens de Em Andamento que ainda não possuem treatmentOrder
+    const unassignedBoard = inProgressItems.filter(i => !i.treatmentOrder || i.treatmentOrder <= 0);
+    if (unassignedBoard.length > 0) {
+      unassignedBoard.sort((a, b) => parseCreationTimestamp(a) - parseCreationTimestamp(b));
+      let maxOrdBoard = 0;
+      inProgressItems.forEach(i => {
+        if (i.treatmentOrder && typeof i.treatmentOrder === 'number' && i.treatmentOrder > maxOrdBoard) {
+          maxOrdBoard = i.treatmentOrder;
+        }
+      });
+      unassignedBoard.forEach(item => {
+        maxOrdBoard++;
+        item.treatmentOrder = maxOrdBoard;
+      });
+    }
+
+    // Ordenar por treatmentOrder crescente (1, 2, 3...)
+    inProgressItems.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
 
     const searchTerm = (document.getElementById('search-board')?.value || '').toLowerCase();
     const teamFilter = document.getElementById('filter-team-board')?.value || '';
@@ -3610,7 +3662,7 @@ const app = {
     if (filteredItems.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda em andamento ou bloqueada encontrada.</td>
+          <td colspan="8" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda em andamento ou bloqueada encontrada.</td>
         </tr>
       `;
       return;
@@ -3619,6 +3671,18 @@ const app = {
     tbody.innerHTML = filteredItems.map((item, idx) => `
       <tr class="hover:bg-white/5 cursor-pointer transition-all" onclick="app.openDemandDetailsModal('${item.id}')">
         <td class="font-black text-sky-400" style="white-space:nowrap; width:48px;">${item.seqId ? '#' + item.seqId : '—'}</td>
+        <td onclick="event.stopPropagation();" style="white-space:nowrap; width:55px;">
+          <input type="number" min="1" value="${item.treatmentOrder || ''}"
+            class="order-input-field"
+            onchange="app.changeBoardOrder('${item.id}', this.value)"
+            onkeydown="if(event.key === 'Enter'){ this.blur(); }"
+            onclick="event.stopPropagation(); this.select();"
+            title="Digite a posição desejada para reordenar"
+            name="board_order_input"
+            autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other"
+            ${canEdit ? '' : 'disabled="true" style="pointer-events:none; opacity:0.6;"'}
+          />
+        </td>
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:85px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
         <td class="text-slate-300" style="white-space:nowrap; width:115px;">${this.cleanRequesterName(item.requester || 'Solicitante Jira')}</td>
@@ -3828,6 +3892,40 @@ const app = {
     this.renderBacklogView();
   },
 
+  // Alterar a ordem de prioridade no Em Andamento (swap isolado da fila de Em Andamento)
+  changeBoardOrder(itemId, newOrderInput) {
+    const allItems = this.state.backlogItems[this.activeSquad] || [];
+    const inProgressItems = allItems.filter(i => i.status === 'Em Andamento' || (i.status === 'Bloqueado' && (i.phase === 'em-andamento' || !i.phase)));
+    const item = inProgressItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    let newOrder = parseInt(newOrderInput, 10);
+
+    // Se não for um número válido ou menor que 1, recarregar sem alterar
+    if (isNaN(newOrder) || newOrder < 1) {
+      this.renderBoardView();
+      return;
+    }
+
+    const oldOrder = item.treatmentOrder || 1;
+    if (oldOrder === newOrder) {
+      this.renderBoardView();
+      return;
+    }
+
+    // Se outra demanda de Em Andamento já possui essa ordem, realiza a troca (swap)
+    const targetItem = inProgressItems.find(bi => bi.id !== itemId && bi.treatmentOrder === newOrder);
+    if (targetItem) {
+      targetItem.treatmentOrder = oldOrder;
+    }
+
+    item.treatmentOrder = newOrder;
+
+    this.saveState();
+    this.renderBoardView();
+    this.applyRolePermissions();
+  },
+
   deleteBacklogItem(id) {
     this.state.backlogItems[this.activeSquad] = this.state.backlogItems[this.activeSquad].filter(i => i.id !== id);
     this.saveState();
@@ -4033,6 +4131,25 @@ const app = {
       const all = this.state.backlogItems[this.activeSquad] || [];
       items = all.filter(i => i.status === 'Em Andamento' || (i.status === 'Bloqueado' && (i.phase === 'em-andamento' || !i.phase)));
 
+      // Garantir atribuição de ordem para unassigned (ordenados por data de criação)
+      const unassigned = items.filter(i => !i.treatmentOrder || i.treatmentOrder <= 0);
+      if (unassigned.length > 0) {
+        unassigned.sort((a, b) => parseCreationTimestamp(a) - parseCreationTimestamp(b));
+        let maxOrd = 0;
+        items.forEach(i => {
+          if (i.treatmentOrder && typeof i.treatmentOrder === 'number' && i.treatmentOrder > maxOrd) {
+            maxOrd = i.treatmentOrder;
+          }
+        });
+        unassigned.forEach(item => {
+          maxOrd++;
+          item.treatmentOrder = maxOrd;
+        });
+      }
+
+      // Ordenar estritamente por treatmentOrder crescente (1, 2, 3, 4...)
+      items.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
+
       const searchTerm = (document.getElementById('search-board')?.value || '').toLowerCase();
       const teamFilter = document.getElementById('filter-team-board')?.value || '';
 
@@ -4052,6 +4169,7 @@ const app = {
 
       exportData = filtered.map((item) => ({
         'ID': item.seqId ? `#${item.seqId}` : '',
+        'Ordem': item.treatmentOrder || '',
         'GAU / Chave': item.gau || item.jiraKey || 'GAU-000',
         'Título da Demanda': item.title || '',
         'Descrição Completa do Chamado': item.notes || item.description || item.taskDescription || '',
