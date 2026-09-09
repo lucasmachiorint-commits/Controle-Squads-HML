@@ -2657,12 +2657,21 @@ const app = {
     if (!item) return;
 
     const oldStatus = item.status;
+    const oldPhase = item.phase;
     item.status = newStatus;
 
     if (newStatus === 'Em Andamento') {
       item.phase = 'em-andamento';
+      // Se veio de outra fase (ex: Backlog), posiciona no final da fila de Em Andamento
+      if (oldStatus !== 'Em Andamento' && oldPhase !== 'em-andamento') {
+        item.treatmentOrder = 999999;
+      }
     } else if (newStatus === 'Backlog') {
       item.phase = 'backlog';
+      // Se veio de outra fase (ex: Em Andamento), posiciona no final da fila de Backlog
+      if (oldStatus !== 'Backlog' && oldPhase !== 'backlog') {
+        item.treatmentOrder = 999999;
+      }
     } else if (newStatus === 'Bloqueado') {
       if (!item.phase) {
         item.phase = (oldStatus === 'Em Andamento') ? 'em-andamento' : 'backlog';
@@ -2704,6 +2713,13 @@ const app = {
         });
       }
     }
+
+    // Resequenciar automaticamente ambas as filas da squad ativa para manter 1, 2, 3...
+    const allSquadItems = this.state.backlogItems[this.activeSquad] || [];
+    const backlogOnly = allSquadItems.filter(i => i.status === 'Backlog' || (i.status === 'Bloqueado' && i.phase === 'backlog'));
+    const boardOnly = allSquadItems.filter(i => i.status === 'Em Andamento' || (i.status === 'Bloqueado' && (i.phase === 'em-andamento' || !i.phase)));
+    this.resequenceOrders(backlogOnly);
+    this.resequenceOrders(boardOnly);
 
     this.saveState();
     this.renderBoardView();
@@ -3635,8 +3651,8 @@ const app = {
       });
     }
 
-    // Ordenar por treatmentOrder crescente (1, 2, 3...)
-    inProgressItems.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
+    // Garantir resequenciamento estrito e sequencial (1, 2, 3...)
+    this.resequenceOrders(inProgressItems);
 
     const searchTerm = (document.getElementById('search-board')?.value || '').toLowerCase();
     const teamFilter = document.getElementById('filter-team-board')?.value || '';
@@ -3784,8 +3800,8 @@ const app = {
       });
     }
 
-    // Ordenar por treatmentOrder crescente (1, 2, 3...)
-    backlogItems.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
+    // Garantir resequenciamento estrito e sequencial (1, 2, 3...)
+    this.resequenceOrders(backlogItems);
 
     const searchTerm = (document.getElementById('search-backlog')?.value || '').toLowerCase();
     const teamFilter = document.getElementById('filter-team-backlog')?.value || '';
@@ -3855,6 +3871,15 @@ const app = {
         <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:90px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
       </tr>
     `).join('');
+  },
+
+  // Renumera sequencialmente as ordens de uma fila (1, 2, 3...) eliminando lacunas
+  resequenceOrders(items) {
+    if (!items || !Array.isArray(items) || items.length === 0) return;
+    items.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
+    items.forEach((item, idx) => {
+      item.treatmentOrder = idx + 1;
+    });
   },
 
   // Alterar a ordem de prioridade no backlog permitindo valores customizados maiores que o total de itens
@@ -3927,8 +3952,15 @@ const app = {
   },
 
   deleteBacklogItem(id) {
-    this.state.backlogItems[this.activeSquad] = this.state.backlogItems[this.activeSquad].filter(i => i.id !== id);
+    this.state.backlogItems[this.activeSquad] = (this.state.backlogItems[this.activeSquad] || []).filter(i => i.id !== id);
+    const remaining = this.state.backlogItems[this.activeSquad] || [];
+    const backlogOnly = remaining.filter(i => i.status === 'Backlog' || (i.status === 'Bloqueado' && i.phase === 'backlog'));
+    const boardOnly = remaining.filter(i => i.status === 'Em Andamento' || (i.status === 'Bloqueado' && (i.phase === 'em-andamento' || !i.phase)));
+    this.resequenceOrders(backlogOnly);
+    this.resequenceOrders(boardOnly);
     this.saveState();
+    this.renderBoardView();
+    this.renderBacklogView();
   },
 
   // Alterar Time Solicitante e disparar sincronização com Jira Cloud
