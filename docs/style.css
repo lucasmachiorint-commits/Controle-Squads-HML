@@ -446,6 +446,52 @@ body {
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   margin-top: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 230, 153, 0.4) rgba(15, 23, 42, 0.5);
+}
+
+/* Scrollbar Pílula Exclusiva para Tabelas (.table-responsive) */
+.table-responsive::-webkit-scrollbar {
+  height: 8px !important;
+  width: 8px !important;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-radius: 9999px !important;
+  margin: 0 8px 4px 8px !important;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: rgba(0, 230, 153, 0.4) !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(0, 230, 153, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 230, 153, 0.85) !important;
+  box-shadow: 0 0 10px rgba(0, 230, 153, 0.4) !important;
+}
+
+/* Scrollbar Pílula no Light Theme para Tabelas */
+body.light-theme .table-responsive {
+  scrollbar-color: #94a3b8 #f1f5f9;
+}
+
+body.light-theme .table-responsive::-webkit-scrollbar-track {
+  background: #f1f5f9 !important;
+  border-radius: 9999px !important;
+}
+
+body.light-theme .table-responsive::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+body.light-theme .table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8 !important;
 }
 
 .custom-table {
@@ -712,6 +758,16 @@ body.light-theme .detail-card div::-webkit-scrollbar-thumb:hover,
 body.light-theme .modal-content *::-webkit-scrollbar-thumb:hover,
 body.light-theme .modal-demand-content *::-webkit-scrollbar-thumb:hover {
   background: #94a3b8 !important;
+}
+
+/* Scrollbar Global Pílula Elegante para todo o App */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 230, 153, 0.35) rgba(15, 23, 42, 0.4);
+}
+
+body.light-theme * {
+  scrollbar-color: #cbd5e1 #f1f5f9;
 }
 
 /* Painel de Banner da Mesa de Triagem - Padding e Espaçamento Amplo (Sem Colisão com as Bordas) */
