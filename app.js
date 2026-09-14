@@ -3919,8 +3919,8 @@ const app = {
     // 4. Insere o item na nova posição desejada
     backlogItems.splice(targetIndex, 0, movedItem);
 
-    // 5. Renumera sequencialmente 1, 2, 3... eliminando lacunas e deslocando os demais
-    this.resequenceOrders(backlogItems);
+    // 5. Renumera diretamente na ordem atual do array (sem re-sort)
+    backlogItems.forEach((it, idx) => { it.treatmentOrder = idx + 1; });
 
     // Salvar estado e re-renderizar a visualização ordenada numericamente
     this.saveState();
@@ -3964,8 +3964,8 @@ const app = {
     // 4. Insere o item na nova posição desejada
     inProgressItems.splice(targetIndex, 0, movedItem);
 
-    // 5. Renumera sequencialmente 1, 2, 3... eliminando lacunas e deslocando os demais
-    this.resequenceOrders(inProgressItems);
+    // 5. Renumera diretamente na ordem atual do array (sem re-sort)
+    inProgressItems.forEach((it, idx) => { it.treatmentOrder = idx + 1; });
 
     // Salvar estado e re-renderizar a visualização
     this.saveState();
