@@ -3882,10 +3882,10 @@ const app = {
     });
   },
 
-  // Alterar a ordem de prioridade no backlog permitindo valores customizados maiores que o total de itens
+  // Alterar a ordem de prioridade no backlog por deslocamento sequencial (shift/insert)
   changeBacklogOrder(itemId, newOrderInput) {
     const allItems = this.state.backlogItems[this.activeSquad] || [];
-    const backlogItems = allItems.filter(i => i.status !== 'Em Andamento' && i.status !== 'Bloqueado' && i.status !== 'Concluído' && i.status !== 'Concluido');
+    const backlogItems = allItems.filter(i => i.status === 'Backlog' || (i.status === 'Bloqueado' && i.phase === 'backlog'));
     const item = backlogItems.find(i => i.id === itemId);
     if (!item) return;
 
@@ -3903,21 +3903,31 @@ const app = {
       return;
     }
 
-    // Se outra demanda já possui exatamente essa ordem, realiza a troca (swap)
-    const targetItem = backlogItems.find(bi => bi.id !== itemId && bi.treatmentOrder === newOrder);
-    if (targetItem) {
-      targetItem.treatmentOrder = oldOrder;
-    }
+    // 1. Garante ordenação pela ordem atual
+    backlogItems.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
 
-    // Atribuir a nova ordem (mesmo se for superior à quantidade total de itens)
-    item.treatmentOrder = newOrder;
+    // 2. Remove o item de sua posição atual
+    const currentIndex = backlogItems.findIndex(bi => bi.id === itemId);
+    if (currentIndex === -1) return;
+    const [movedItem] = backlogItems.splice(currentIndex, 1);
+
+    // 3. Calcula o índice alvo (0-indexed, limitado aos extremos da lista)
+    let targetIndex = newOrder - 1;
+    if (targetIndex < 0) targetIndex = 0;
+    if (targetIndex > backlogItems.length) targetIndex = backlogItems.length;
+
+    // 4. Insere o item na nova posição desejada
+    backlogItems.splice(targetIndex, 0, movedItem);
+
+    // 5. Renumera sequencialmente 1, 2, 3... eliminando lacunas e deslocando os demais
+    this.resequenceOrders(backlogItems);
 
     // Salvar estado e re-renderizar a visualização ordenada numericamente
     this.saveState();
     this.renderBacklogView();
   },
 
-  // Alterar a ordem de prioridade no Em Andamento (swap isolado da fila de Em Andamento)
+  // Alterar a ordem de prioridade no Em Andamento por deslocamento sequencial (shift/insert)
   changeBoardOrder(itemId, newOrderInput) {
     const allItems = this.state.backlogItems[this.activeSquad] || [];
     const inProgressItems = allItems.filter(i => i.status === 'Em Andamento' || (i.status === 'Bloqueado' && (i.phase === 'em-andamento' || !i.phase)));
@@ -3938,14 +3948,26 @@ const app = {
       return;
     }
 
-    // Se outra demanda de Em Andamento já possui essa ordem, realiza a troca (swap)
-    const targetItem = inProgressItems.find(bi => bi.id !== itemId && bi.treatmentOrder === newOrder);
-    if (targetItem) {
-      targetItem.treatmentOrder = oldOrder;
-    }
+    // 1. Garante ordenação pela ordem atual
+    inProgressItems.sort((a, b) => (a.treatmentOrder || 999) - (b.treatmentOrder || 999));
 
-    item.treatmentOrder = newOrder;
+    // 2. Remove o item de sua posição atual
+    const currentIndex = inProgressItems.findIndex(bi => bi.id === itemId);
+    if (currentIndex === -1) return;
+    const [movedItem] = inProgressItems.splice(currentIndex, 1);
 
+    // 3. Calcula o índice alvo (0-indexed, limitado aos extremos da lista)
+    let targetIndex = newOrder - 1;
+    if (targetIndex < 0) targetIndex = 0;
+    if (targetIndex > inProgressItems.length) targetIndex = inProgressItems.length;
+
+    // 4. Insere o item na nova posição desejada
+    inProgressItems.splice(targetIndex, 0, movedItem);
+
+    // 5. Renumera sequencialmente 1, 2, 3... eliminando lacunas e deslocando os demais
+    this.resequenceOrders(inProgressItems);
+
+    // Salvar estado e re-renderizar a visualização
     this.saveState();
     this.renderBoardView();
     this.applyRolePermissions();
