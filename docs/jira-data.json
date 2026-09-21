@@ -1,7 +1,149 @@
 ﻿{
-    "updatedAt":  "2026-09-10T19:25:38.671Z",
-    "totalCards":  141,
+    "updatedAt":  "2026-09-21T20:08:59.560Z",
+    "totalCards":  147,
     "cards":  [
+                  {
+                      "id":  "1623912",
+                      "key":  "GAU-167",
+                      "jiraKey":  "GAU-167",
+                      "title":  "Script de emissão de cartão de Renovação em massa",
+                      "summary":  "Script de emissão de cartão de Renovação em massa",
+                      "status":  "Backlog",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+                                                "value":  "Suporte Operacional",
+                                                "id":  "24152"
+                                            },
+                      "squad":  null,
+                      "requester":  "valdirene batista da silva souza figueredo",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "18/09/2026",
+                      "description":  "Necessidade de criação de um script interno para automatizar a emissão de cartões de renovação em massa, utilizando a API individual da Dock (conforme orientação técnica repassada no chamado OSA-2989). A solução deve permitir definir de forma centralizada os parâmetros de emissão dos cartões de renovação, atendendo à diretriz de que a Natura passe a comandar esse processo de forma autônoma e em lote."
+                  },
+                  {
+                      "id":  "1622357",
+                      "key":  "GAU-166",
+                      "jiraKey":  "GAU-166",
+                      "title":  "Inclusão de dados de Autosserviço",
+                      "summary":  "Inclusão de dados de Autosserviço",
+                      "status":  "Backlog",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
+                                                "value":  "Atendimento",
+                                                "id":  "24153"
+                                            },
+                      "squad":  null,
+                      "requester":  "Vanessa Felix Belmonte",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "18/09/2026",
+                      "description":  "disponibilizar dados de Autosserviço via tabela liberada por tecnologia no banco de dados"
+                  },
+                  {
+                      "id":  "1620184",
+                      "key":  "GAU-165",
+                      "jiraKey":  "GAU-165",
+                      "title":  "Base Cadastral SCD Brasil - Desvinculação Dependência Dock",
+                      "summary":  "Base Cadastral SCD Brasil - Desvinculação Dependência Dock",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                                "value":  "Operações NPay",
+                                                "id":  "16005"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                    "value":  "Operações NPay",
+                                    "id":  "16005"
+                                },
+                      "requester":  "Bruno Giglio Rocco",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "18/09/2026",
+                      "description":  "Para viabilizar o Produto Pag Emana Pay para o Público CB PJ Sem Conta, é necessário Desvincular a Base Cadastral da Dock, pois na Dock não é possível criar Cadastro PJ Sem Conta. Para isso, seria necessário criar a Base Cadastral Brasil V3. O id_person (chave da base) deve manter o histórico, mas para novos registros ter novo id_person_pay não vinculado à Dock e auto incremental. O person_id dock deverá passar a ser armazendado em um novo campo (\"external id\").\nEntão nossa demanda seria esta, para o PEP PJ"
+                  },
+                  {
+                      "id":  "1620182",
+                      "key":  "GAU-164",
+                      "jiraKey":  "GAU-164",
+                      "title":  "Base Cadastral Hispana México",
+                      "summary":  "Base Cadastral Hispana México",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                                "value":  "Operações NPay",
+                                                "id":  "16005"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                    "value":  "Operações NPay",
+                                    "id":  "16005"
+                                },
+                      "requester":  "Bruno Giglio Rocco",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "18/09/2026",
+                      "description":  "Os produtos do Emana Pay estão sendo expandidos para a Hispana.\nJá temos a Conta Digital na Argentina, por exemplo, e serão lançados produtos de crédito também.\nAtualmente não existe uma Base Cadastral Emana Pay SCD para os países da Hispana, nos mesmos moldes que existe no Brasil.\nEsta criação é necessária, principalmente para habilitar os produtos de crédito.\nÉ necessário ter uma base cadastral, contendo os clientes que possuem ou já possuíram relacionamento com o Emana Pay (ex produto de conta ou crédito), para que esta base seja consumida pelos processos de tecnologia e produtos.\nApós criada a base, será necessário o desenvolvimento de serviços e APIs de consulta dessas bases.\n\nPara Hispana, foi iniciado o desenvolvimento da Base Cadastral Argentina.\nSerá necessário criar também a Base Cadastral para o México.\nEstá prevista a necessidade dela para jan/27.\n\nO formato e dados necessários está sendo discutido junto com as áreas de negócios (monicacezario@natura.net).\nLink Mapeamento Produtos:"
+                  },
+                  {
+                      "id":  "1608441",
+                      "key":  "GAU-163",
+                      "jiraKey":  "GAU-163",
+                      "title":  "Teste incidente",
+                      "summary":  "Teste incidente",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+                                                "value":  "Suporte Operacional",
+                                                "id":  "24152"
+                                            },
+                      "squad":  null,
+                      "requester":  "Jailton Gomes Dos Santos",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "16/09/2026",
+                      "description":  "Sem descrição"
+                  },
+                  {
+                      "id":  "1608439",
+                      "key":  "GAU-162",
+                      "jiraKey":  "GAU-162",
+                      "title":  "Teste Jailton",
+                      "summary":  "Teste Jailton",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+                                                "value":  "Suporte Operacional",
+                                                "id":  "24152"
+                                            },
+                      "squad":  null,
+                      "requester":  "Jailton Gomes Dos Santos",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "16/09/2026",
+                      "description":  "Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste 1Teste"
+                  },
                   {
                       "id":  "1577711",
                       "key":  "GAU-159",
@@ -37,8 +179,8 @@
                       "jiraKey":  "GAU-158",
                       "title":  "[Sustentação] Tabela authorization_snapshot e authorization_snapshot com defasagem de dados",
                       "summary":  "[Sustentação] Tabela authorization_snapshot e authorization_snapshot com defasagem de dados",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -95,8 +237,8 @@
                       "jiraKey":  "GAU-156",
                       "title":  "sustentação - prd.trusted_cybersource_view.dview_transactions_mexico_history",
                       "summary":  "sustentação - prd.trusted_cybersource_view.dview_transactions_mexico_history",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -153,8 +295,8 @@
                       "jiraKey":  "GAU-154",
                       "title":  "[Sustentação] - Dado não atualizado na tabela  (prd.trusted_operacoes_agenda_view.dview_receivables_snapshot)",
                       "summary":  "[Sustentação] - Dado não atualizado na tabela  (prd.trusted_operacoes_agenda_view.dview_receivables_snapshot)",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -356,8 +498,8 @@
                       "jiraKey":  "GAU-147",
                       "title":  "Profissão Base Cadastral (Atualização/Inclusão) Recebidos de Eventos de Onboarding",
                       "summary":  "Profissão Base Cadastral (Atualização/Inclusão) Recebidos de Eventos de Onboarding",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
                                                 "value":  "Operações NPay",
@@ -530,8 +672,8 @@
                       "jiraKey":  "GAU-141",
                       "title":  "Trafego arquivos de conciliação casas de recaudación argentina",
                       "summary":  "Trafego arquivos de conciliação casas de recaudación argentina",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
                                                 "value":  "Operações NPay",
@@ -950,8 +1092,8 @@
                       "jiraKey":  "GAU-120",
                       "title":  "Visão 360 de Elegibilidade e Cobrança (Integração Zord)",
                       "summary":  "Visão 360 de Elegibilidade e Cobrança (Integração Zord)",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -1125,8 +1267,8 @@
                       "jiraKey":  "GAU-113",
                       "title":  "Squad Operações - Zord - Melhoria Funcionalidade Atualização Cadastral - Endereço",
                       "summary":  "Squad Operações - Zord - Melhoria Funcionalidade Atualização Cadastral - Endereço",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
                                                 "value":  "Operações NPay",
@@ -1300,8 +1442,8 @@
                       "jiraKey":  "GAU-106",
                       "title":  "Criação Base Cadastro D0 - Pag Emana Pay Sem Conta",
                       "summary":  "Criação Base Cadastro D0 - Pag Emana Pay Sem Conta",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
                                                 "value":  "Operações NPay",
