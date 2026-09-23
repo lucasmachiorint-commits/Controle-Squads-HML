@@ -1,7 +1,36 @@
 ﻿{
-    "updatedAt":  "2026-09-21T20:08:59.560Z",
-    "totalCards":  147,
+    "updatedAt":  "2026-09-23T19:33:10.743Z",
+    "totalCards":  148,
     "cards":  [
+                  {
+                      "id":  "1641566",
+                      "key":  "GAU-168",
+                      "jiraKey":  "GAU-168",
+                      "title":  "Dados Operações - Base Cadastral SCD Brasil - Desvinculação Dependência Dock",
+                      "summary":  "Dados Operações - Base Cadastral SCD Brasil - Desvinculação Dependência Dock",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Bruno Giglio Rocco",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "23/09/2026",
+                      "description":  "Foi criada uma demanda para a Squad de Operações, para atualização do fluxo da Base Cadastral: \nGAU-119\nNesta demanda, o objetivo será tornar a Base Cadastral Emana Pay SCD independente da Dock.\nCom isso, serão criados novos Ids.\n\nApós esta melhoria ser implementada, será necessário realizar os ajustes necessários nas tabelas Trusted Base Cadastral que forem alteradas.\nA demanda visa, após implementação do ajuste na Base Cadastral, replicar a melhoria nas viesw do databricks da base cadastral."
+                  },
                   {
                       "id":  "1623912",
                       "key":  "GAU-167",
@@ -29,15 +58,23 @@
                       "jiraKey":  "GAU-166",
                       "title":  "Inclusão de dados de Autosserviço",
                       "summary":  "Inclusão de dados de Autosserviço",
-                      "status":  "Backlog",
+                      "status":  "Aguardando Squad",
                       "categoriaStatus":  "Itens Pendentes",
-                      "customfield_12475":  null,
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
                       "customfield_11010":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
                                                 "value":  "Atendimento",
                                                 "id":  "24153"
                                             },
-                      "squad":  null,
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
                       "requester":  "Vanessa Felix Belmonte",
                       "priority":  "Média",
                       "category":  "Geral",
@@ -351,8 +388,8 @@
                       "id":  "1490771",
                       "key":  "GAU-152",
                       "jiraKey":  "GAU-152",
-                      "title":  "Squad Ops | Criação Base Cadastral Hispana",
-                      "summary":  "Squad Ops | Criação Base Cadastral Hispana",
+                      "title":  "Squad Ops | Criação Base Cadastral Hispana (Argentina) ",
+                      "summary":  "Squad Ops | Criação Base Cadastral Hispana (Argentina) ",
                       "status":  "Aguardando Squad",
                       "categoriaStatus":  "Itens Pendentes",
                       "customfield_12475":  {
@@ -1342,8 +1379,8 @@
                       "jiraKey":  "GAU-110",
                       "title":  "Integração das conciliações no Zord",
                       "summary":  "Integração das conciliações no Zord",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
                                                 "value":  "Operações NPay",
@@ -3742,8 +3779,8 @@
                       "jiraKey":  "GAU-8",
                       "title":  "Squad Ops | Melhoria Bidirecional Canal Capta",
                       "summary":  "Squad Ops | Melhoria Bidirecional Canal Capta",
-                      "status":  "Coletar Resultados",
-                      "categoriaStatus":  "Em andamento",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
                                                 "value":  "Operações NPay",
