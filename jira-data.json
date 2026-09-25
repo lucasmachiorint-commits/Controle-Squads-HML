@@ -1,7 +1,36 @@
 ﻿{
-    "updatedAt":  "2026-09-23T19:33:10.743Z",
-    "totalCards":  148,
+    "updatedAt":  "2026-09-25T15:29:20.132Z",
+    "totalCards":  149,
     "cards":  [
+                  {
+                      "id":  "1657461",
+                      "key":  "GAU-169",
+                      "jiraKey":  "GAU-169",
+                      "title":  "Melhoria Adquação Equals",
+                      "summary":  "Melhoria Adquação Equals",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Jailton Gomes Dos Santos",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "25/09/2026",
+                      "description":  "O pipeline de envio de extratos (CREATION) para a parceira Equals tem apresentado reenvio duplicado do mesmo arquivo em execuções diferentes (O job ndata-operation-pay-output-equals-creationfiles-job reenvia arquivos CREATION já enviados anteriormente). Já houve um chamado anterior sobre isso (GSTKT-56362, reprocessamento histórico).\nCausa raiz: o estágio filter_and_copy_creation_files particiona o destino usando __last_update_timestamp (data de atualização da linha na tabela statements_list_snapshot), em vez da data real do arquivo (já embutida no nome, ex: CREATION_2_2026-08-23_\u003cuuid\u003e.csv). Quando uma linha é \"retocada\" (reprocessamento em massa ou atualização natural em mais de um dia), ela cai numa pasta de destino nova, e o estágio creation_files_sftp_equals — que só lê a pasta do dia da execução — reenvia o arquivo como se fosse inédito. O checkpoint do Autoloader não protege porque dedupe por caminho, e o caminho muda todo dia."
+                  },
                   {
                       "id":  "1641566",
                       "key":  "GAU-168",
@@ -37,8 +66,8 @@
                       "jiraKey":  "GAU-167",
                       "title":  "Script de emissão de cartão de Renovação em massa",
                       "summary":  "Script de emissão de cartão de Renovação em massa",
-                      "status":  "Backlog",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Em Análise",
+                      "categoriaStatus":  "Em andamento",
                       "customfield_12475":  null,
                       "customfield_11010":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
@@ -1179,8 +1208,8 @@
                       "jiraKey":  "GAU-118",
                       "title":  "Atualização Base Cadastral -\u003e Eventos de Onboarding (Com e Sem Conta)",
                       "summary":  "Atualização Base Cadastral -\u003e Eventos de Onboarding (Com e Sem Conta)",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
                                                 "value":  "Operações NPay",
