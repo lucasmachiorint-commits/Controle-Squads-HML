@@ -1,7 +1,28 @@
 ﻿{
-    "updatedAt":  "2026-09-25T15:40:08.737Z",
-    "totalCards":  149,
+    "updatedAt":  "2026-09-30T19:36:53.780Z",
+    "totalCards":  150,
     "cards":  [
+                  {
+                      "id":  "1673388",
+                      "key":  "GAU-170",
+                      "jiraKey":  "GAU-170",
+                      "title":  "INCIDENTE | Dados tabela - Liquidação (28/09)",
+                      "summary":  "INCIDENTE | Dados tabela - Liquidação (28/09)",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  null,
+                      "requester":  "LAIS ANDRADE",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "29/09/2026",
+                      "description":  "Prezados,\n\nAté o momento, os dados referente a tabela abaixo, não foram atualizados. \nprd.trusted_gsurf_view.dview_settlement_items_snapshot a\n\nPoderiam verificar, por favor?"
+                  },
                   {
                       "id":  "1657461",
                       "key":  "GAU-169",
@@ -66,16 +87,24 @@
                       "jiraKey":  "GAU-167",
                       "title":  "Script de emissão de cartão de Renovação em massa",
                       "summary":  "Script de emissão de cartão de Renovação em massa",
-                      "status":  "Em Análise",
+                      "status":  "Em andamento",
                       "categoriaStatus":  "Em andamento",
-                      "customfield_12475":  null,
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
                       "customfield_11010":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
                                                 "value":  "Suporte Operacional",
                                                 "id":  "24152"
                                             },
-                      "squad":  null,
-                      "requester":  "valdirene batista da silva souza figueredo",
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "VALDIRENE BATISTA DA SILVA SOUZA FIGUEREDO",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "18/09/2026",
@@ -262,7 +291,7 @@
                                     "value":  "Dados Operações",
                                     "id":  "16006"
                                 },
-                      "requester":  "Gabriela Alves Sampaio",
+                      "requester":  "Gabriela Sampaio",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "04/09/2026",
@@ -291,7 +320,7 @@
                                     "value":  "Dados Operações",
                                     "id":  "16006"
                                 },
-                      "requester":  "Gabriela Alves Sampaio",
+                      "requester":  "Gabriela Sampaio",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "31/08/2026",
@@ -378,7 +407,7 @@
                                     "value":  "Dados Operações",
                                     "id":  "16006"
                                 },
-                      "requester":  "Gabriela Alves Sampaio",
+                      "requester":  "Gabriela Sampaio",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "26/08/2026",
@@ -854,8 +883,8 @@
                       "jiraKey":  "GAU-137",
                       "title":  "Ingestão Tabelas Agenda",
                       "summary":  "Ingestão Tabelas Agenda",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -871,7 +900,7 @@
                                     "value":  "Dados Operações",
                                     "id":  "16006"
                                 },
-                      "requester":  "Gabriela Alves Sampaio",
+                      "requester":  "Gabriela Sampaio",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "06/08/2026",
@@ -946,7 +975,7 @@
                                     "value":  "Dados Operações",
                                     "id":  "16006"
                                 },
-                      "requester":  "Gabriela Alves Sampaio",
+                      "requester":  "Gabriela Sampaio",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "17/07/2026",
@@ -958,8 +987,8 @@
                       "jiraKey":  "GAU-128",
                       "title":  "Squad Dados | Criar Front no Zord para Consulta de Transações (Integrar Gsurf e Motor de Agenda). Operações",
                       "summary":  "Squad Dados | Criar Front no Zord para Consulta de Transações (Integrar Gsurf e Motor de Agenda). Operações",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Em Análise",
+                      "categoriaStatus":  "Em andamento",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -1071,7 +1100,7 @@
                                     "value":  "RPA",
                                     "id":  "16007"
                                 },
-                      "requester":  "Evandro Paulo Coelho",
+                      "requester":  "EVANDRO PAULO COELHO",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "04/06/2026",
@@ -1096,7 +1125,7 @@
                                     "value":  "RPA",
                                     "id":  "16007"
                                 },
-                      "requester":  "Evandro Paulo Coelho",
+                      "requester":  "EVANDRO PAULO COELHO",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "04/06/2026",
@@ -1121,7 +1150,7 @@
                                     "value":  "RPA",
                                     "id":  "16007"
                                 },
-                      "requester":  "Evandro Paulo Coelho",
+                      "requester":  "EVANDRO PAULO COELHO",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "04/06/2026",
@@ -1146,7 +1175,7 @@
                                     "value":  "RPA",
                                     "id":  "16007"
                                 },
-                      "requester":  "Evandro Paulo Coelho",
+                      "requester":  "EVANDRO PAULO COELHO",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "04/06/2026",
@@ -1321,7 +1350,7 @@
                                     "value":  "Dados Operações",
                                     "id":  "16006"
                                 },
-                      "requester":  "Silvana Jaguszewski",
+                      "requester":  "SILVANA JAGUSZEWSKI",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "27/04/2026",
@@ -1646,7 +1675,7 @@
                                     "value":  "RPA",
                                     "id":  "16007"
                                 },
-                      "requester":  "valdirene batista da silva souza figueredo",
+                      "requester":  "VALDIRENE BATISTA DA SILVA SOUZA FIGUEREDO",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "24/02/2026",
@@ -1871,7 +1900,7 @@
                                     "value":  "RPA",
                                     "id":  "16007"
                                 },
-                      "requester":  "Evandro Paulo Coelho",
+                      "requester":  "EVANDRO PAULO COELHO",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "11/02/2026",
@@ -3071,7 +3100,7 @@
                                     "value":  "Operações NPay",
                                     "id":  "16005"
                                 },
-                      "requester":  "VANESSA FELIX BELMONTE",
+                      "requester":  "Vanessa Belmonte",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "22/08/2025",
@@ -3096,7 +3125,7 @@
                                     "value":  "Operações NPay",
                                     "id":  "16005"
                                 },
-                      "requester":  "VANESSA FELIX BELMONTE",
+                      "requester":  "Vanessa Belmonte",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "22/08/2025",
@@ -3121,7 +3150,7 @@
                                     "value":  "Operações NPay",
                                     "id":  "16005"
                                 },
-                      "requester":  "VANESSA FELIX BELMONTE",
+                      "requester":  "Vanessa Belmonte",
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "22/08/2025",
