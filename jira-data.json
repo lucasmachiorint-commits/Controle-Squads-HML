@@ -1,7 +1,36 @@
 ﻿{
-    "updatedAt":  "2026-09-30T19:36:53.780Z",
-    "totalCards":  150,
+    "updatedAt":  "2026-09-30T20:10:58.800Z",
+    "totalCards":  151,
     "cards":  [
+                  {
+                      "id":  "1681864",
+                      "key":  "GAU-171",
+                      "jiraKey":  "GAU-171",
+                      "title":  "RPA | Baixa de ligações 55pbx - Speech Analytics",
+                      "summary":  "RPA | Baixa de ligações 55pbx - Speech Analytics",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+                                                "value":  "RPA",
+                                                "id":  "16007"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
+                                                "value":  "Atendimento",
+                                                "id":  "24153"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+                                    "value":  "RPA",
+                                    "id":  "16007"
+                                },
+                      "requester":  "Lucas da Silva Machiori - Natura",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "30/09/2026",
+                      "description":  "Realizar a criação de um Robô para acessar o site da 55PBX, baixar as ligações do dia e disponibiliza-las no repositório indicado pelo time de Ciência de Dados."
+                  },
                   {
                       "id":  "1673388",
                       "key":  "GAU-170",
@@ -87,12 +116,12 @@
                       "jiraKey":  "GAU-167",
                       "title":  "Script de emissão de cartão de Renovação em massa",
                       "summary":  "Script de emissão de cartão de Renovação em massa",
-                      "status":  "Em andamento",
-                      "categoriaStatus":  "Em andamento",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
                       "customfield_12475":  {
-                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
-                                                "value":  "Dados Operações",
-                                                "id":  "16006"
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                                "value":  "Operações NPay",
+                                                "id":  "16005"
                                             },
                       "customfield_11010":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
@@ -100,9 +129,9 @@
                                                 "id":  "24152"
                                             },
                       "squad":  {
-                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
-                                    "value":  "Dados Operações",
-                                    "id":  "16006"
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                    "value":  "Operações NPay",
+                                    "id":  "16005"
                                 },
                       "requester":  "VALDIRENE BATISTA DA SILVA SOUZA FIGUEREDO",
                       "priority":  "Média",
