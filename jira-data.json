@@ -1,7 +1,94 @@
 ﻿{
-    "updatedAt":  "2026-09-30T20:10:58.800Z",
-    "totalCards":  151,
+    "updatedAt":  "2026-10-07T13:21:49.102Z",
+    "totalCards":  154,
     "cards":  [
+                  {
+                      "id":  "1714318",
+                      "key":  "GAU-174",
+                      "jiraKey":  "GAU-174",
+                      "title":  "[Incidente] Tabela do Banco de Dados com dado inconsistente dview_receivable_unit_payments_snapshot",
+                      "summary":  "[Incidente] Tabela do Banco de Dados com dado inconsistente dview_receivable_unit_payments_snapshot",
+                      "status":  "Em andamento",
+                      "categoriaStatus":  "Em andamento",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Gabriela Sampaio",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "07/10/2026",
+                      "description":  "Sem descrição"
+                  },
+                  {
+                      "id":  "1712242",
+                      "key":  "GAU-173",
+                      "jiraKey":  "GAU-173",
+                      "title":  "Trafego arquivos de conciliação casas de recaudación argentina ",
+                      "summary":  "Trafego arquivos de conciliação casas de recaudación argentina ",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                                "value":  "Operações NPay",
+                                                "id":  "16005"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                    "value":  "Operações NPay",
+                                    "id":  "16005"
+                                },
+                      "requester":  "Luiz Paulo Marcelo Moreira - Natura Pay",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "06/10/2026",
+                      "description":  "Complementar ao GAU-141\n\nPrecisamos acessar SFTPs de casas de recaudación da Argentina, copiar arquivos e salva-los em um bucket da Natura Pay.\nO Processo deve ser executado diariamente, de segunda a sexta , e trazer todos os arquivos novos a cada execução.\n\nServidor Producción: girenet.gire.com \nPuerto: 22 \nProtocolo: SFTP – SSH File Transfer Protocol \n\n Acceder con el usuario y contraseña proporcionado por Gire:\nLMOREIRA.5030\nNigptupe.7843"
+                  },
+                  {
+                      "id":  "1704134",
+                      "key":  "GAU-172",
+                      "jiraKey":  "GAU-172",
+                      "title":  "Automação / Script de abertura de conta em massa",
+                      "summary":  "Automação / Script de abertura de conta em massa",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                                "value":  "Operações NPay",
+                                                "id":  "16005"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+                                                "value":  "Suporte Operacional",
+                                                "id":  "24152"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                    "value":  "Operações NPay",
+                                    "id":  "16005"
+                                },
+                      "requester":  "VALDIRENE BATISTA DA SILVA SOUZA FIGUEREDO",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "05/10/2026",
+                      "description":  "Objetivo: Automatizar a abertura em massa de contas para consultoras sem conta bancária, visando agilizar os reembolsos do PEP.\n\nJustificativa: Substituir o processo manual atual, que demanda alto esforço operacional devido ao volume crescente de casos.\n\nEspecificações Técnicas: Utilizar os dados e endpoints da API de criação de contas individuais da Dock para estruturar a integração."
+                  },
                   {
                       "id":  "1681864",
                       "key":  "GAU-171",
@@ -1316,8 +1403,8 @@
                       "jiraKey":  "GAU-116",
                       "title":  "Criação Base Cadastral PJ (SCD)",
                       "summary":  "Criação Base Cadastral PJ (SCD)",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
                                                 "value":  "Operações NPay",
