@@ -1,15 +1,265 @@
 ﻿{
-    "updatedAt":  "2026-10-07T13:21:49.102Z",
-    "totalCards":  154,
+    "updatedAt":  "2026-10-27T14:32:25.698Z",
+    "totalCards":  164,
     "cards":  [
+                  {
+                      "id":  "1812284",
+                      "key":  "GAU-184",
+                      "jiraKey":  "GAU-184",
+                      "title":  "Controle de Atendimentos BKO - Ingestão automática Databricks",
+                      "summary":  "Controle de Atendimentos BKO - Ingestão automática Databricks",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+                                                "value":  "Suporte Operacional",
+                                                "id":  "24152"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Erika Kimie Kitahara",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "26/10/2026",
+                      "description":  "Bom dia! \nSolicitamos uma automação para gerar a ingestão automática de dados de atendimento BKO para um Painel no Databricks.\nA ingestão deve ser realizada 1X ao dia entre 21:00 e 22:00.\nLocal de origem (pasta no Drive): \n \n\nVolume Sandbox X Planilhas: \n\u0027/Volumes/sandbox_operacao_prd/sandbox/sandbox_volume/Controle de BKO/Controle de Bko - 2026.xlsx\u0027,\n \n\n\u0027/Volumes/sandbox_operacao_prd/sandbox/sandbox_volume/Controle de BKO/Controle de Bko - 2026-2_Set a Dez.xlsx\u0027,\n \n\nPainel No Databricks: \nhttps://dbc-d47e6e2f-abf7.cloud.databricks.com/sql/dashboardsv3/01f15924b7a21749b409d86918095714/pages/3ccd29a7?o=7264763073814085\n \nEstamos à disposição para refinar o processo.\n\nAtt.,\nÉrika Kimie"
+                  },
+                  {
+                      "id":  "1805721",
+                      "key":  "GAU-183",
+                      "jiraKey":  "GAU-183",
+                      "title":  "Melhoria atualização settlement Gsuf",
+                      "summary":  "Melhoria atualização settlement Gsuf",
+                      "status":  "Coletar Resultados",
+                      "categoriaStatus":  "Em andamento",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Willian Marcos Rodrigues - Natura Pay",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "23/10/2026",
+                      "description":  "Temos uma tabela da Gsurf \u003cprd.trusted_gsurf_view.dview_settlement_items_snapshot\u003e que traz dados de liquidação e em qual domicilio será liquidado.\nHoje ela apenas \"amontoa\" os dados diariamente, porem quando há alguma atualização de dado ja ingerido, essa atualização nao acontece aqui dentro do nosso banco.\nPoderiam me ajuda com a avaliação da possibilidade de que essas atualização reflitam no aqui dentro do banco de dados Natura?"
+                  },
+                  {
+                      "id":  "1777641",
+                      "key":  "GAU-182",
+                      "jiraKey":  "GAU-182",
+                      "title":  "Atualização e Inclusão de Tabelas e Campos da Base Cadastral (CBPJ)",
+                      "summary":  "Atualização e Inclusão de Tabelas e Campos da Base Cadastral (CBPJ)",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Jailton Gomes Dos Santos",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "16/10/2026",
+                      "description":  "Precisamos atualizar e estruturar as tabelas normalizadas de Pessoa Física e Jurídica (como Person, PersonLegal, PersonMember, PersonDocument, entre outras de domínio) conforme o novo dicionário de dados do CBPJ. O objetivo é incorporar os novos campos de faturamento, regime tributário e formato de estabelecimento, além de popular o novo campo de identificador de documento (doc ID) para eliminar a dependência legada da base com a DOC e viabilizar as entregas da sprint da Argentina e CBPJ."
+                  },
+                  {
+                      "id":  "1755605",
+                      "key":  "GAU-181",
+                      "jiraKey":  "GAU-181",
+                      "title":  "BUG - Dados do dia 07/10/2026 não ingeridos na Tabela",
+                      "summary":  "BUG - Dados do dia 07/10/2026 não ingeridos na Tabela",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Jailton Gomes Dos Santos",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "14/10/2026",
+                      "description":  "Sem descrição"
+                  },
+                  {
+                      "id":  "1753467",
+                      "key":  "GAU-180",
+                      "jiraKey":  "GAU-180",
+                      "title":  "teste jailton",
+                      "summary":  "teste jailton",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  null,
+                      "requester":  "Jailton Gomes Dos Santos",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "14/10/2026",
+                      "description":  "ghhg"
+                  },
+                  {
+                      "id":  "1753453",
+                      "key":  "GAU-179",
+                      "jiraKey":  "GAU-179",
+                      "title":  "Teste Thyago",
+                      "summary":  "Teste Thyago",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
+                                                "value":  "Atendimento",
+                                                "id":  "24153"
+                                            },
+                      "squad":  null,
+                      "requester":  "Thyago Chiprauski - GFT",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "14/10/2026",
+                      "description":  "Teste Thyago"
+                  },
+                  {
+                      "id":  "1753354",
+                      "key":  "GAU-178",
+                      "jiraKey":  "GAU-178",
+                      "title":  "Teste Thyago",
+                      "summary":  "Teste Thyago",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
+                                                "value":  "Atendimento",
+                                                "id":  "24153"
+                                            },
+                      "squad":  null,
+                      "requester":  "Thyago Chiprauski - GFT",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "14/10/2026",
+                      "description":  "Sem descrição"
+                  },
+                  {
+                      "id":  "1753349",
+                      "key":  "GAU-177",
+                      "jiraKey":  "GAU-177",
+                      "title":  "Teste Thyago Incidente",
+                      "summary":  "Teste Thyago Incidente",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
+                                                "value":  "Atendimento",
+                                                "id":  "24153"
+                                            },
+                      "squad":  null,
+                      "requester":  "Thyago Chiprauski - GFT",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "14/10/2026",
+                      "description":  "Sem descrição"
+                  },
+                  {
+                      "id":  "1753347",
+                      "key":  "GAU-176",
+                      "jiraKey":  "GAU-176",
+                      "title":  "Teste Thyago",
+                      "summary":  "Teste Thyago",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
+                      "customfield_12475":  null,
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
+                                                "value":  "Atendimento",
+                                                "id":  "24153"
+                                            },
+                      "squad":  null,
+                      "requester":  "Thyago Chiprauski - GFT",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "14/10/2026",
+                      "description":  "Sem descrição"
+                  },
+                  {
+                      "id":  "1725343",
+                      "key":  "GAU-175",
+                      "jiraKey":  "GAU-175",
+                      "title":  "[Incidente] Tabela do Banco de Dados não atualizada dview_receivables_snapshot",
+                      "summary":  "[Incidente] Tabela do Banco de Dados não atualizada dview_receivables_snapshot",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Gabriela Sampaio",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "08/10/2026",
+                      "description":  "Sem descrição"
+                  },
                   {
                       "id":  "1714318",
                       "key":  "GAU-174",
                       "jiraKey":  "GAU-174",
                       "title":  "[Incidente] Tabela do Banco de Dados com dado inconsistente dview_receivable_unit_payments_snapshot",
                       "summary":  "[Incidente] Tabela do Banco de Dados com dado inconsistente dview_receivable_unit_payments_snapshot",
-                      "status":  "Em andamento",
-                      "categoriaStatus":  "Em andamento",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -593,8 +843,8 @@
                       "jiraKey":  "GAU-151",
                       "title":  "ID28 - Amortização Reembolso (Amortização de notas de Crédito)",
                       "summary":  "ID28 - Amortização Reembolso (Amortização de notas de Crédito)",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
                                                 "value":  "RPA",
@@ -622,8 +872,8 @@
                       "jiraKey":  "GAU-150",
                       "title":  "ID27 - Amortização Performer (Amortização de Notas de Crédito)",
                       "summary":  "ID27 - Amortização Performer (Amortização de Notas de Crédito)",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
                                                 "value":  "RPA",
@@ -738,8 +988,8 @@
                       "jiraKey":  "GAU-146",
                       "title":  "ID16 Pendência Jira",
                       "summary":  "ID16 Pendência Jira",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
                                                 "value":  "RPA",
@@ -767,8 +1017,8 @@
                       "jiraKey":  "GAU-145",
                       "title":  "ID26 - Amortização Dispatcher",
                       "summary":  "ID26 - Amortização Dispatcher",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
                                                 "value":  "RPA",
@@ -796,8 +1046,8 @@
                       "jiraKey":  "GAU-144",
                       "title":  "ID 06 - Análise de Baixas ",
                       "summary":  "ID 06 - Análise de Baixas ",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
                                                 "value":  "RPA",
@@ -854,8 +1104,8 @@
                       "jiraKey":  "GAU-142",
                       "title":  "ID17 Amortização Reembolso Notas de Crédito",
                       "summary":  "ID17 Amortização Reembolso Notas de Crédito",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
                                                 "value":  "RPA",
@@ -1451,10 +1701,10 @@
                       "id":  "855456",
                       "key":  "GAU-114",
                       "jiraKey":  "GAU-114",
-                      "title":  "Visibilidade de volume e motivos de acionamento atendimento Cosméticos para CB\u0027s Pag Pay",
-                      "summary":  "Visibilidade de volume e motivos de acionamento atendimento Cosméticos para CB\u0027s Pag Pay",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "title":  "Dashboard - Visibilidade de volume e motivos de acionamento atendimento Cosméticos para CB\u0027s Pag Pay",
+                      "summary":  "Dashboard - Visibilidade de volume e motivos de acionamento atendimento Cosméticos para CB\u0027s Pag Pay",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
