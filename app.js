@@ -877,6 +877,7 @@ const app = {
       }
 
       this.state = data.data;
+      this.ensureStateSanity();
       if (!this.state.usersList) this.state.usersList = [];
       if (this.state.rpaPendencies && Array.isArray(this.state.rpaPendencies) && this.state.rpaPendencies.length > 0) {
         if (window.RpaPendenciesModule) {
