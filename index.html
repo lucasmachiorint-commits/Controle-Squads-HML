@@ -20,11 +20,11 @@
             for (let name of names) { caches.delete(name); }
           });
         }
-        const TARGET_RELEASE = 'v6.86.0-hml';
+        const TARGET_RELEASE = 'v6.87.0-hml';
         const currentLock = localStorage.getItem('cs_deployed_release_lock_hml');
-        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.86.0-hml')) {
+        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.87.0-hml')) {
           localStorage.setItem('cs_deployed_release_lock_hml', TARGET_RELEASE);
-          window.location.href = window.location.pathname + '?v=6.86.0-hml&t=' + Date.now();
+          window.location.href = window.location.pathname + '?v=6.87.0-hml&t=' + Date.now();
         }
       })();
     </script>
@@ -1457,6 +1457,7 @@
               <option value="ID20 - Cancelamento CAPTA" class="bg-[#0f172a] text-gray-200">ID20 - Cancelamento CAPTA</option>
             </optgroup>
             <optgroup label="AMORTIZAÇÃO NOTAS DE CRÉDITO" class="bg-[#0f172a] text-gray-400 font-bold">
+              <option value="ID17 Amortização Reembolso Notas de Crédito" class="bg-[#0f172a] text-gray-200">ID17 Amortização Reembolso Notas de Crédito</option>
               <option value="ID26 - Amortização Dispatcher" class="bg-[#0f172a] text-gray-200">ID26 - Amortização Dispatcher</option>
               <option value="ID27 - Amortização Performer 1" class="bg-[#0f172a] text-gray-200">ID27 - Amortização Performer 1</option>
               <option value="ID28 - Amortização Performer 2" class="bg-[#0f172a] text-gray-200">ID28 - Amortização Performer 2</option>
