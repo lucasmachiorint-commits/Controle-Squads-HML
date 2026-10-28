@@ -150,27 +150,110 @@ const app = {
       .map(cleanItem);
 
     ['dados', 'operacoes', 'rpa'].forEach(id => {
-      this.state.backlogItems[id] = (this.state.backlogItems[id] || [])
+      // 1. Higienizar e deduplicar completedTasks da squad
+      const rawCompleted = (this.state.completedTasks[id] || [])
+        .filter(i => !ghostKeys.has(extractKey(i)))
+        .map(cleanItem);
+
+      const completedMap = new Map();
+      const dedupedCompleted = [];
+      rawCompleted.forEach(c => {
+        if (!c) return;
+        const k = extractKey(c) || c.id;
+        if (!k) {
+          dedupedCompleted.push(c);
+          return;
+        }
+        if (!completedMap.has(k)) {
+          completedMap.set(k, c);
+          dedupedCompleted.push(c);
+        } else {
+          const existingC = completedMap.get(k);
+          if (!existingC.gains && c.gains) existingC.gains = c.gains;
+          if (!existingC.teamSolicitante && c.teamSolicitante) existingC.teamSolicitante = c.teamSolicitante;
+          if ((!existingC.timelineEntries || !existingC.timelineEntries.length) && c.timelineEntries?.length) {
+            existingC.timelineEntries = c.timelineEntries;
+          }
+          if (!existingC.devName && c.devName) existingC.devName = c.devName;
+          if (!existingC.devRole && c.devRole) existingC.devRole = c.devRole;
+        }
+      });
+
+      // 2. Higienizar e deduplicar backlogItems da squad, removendo itens que já estão em completedTasks
+      const rawBacklog = (this.state.backlogItems[id] || [])
         .filter(i => !ghostKeys.has(extractKey(i)))
         .map(item => {
           const cleaned = cleanItem(item);
-          if (cleaned) {
-            if (!cleaned.phase) {
-              if (cleaned.status === 'Em Andamento') {
-                cleaned.phase = 'em-andamento';
-              } else if (cleaned.status === 'Backlog') {
-                cleaned.phase = 'backlog';
-              } else if (cleaned.status === 'Bloqueado') {
-                cleaned.phase = 'em-andamento';
-              }
+          if (cleaned && !cleaned.phase) {
+            if (cleaned.status === 'Em Andamento') {
+              cleaned.phase = 'em-andamento';
+            } else if (cleaned.status === 'Backlog') {
+              cleaned.phase = 'backlog';
+            } else if (cleaned.status === 'Bloqueado') {
+              cleaned.phase = 'em-andamento';
             }
           }
           return cleaned;
         });
 
-      this.state.completedTasks[id] = (this.state.completedTasks[id] || [])
-        .filter(i => !ghostKeys.has(extractKey(i)))
-        .map(cleanItem);
+      const backlogMap = new Map();
+      const dedupedBacklog = [];
+
+      rawBacklog.forEach(b => {
+        if (!b) return;
+        const k = extractKey(b) || b.id;
+
+        // Se o item já consta em Concluídos (completedTasks), mescla metadados ricos e NÃO mantém em backlogItems
+        if (k && completedMap.has(k)) {
+          const compItem = completedMap.get(k);
+          if (!compItem.gains && b.gains) compItem.gains = b.gains;
+          if (!compItem.teamSolicitante && b.teamSolicitante) compItem.teamSolicitante = b.teamSolicitante;
+          if ((!compItem.timelineEntries || !compItem.timelineEntries.length) && b.timelineEntries?.length) {
+            compItem.timelineEntries = b.timelineEntries;
+          }
+          if (!compItem.devName && b.devName) compItem.devName = b.devName;
+          if (!compItem.devRole && b.devRole) compItem.devRole = b.devRole;
+          if (!compItem.targetDeliveryDate && b.targetDeliveryDate) compItem.targetDeliveryDate = b.targetDeliveryDate;
+          return;
+        }
+
+        // Se o item está com status Concluído órfão dentro de backlogItems (ex: reaberto no Jira depois),
+        // verificar se existe outra cópia ativa da mesma chave em rawBacklog
+        const isOrphanCompleted = (b.status === 'Concluído' || b.status === 'Concluido' || b.phase === 'concluido');
+        if (isOrphanCompleted && k) {
+          const hasActiveSibling = rawBacklog.some(other =>
+            other && other !== b && (extractKey(other) || other.id) === k &&
+            other.status !== 'Concluído' && other.status !== 'Concluido' && other.phase !== 'concluido'
+          );
+          if (hasActiveSibling) {
+            // Descarta a cópia Concluído fantasma para não bloquear a cópia ativa no Backlog/Andamento
+            return;
+          }
+        }
+
+        if (!k) {
+          dedupedBacklog.push(b);
+          return;
+        }
+
+        if (!backlogMap.has(k)) {
+          backlogMap.set(k, b);
+          dedupedBacklog.push(b);
+        } else {
+          // Mesclar dados relevantes caso haja duplicata ativa
+          const existingB = backlogMap.get(k);
+          if (!existingB.gains && b.gains) existingB.gains = b.gains;
+          if (!existingB.teamSolicitante && b.teamSolicitante) existingB.teamSolicitante = b.teamSolicitante;
+          if ((!existingB.timelineEntries || !existingB.timelineEntries.length) && b.timelineEntries?.length) {
+            existingB.timelineEntries = b.timelineEntries;
+          }
+          if (!existingB.devName && b.devName) existingB.devName = b.devName;
+          if (!existingB.devRole && b.devRole) existingB.devRole = b.devRole;
+        }
+      });
+
+      this.state.completedTasks[id] = dedupedCompleted;
+      this.state.backlogItems[id] = dedupedBacklog;
     });
   },
 
@@ -2589,34 +2672,41 @@ const app = {
     item.status = 'Triado';
     item.triagedSquadId = targetSquadId;
 
-    // Inserir no backlog da Squad com status 'Backlog' por padrão
+    // Inserir no backlog da Squad com status 'Backlog' por padrão (evitando duplicatas)
     const squadNames = { dados: 'Squad de Dados', operacoes: 'Squad de Operações', rpa: 'Squad de RPA' };
     if (!this.state.backlogItems[targetSquadId]) {
       this.state.backlogItems[targetSquadId] = [];
     }
 
-    let maxOrder = 0;
-    (this.state.backlogItems[targetSquadId] || []).forEach(i => {
-      if (i.treatmentOrder && typeof i.treatmentOrder === 'number' && i.treatmentOrder > maxOrder) {
-        maxOrder = i.treatmentOrder;
-      }
-    });
+    const existingBacklog = this.state.backlogItems[targetSquadId].find(
+      i => i.jiraKey === item.jiraKey || i.gau === item.jiraKey || i.id === `backlog-${item.jiraKey}`
+    );
 
-    this.state.backlogItems[targetSquadId].push({
-      id: `backlog-${item.jiraKey}`,
-      gau: item.jiraKey,
-      jiraKey: item.jiraKey,
-      title: item.title,
-      notes: item.description,
-      requester: item.requesterName || 'Solicitante Jira',
-      createdDate: item.createdDate || item.date,
-      team: squadNames[targetSquadId],
-      priority: item.priority || '2 - Alta',
-      treatmentOrder: maxOrder + 1,
-      status: 'Backlog',
-      phase: 'backlog',
-      progress: 0
-    });
+    if (!existingBacklog) {
+      let maxOrder = 0;
+      (this.state.backlogItems[targetSquadId] || []).forEach(i => {
+        if (i.treatmentOrder && typeof i.treatmentOrder === 'number' && i.treatmentOrder > maxOrder) {
+          maxOrder = i.treatmentOrder;
+        }
+      });
+
+      this.state.backlogItems[targetSquadId].push({
+        id: `backlog-${item.jiraKey}`,
+        gau: item.jiraKey,
+        jiraKey: item.jiraKey,
+        title: item.title,
+        notes: item.description,
+        requester: item.requesterName || 'Solicitante Jira',
+        teamSolicitante: item.teamSolicitante || '',
+        createdDate: item.createdDate || item.date,
+        team: squadNames[targetSquadId],
+        priority: item.priority || '2 - Alta',
+        treatmentOrder: maxOrder + 1,
+        status: 'Backlog',
+        phase: 'backlog',
+        progress: 0
+      });
+    }
 
     this.saveState();
 
@@ -2653,9 +2743,12 @@ const app = {
       return;
     }
     const squadItems = this.state.backlogItems[this.activeSquad] || [];
-    const item = squadItems.find(i => i.id === itemId || i.gau === itemId || i.jiraKey === itemId);
+    // Priorizar item ativo (não Concluído) caso existam cópias legadas no array
+    const item = squadItems.find(i => (i.id === itemId || i.gau === itemId || i.jiraKey === itemId) && i.status !== 'Concluído' && i.status !== 'Concluido') ||
+                 squadItems.find(i => i.id === itemId || i.gau === itemId || i.jiraKey === itemId);
     if (!item) return;
 
+    const gauKey = this.getItemGau(item);
     const oldStatus = item.status;
     const oldPhase = item.phase;
     item.status = newStatus;
@@ -2683,16 +2776,18 @@ const app = {
       }
     }
 
-    // Se alterado para Concluído, registra no histórico de entregas se não existir
+    // Se alterado para Concluído, move para completedTasks e remove de backlogItems para evitar duplicidade
     if (newStatus === 'Concluído' || newStatus === 'Concluido') {
       if (!this.state.completedTasks[this.activeSquad]) {
         this.state.completedTasks[this.activeSquad] = [];
       }
-      const alreadyCompleted = this.state.completedTasks[this.activeSquad].some(c => c.id === item.id);
-      if (!alreadyCompleted) {
-        const gauKey = this.getItemGau(item);
+      const existingComp = this.state.completedTasks[this.activeSquad].find(
+        c => c.id === item.id || (gauKey && this.getItemGau(c) === gauKey)
+      );
+      if (!existingComp) {
         this.state.completedTasks[this.activeSquad].unshift({
           id: item.id,
+          seqId: item.seqId,
           gau: gauKey,
           jiraKey: item.jiraKey || item.gau || gauKey,
           title: item.title || item.taskTitle,
@@ -2702,8 +2797,9 @@ const app = {
           requester: item.requester || item.requesterName || 'Solicitante Jira',
           requesterName: item.requester || item.requesterName || 'Solicitante Jira',
           completedBy: item.requester || item.requesterName || 'Analista Squad',
+          teamSolicitante: item.teamSolicitante || '',
           createdDate: item.createdDate || item.date || item.createdAt,
-          completionDate: new Date().toLocaleDateString('pt-BR'),
+          completionDate: item.completionDate || new Date().toLocaleDateString('pt-BR'),
           gains: item.gains || '',
           devRole: item.devRole,
           devName: item.devName,
@@ -2711,6 +2807,27 @@ const app = {
           devProgress: item.devProgress || '100%',
           timelineEntries: item.timelineEntries || []
         });
+      } else {
+        if (!existingComp.gains && item.gains) existingComp.gains = item.gains;
+        if (!existingComp.teamSolicitante && item.teamSolicitante) existingComp.teamSolicitante = item.teamSolicitante;
+        if ((!existingComp.timelineEntries || !existingComp.timelineEntries.length) && item.timelineEntries?.length) {
+          existingComp.timelineEntries = item.timelineEntries;
+        }
+      }
+
+      // Remover todas as cópias deste card de backlogItems da squad
+      this.state.backlogItems[this.activeSquad] = (this.state.backlogItems[this.activeSquad] || []).filter(
+        i => i.id !== item.id && (!gauKey || this.getItemGau(i) !== gauKey)
+      );
+    } else {
+      // Se alterado para Backlog / Em Andamento / Bloqueado, remover eventuais duplicatas no mesmo array e em completedTasks
+      this.state.backlogItems[this.activeSquad] = (this.state.backlogItems[this.activeSquad] || []).filter(
+        i => i === item || (i.id !== item.id && (!gauKey || this.getItemGau(i) !== gauKey))
+      );
+      if (this.state.completedTasks[this.activeSquad]) {
+        this.state.completedTasks[this.activeSquad] = this.state.completedTasks[this.activeSquad].filter(
+          c => c.id !== item.id && (!gauKey || this.getItemGau(c) !== gauKey)
+        );
       }
     }
 

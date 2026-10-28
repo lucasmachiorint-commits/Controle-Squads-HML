@@ -372,17 +372,14 @@ const JiraSyncEngine = {
           countToCompleted++;
         }
 
-        // Remover da fila anterior
-        const oldLoc = existing.queue;
-        if (oldLoc === 'triage') {
-          state.triageItems = state.triageItems.filter(t => extractJiraKey(t) !== jiraKey);
-        } else if (oldLoc.startsWith('backlog_')) {
-          const sId = oldLoc.replace('backlog_', '');
+        const prevItem = existing.item || {};
+
+        // Remover de TODAS as filas anteriores para impedir duplicatas órfãs entre filas
+        state.triageItems = state.triageItems.filter(t => extractJiraKey(t) !== jiraKey);
+        ['dados', 'operacoes', 'rpa'].forEach(sId => {
           state.backlogItems[sId] = (state.backlogItems[sId] || []).filter(b => extractJiraKey(b) !== jiraKey);
-        } else if (oldLoc.startsWith('completed_')) {
-          const sId = oldLoc.replace('completed_', '');
           state.completedTasks[sId] = (state.completedTasks[sId] || []).filter(c => extractJiraKey(c) !== jiraKey);
-        }
+        });
 
         // Inserir na nova fila
         existingMap.set(jiraKey, { queue: targetQueue });
@@ -405,21 +402,26 @@ const JiraSyncEngine = {
           });
         } else if (targetQueue.startsWith('completed_')) {
           state.completedTasks[targetSquadId].unshift({
-            id: `completed-${jiraKey}`,
+            id: prevItem.id || `completed-${jiraKey}`,
             gau: jiraKey,
             jiraKey: jiraKey,
             title: title,
             taskTitle: title,
             taskDescription: description,
             description: description,
-            area: 'Geral',
+            area: prevItem.area || 'Geral',
             completedBy: requester || targetSquadName,
             requester: requester || targetSquadName,
-            teamSolicitante,
-            dueDate: card.dueDate || new Date().toISOString().split('T')[0],
+            teamSolicitante: teamSolicitante || prevItem.teamSolicitante || '',
+            dueDate: card.dueDate || prevItem.dueDate || new Date().toISOString().split('T')[0],
             createdDate,
-            completionDate: new Date().toLocaleDateString('pt-BR'),
-            gains: '',
+            completionDate: prevItem.completionDate || new Date().toLocaleDateString('pt-BR'),
+            gains: prevItem.gains || '',
+            devRole: prevItem.devRole,
+            devName: prevItem.devName,
+            targetDeliveryDate: prevItem.targetDeliveryDate,
+            devProgress: '100%',
+            timelineEntries: prevItem.timelineEntries || [],
             requesterArea: requester
           });
         } else {
@@ -431,7 +433,7 @@ const JiraSyncEngine = {
             title,
             notes: description,
             requester,
-            teamSolicitante,
+            teamSolicitante: teamSolicitante || prevItem.teamSolicitante || '',
             team: targetSquadName,
             dueDate: card.dueDate || new Date().toISOString().split('T')[0],
             createdDate,
@@ -440,14 +442,32 @@ const JiraSyncEngine = {
             status: defaultStatus,
             phase: 'backlog',
             progress: 0,
+            gains: prevItem.gains || '',
+            devRole: prevItem.devRole,
+            devName: prevItem.devName,
+            targetDeliveryDate: prevItem.targetDeliveryDate,
+            timelineEntries: prevItem.timelineEntries || [],
             rawCreated: rawCreated || card.created
           });
         }
       }
-      // CASO C: TICKET EXISTE NA MESMA FILA (Atualizar dados preservando estado do usuário)
+      // CASO C: TICKET EXISTE NA MESMA FILA (Atualizar dados preservando estado do usuário e limpar cópias órfãs em outras filas)
       else {
         const itemObj = existing.item;
         let isModified = false;
+
+        // Se o card está em completed_<squad>, garantir que não existam cópias órfãs dele em triageItems ou backlogItems
+        if (targetQueue.startsWith('completed_')) {
+          state.triageItems = state.triageItems.filter(t => extractJiraKey(t) !== jiraKey);
+          ['dados', 'operacoes', 'rpa'].forEach(sId => {
+            const beforeLen = (state.backlogItems[sId] || []).length;
+            state.backlogItems[sId] = (state.backlogItems[sId] || []).filter(b => extractJiraKey(b) !== jiraKey);
+            if (state.backlogItems[sId].length !== beforeLen) {
+              isModified = true;
+            }
+          });
+        }
+
         if (itemObj) {
           if (title && itemObj.title !== title) {
             itemObj.title = title;
@@ -465,7 +485,8 @@ const JiraSyncEngine = {
           if (isModified) countUpdated++;
           else countUnchanged++;
         } else {
-          countUnchanged++;
+          if (isModified) countUpdated++;
+          else countUnchanged++;
         }
       }
     });
