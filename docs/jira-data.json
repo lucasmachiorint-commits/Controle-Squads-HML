@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-10-29T17:28:40.415Z",
+    "updatedAt":  "2026-10-29T17:45:49.200Z",
     "totalCards":  168,
     "cards":  [
                   {
@@ -151,8 +151,8 @@
                       "id":  "1805721",
                       "key":  "GAU-183",
                       "jiraKey":  "GAU-183",
-                      "title":  "Incidente_Melhoria atualização settlement Gsuf",
-                      "summary":  "Incidente_Melhoria atualização settlement Gsuf",
+                      "title":  "Ingestão de dados_Melhoria atualização settlement Gsuf",
+                      "summary":  "Ingestão de dados_Melhoria atualização settlement Gsuf",
                       "status":  "Coletar Resultados",
                       "categoriaStatus":  "Em andamento",
                       "customfield_12475":  {
