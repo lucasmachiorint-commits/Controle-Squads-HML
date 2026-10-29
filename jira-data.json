@@ -1,7 +1,123 @@
 ﻿{
-    "updatedAt":  "2026-10-27T14:32:25.698Z",
-    "totalCards":  164,
+    "updatedAt":  "2026-10-29T17:28:40.415Z",
+    "totalCards":  168,
     "cards":  [
+                  {
+                      "id":  "1831090",
+                      "key":  "GAU-189",
+                      "jiraKey":  "GAU-189",
+                      "title":  "Teste Thyago",
+                      "summary":  "Teste Thyago",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
+                                                "value":  "Atendimento",
+                                                "id":  "24153"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Thyago Chiprauski - GFT",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "29/10/2026",
+                      "description":  "Sem descrição"
+                  },
+                  {
+                      "id":  "1830749",
+                      "key":  "GAU-188",
+                      "jiraKey":  "GAU-188",
+                      "title":  "[Incidente] Tabela do Banco de Dados com dado inconsistente dview_receivable_unit_payments_snapshot",
+                      "summary":  "[Incidente] Tabela do Banco de Dados com dado inconsistente dview_receivable_unit_payments_snapshot",
+                      "status":  "Coletar Resultados",
+                      "categoriaStatus":  "Em andamento",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Gabriela Sampaio",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "29/10/2026",
+                      "description":  "Sem descrição"
+                  },
+                  {
+                      "id":  "1828605",
+                      "key":  "GAU-187",
+                      "jiraKey":  "GAU-187",
+                      "title":  "Teste Thyago",
+                      "summary":  "Teste Thyago",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
+                                                "value":  "Atendimento",
+                                                "id":  "24153"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Thyago Chiprauski - GFT",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "28/10/2026",
+                      "description":  "Sem descrição"
+                  },
+                  {
+                      "id":  "1825054",
+                      "key":  "GAU-185",
+                      "jiraKey":  "GAU-185",
+                      "title":  " Baixar dados do Função via automação",
+                      "summary":  " Baixar dados do Função via automação",
+                      "status":  "Em andamento",
+                      "categoriaStatus":  "Em andamento",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+                                                "value":  "RPA",
+                                                "id":  "16007"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16007",
+                                    "value":  "RPA",
+                                    "id":  "16007"
+                                },
+                      "requester":  "Jailton Gomes Dos Santos",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "27/10/2026",
+                      "description":  "Automação para extração diária dos relatórios do sistema Função, disponibilizando a base de dados necessária para a equipe de Dados construir o Dashboard de Pagamento Pag Emana Pay"
+                  },
                   {
                       "id":  "1812284",
                       "key":  "GAU-184",
@@ -35,8 +151,8 @@
                       "id":  "1805721",
                       "key":  "GAU-183",
                       "jiraKey":  "GAU-183",
-                      "title":  "Melhoria atualização settlement Gsuf",
-                      "summary":  "Melhoria atualização settlement Gsuf",
+                      "title":  "Incidente_Melhoria atualização settlement Gsuf",
+                      "summary":  "Incidente_Melhoria atualização settlement Gsuf",
                       "status":  "Coletar Resultados",
                       "categoriaStatus":  "Em andamento",
                       "customfield_12475":  {
@@ -1353,18 +1469,18 @@
                       "jiraKey":  "GAU-128",
                       "title":  "Squad Dados | Criar Front no Zord para Consulta de Transações (Integrar Gsurf e Motor de Agenda). Operações",
                       "summary":  "Squad Dados | Criar Front no Zord para Consulta de Transações (Integrar Gsurf e Motor de Agenda). Operações",
-                      "status":  "Em Análise",
-                      "categoriaStatus":  "Em andamento",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
                       "customfield_12475":  {
-                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
-                                                "value":  "Dados Operações",
-                                                "id":  "16006"
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                                "value":  "Operações NPay",
+                                                "id":  "16005"
                                             },
                       "customfield_11010":  null,
                       "squad":  {
-                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
-                                    "value":  "Dados Operações",
-                                    "id":  "16006"
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16005",
+                                    "value":  "Operações NPay",
+                                    "id":  "16005"
                                 },
                       "requester":  "Jacqueline Soares",
                       "priority":  "Média",
