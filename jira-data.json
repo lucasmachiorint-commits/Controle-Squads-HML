@@ -1,13 +1,13 @@
 ﻿{
-    "updatedAt":  "2026-10-29T17:45:49.200Z",
+    "updatedAt":  "2026-11-05T18:53:14.440Z",
     "totalCards":  168,
     "cards":  [
                   {
-                      "id":  "1831090",
-                      "key":  "GAU-189",
-                      "jiraKey":  "GAU-189",
-                      "title":  "Teste Thyago",
-                      "summary":  "Teste Thyago",
+                      "id":  "1839128",
+                      "key":  "GAU-191",
+                      "jiraKey":  "GAU-191",
+                      "title":  "Importação da Planilha Demandas BKO no Databricks",
+                      "summary":  "Importação da Planilha Demandas BKO no Databricks",
                       "status":  "Aguardando Squad",
                       "categoriaStatus":  "Itens Pendentes",
                       "customfield_12475":  {
@@ -16,19 +16,48 @@
                                                 "id":  "16006"
                                             },
                       "customfield_11010":  {
-                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
-                                                "value":  "Atendimento",
-                                                "id":  "24153"
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24152",
+                                                "value":  "Suporte Operacional",
+                                                "id":  "24152"
                                             },
                       "squad":  {
                                     "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                     "value":  "Dados Operações",
                                     "id":  "16006"
                                 },
-                      "requester":  "Thyago Chiprauski - GFT",
+                      "requester":  "Erika Kimie Kitahara",
                       "priority":  "Média",
                       "category":  "Geral",
-                      "createdDate":  "29/10/2026",
+                      "createdDate":  "30/10/2026",
+                      "description":  "Boa tarde! \nNecessidade de disponibilizar e centralizar no Databricks os dados operacionais referentes ao fluxo de conciliação e baixa manual de pagamentos não liquidados via API (Planilha de Demandas BKO). \nAtualmente, o robô de Backoffice realiza a análise e a baixa dessas pendências no sistema Função, alimentando uma planilha junto às equipes de Conciliação e Backoffice (inclusão de itens) e às automações de baixas e reembolsos. O arquivo é atualizado diariamente (em dias úteis) e fica armazenado no SFTP no caminho /BKO-RPA-FILES-PRD/05_BKO_DemandasBKO/Demandas_Processadas/. \nSolicitamos que exista uma automação que extraia os dados da planilha e realize a ingestão no Databricks para o consumo de outras áreas, como por exemplo o time de Tesouraria."
+                  },
+                  {
+                      "id":  "1837765",
+                      "key":  "GAU-190",
+                      "jiraKey":  "GAU-190",
+                      "title":  "Inicidente - Transações com status desatualizado - tabela dview_transactions_snapshot",
+                      "summary":  "Inicidente - Transações com status desatualizado - tabela dview_transactions_snapshot",
+                      "status":  "Aguardando Squad",
+                      "categoriaStatus":  "Itens Pendentes",
+                      "customfield_12475":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                                "value":  "Dados Operações",
+                                                "id":  "16006"
+                                            },
+                      "customfield_11010":  {
+                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24154",
+                                                "value":  "Conciliação, Parâmetros, Processamento e Adquirência",
+                                                "id":  "24154"
+                                            },
+                      "squad":  {
+                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
+                                    "value":  "Dados Operações",
+                                    "id":  "16006"
+                                },
+                      "requester":  "Gabriela Sampaio",
+                      "priority":  "Média",
+                      "category":  "Geral",
+                      "createdDate":  "30/10/2026",
                       "description":  "Sem descrição"
                   },
                   {
@@ -37,8 +66,8 @@
                       "jiraKey":  "GAU-188",
                       "title":  "[Incidente] Tabela do Banco de Dados com dado inconsistente dview_receivable_unit_payments_snapshot",
                       "summary":  "[Incidente] Tabela do Banco de Dados com dado inconsistente dview_receivable_unit_payments_snapshot",
-                      "status":  "Coletar Resultados",
-                      "categoriaStatus":  "Em andamento",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -58,35 +87,6 @@
                       "priority":  "Média",
                       "category":  "Geral",
                       "createdDate":  "29/10/2026",
-                      "description":  "Sem descrição"
-                  },
-                  {
-                      "id":  "1828605",
-                      "key":  "GAU-187",
-                      "jiraKey":  "GAU-187",
-                      "title":  "Teste Thyago",
-                      "summary":  "Teste Thyago",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
-                      "customfield_12475":  {
-                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
-                                                "value":  "Dados Operações",
-                                                "id":  "16006"
-                                            },
-                      "customfield_11010":  {
-                                                "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/24153",
-                                                "value":  "Atendimento",
-                                                "id":  "24153"
-                                            },
-                      "squad":  {
-                                    "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
-                                    "value":  "Dados Operações",
-                                    "id":  "16006"
-                                },
-                      "requester":  "Thyago Chiprauski - GFT",
-                      "priority":  "Média",
-                      "category":  "Geral",
-                      "createdDate":  "28/10/2026",
                       "description":  "Sem descrição"
                   },
                   {
@@ -182,8 +182,8 @@
                       "jiraKey":  "GAU-182",
                       "title":  "Atualização e Inclusão de Tabelas e Campos da Base Cadastral (CBPJ)",
                       "summary":  "Atualização e Inclusão de Tabelas e Campos da Base Cadastral (CBPJ)",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Cancelado",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -345,8 +345,8 @@
                       "jiraKey":  "GAU-175",
                       "title":  "[Incidente] Tabela do Banco de Dados não atualizada dview_receivables_snapshot",
                       "summary":  "[Incidente] Tabela do Banco de Dados não atualizada dview_receivables_snapshot",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -511,8 +511,8 @@
                       "jiraKey":  "GAU-169",
                       "title":  "Melhoria Adquação Equals",
                       "summary":  "Melhoria Adquação Equals",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -1417,8 +1417,8 @@
                       "id":  "1275674",
                       "key":  "GAU-130",
                       "jiraKey":  "GAU-130",
-                      "title":  "Ingestão Dados DataBricks - Novas Tabelas Base Cadastral PJ - Bloqueado",
-                      "summary":  "Ingestão Dados DataBricks - Novas Tabelas Base Cadastral PJ - Bloqueado",
+                      "title":  "Ingestão Dados DataBricks - Novas Tabelas Base Cadastral CBPJ - ",
+                      "summary":  "Ingestão Dados DataBricks - Novas Tabelas Base Cadastral CBPJ - ",
                       "status":  "Aguardando Squad",
                       "categoriaStatus":  "Itens Pendentes",
                       "customfield_12475":  {
@@ -1494,8 +1494,8 @@
                       "jiraKey":  "GAU-127",
                       "title":  "Acesso a API para consultas de Usuários do portal lojista",
                       "summary":  "Acesso a API para consultas de Usuários do portal lojista",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -1694,8 +1694,8 @@
                       "jiraKey":  "GAU-119",
                       "title":  "DADOS - Base Histórico Alterações Base Cadastral",
                       "summary":  "DADOS - Base Histórico Alterações Base Cadastral",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -1869,8 +1869,8 @@
                       "jiraKey":  "GAU-112",
                       "title":  "DADOS OPERACOES - Ingestão DOCK MORPHEUS EVENTS LOG",
                       "summary":  "DADOS OPERACOES - Ingestão DOCK MORPHEUS EVENTS LOG",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -1894,8 +1894,8 @@
                       "jiraKey":  "GAU-111",
                       "title":  "Dados Operações - Ingestão - Id Parter Tabelas Companies",
                       "summary":  "Dados Operações - Ingestão - Id Parter Tabelas Companies",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
@@ -3069,8 +3069,8 @@
                       "jiraKey":  "GAU-64",
                       "title":  "Squad dados | DOCK  Ingestão Relatório interface contábil ",
                       "summary":  "Squad dados | DOCK  Ingestão Relatório interface contábil ",
-                      "status":  "Aguardando Squad",
-                      "categoriaStatus":  "Itens Pendentes",
+                      "status":  "Concluído",
+                      "categoriaStatus":  "Itens concluídos",
                       "customfield_12475":  {
                                                 "self":  "https://naturapay.atlassian.net/rest/api/3/customFieldOption/16006",
                                                 "value":  "Dados Operações",
