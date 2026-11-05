@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    Controle de Squads & Governança Jira - Visual Design System Executivo (Impeccable UI)
    ========================================================================== */
 
@@ -1826,6 +1826,14 @@ body.light-theme .timeline-scroll-container {
 
 body.light-theme .timeline-item {
   color: #1e293b !important;
+}
+
+/* Linha do Tempo — texto legivel no tema Light */
+body.light-theme #followup-timeline-list .timeline-item div[style*="color:#e2e8f0"] {
+  color: #000000 !important;
+}
+body.light-theme #followup-timeline-list .timeline-item span[style*="color:#94a3b8"] {
+  color: #334155 !important;
 }
 
 /* Status Dropdowns em Tabelas no Light Mode */
