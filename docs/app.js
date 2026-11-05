@@ -2798,6 +2798,7 @@ const app = {
           requester: item.requester || item.requesterName || 'Solicitante Jira',
           requesterName: item.requester || item.requesterName || 'Solicitante Jira',
           completedBy: item.requester || item.requesterName || 'Analista Squad',
+          demandType: item.demandType || '',
           teamSolicitante: item.teamSolicitante || '',
           createdDate: item.createdDate || item.date || item.createdAt,
           completionDate: item.completionDate || new Date().toLocaleDateString('pt-BR'),
@@ -2810,6 +2811,7 @@ const app = {
         });
       } else {
         if (!existingComp.gains && item.gains) existingComp.gains = item.gains;
+        if (!existingComp.demandType && item.demandType) existingComp.demandType = item.demandType;
         if (!existingComp.teamSolicitante && item.teamSolicitante) existingComp.teamSolicitante = item.teamSolicitante;
         if ((!existingComp.timelineEntries || !existingComp.timelineEntries.length) && item.timelineEntries?.length) {
           existingComp.timelineEntries = item.timelineEntries;
@@ -3790,13 +3792,31 @@ const app = {
       return matchSearch && matchTeam;
     });
 
+    const boardHeadEl = document.getElementById('board-table-head');
+    if (boardHeadEl) {
+      boardHeadEl.innerHTML = `
+        <tr>
+          <th style="width: 48px; white-space: nowrap;">ID</th>
+          <th style="width: 50px; white-space: nowrap;">Ordem</th>
+          <th style="width: 85px; white-space: nowrap;">GAU / Chave</th>
+          <th style="min-width: 150px;">Título da Demanda</th>
+          <th style="width: 115px; white-space: nowrap;">Solicitante</th>
+          ${this.activeSquad === 'dados' ? '<th style="width: 118px; white-space: nowrap;">Tipo de Demanda</th>' : ''}
+          <th style="width: 118px; white-space: nowrap;">Time Solicitante</th>
+          <th style="width: 105px; white-space: nowrap;">Status</th>
+          <th style="width: 90px; white-space: nowrap;">Data de Criação</th>
+        </tr>
+      `;
+    }
+
     const boardBadge = document.getElementById('board-count-badge');
     if (boardBadge) boardBadge.textContent = `${filteredItems.length} demandas`;
 
+    const boardColSpan = this.activeSquad === 'dados' ? 9 : 8;
     if (filteredItems.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="8" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda em andamento ou bloqueada encontrada.</td>
+          <td colspan="${boardColSpan}" class="text-center py-8 text-slate-500 font-semibold">Nenhuma demanda em andamento ou bloqueada encontrada.</td>
         </tr>
       `;
       return;
@@ -3820,6 +3840,18 @@ const app = {
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:85px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
         <td class="text-slate-300" style="white-space:nowrap; width:115px;">${this.cleanRequesterName(item.requester || 'Solicitante Jira')}</td>
+        ${this.activeSquad === 'dados' ? `
+          <td onclick="event.stopPropagation();" style="white-space:nowrap; width:118px;">
+            <select class="team-solicitante-select demand-type-select" onchange="app.changeDemandType('${item.id}', this.value)" ${isAdmin ? '' : 'disabled="true" style="pointer-events:none; opacity:0.75;"'}>
+              <option value="">— Selecione —</option>
+              <option value="Ingestão" ${item.demandType === 'Ingestão' ? 'selected' : ''}>Ingestão</option>
+              <option value="Dashboard" ${item.demandType === 'Dashboard' ? 'selected' : ''}>Dashboard</option>
+              <option value="Incidente" ${item.demandType === 'Incidente' ? 'selected' : ''}>Incidente</option>
+              <option value="Bug" ${item.demandType === 'Bug' ? 'selected' : ''}>Bug</option>
+              <option value="Atualização" ${item.demandType === 'Atualização' ? 'selected' : ''}>Atualização</option>
+            </select>
+          </td>
+        ` : ''}
         <td onclick="event.stopPropagation();" style="white-space:nowrap; width:118px;">
           <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)">
             <option value="">— Selecione —</option>
@@ -3856,6 +3888,7 @@ const app = {
           <th style="width: 85px; white-space: nowrap;">GAU / Chave</th>
           <th style="min-width: 150px;">Título da Demanda</th>
           <th style="width: 115px; white-space: nowrap;">Solicitante</th>
+          ${this.activeSquad === 'dados' ? '<th style="width: 118px; white-space: nowrap;">Tipo de Demanda</th>' : ''}
           <th style="width: 118px; white-space: nowrap;">Time Solicitante</th>
           ${isAdmin ? '<th style="width: 105px; white-space: nowrap;">Status</th>' : ''}
           <th style="width: 90px; white-space: nowrap;">Data de Criação</th>
@@ -3942,7 +3975,7 @@ const app = {
     const backlogBadge = document.getElementById('backlog-count-badge');
     if (backlogBadge) backlogBadge.textContent = `${filteredItems.length} demandas`;
 
-    const colSpan = isAdmin ? 8 : 7;
+    const colSpan = (isAdmin ? 8 : 7) + (this.activeSquad === 'dados' ? 1 : 0);
     if (filteredItems.length === 0) {
       tbody.innerHTML = `
         <tr>
@@ -3969,6 +4002,18 @@ const app = {
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:85px;">${item.gau || item.jiraKey || 'GAU-000'}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title}</td>
         <td class="text-slate-300" style="white-space:nowrap; width:115px;">${this.cleanRequesterName(item.requester || 'Solicitante Jira')}</td>
+        ${this.activeSquad === 'dados' ? `
+          <td onclick="event.stopPropagation();" style="white-space:nowrap; width:118px;">
+            <select class="team-solicitante-select demand-type-select" onchange="app.changeDemandType('${item.id}', this.value)" ${isAdmin ? '' : 'disabled="true" style="pointer-events:none; opacity:0.75;"'}>
+              <option value="">— Selecione —</option>
+              <option value="Ingestão" ${item.demandType === 'Ingestão' ? 'selected' : ''}>Ingestão</option>
+              <option value="Dashboard" ${item.demandType === 'Dashboard' ? 'selected' : ''}>Dashboard</option>
+              <option value="Incidente" ${item.demandType === 'Incidente' ? 'selected' : ''}>Incidente</option>
+              <option value="Bug" ${item.demandType === 'Bug' ? 'selected' : ''}>Bug</option>
+              <option value="Atualização" ${item.demandType === 'Atualização' ? 'selected' : ''}>Atualização</option>
+            </select>
+          </td>
+        ` : ''}
         <td onclick="event.stopPropagation();" style="white-space:nowrap; width:118px;">
           <select class="team-solicitante-select" onchange="app.changeTeamSolicitante('${item.id}', this.value)" ${isAdmin ? '' : 'disabled="true" style="pointer-events:none; opacity:0.75;"'}>
             <option value="">— Selecione —</option>
@@ -4129,6 +4174,24 @@ const app = {
     }
   },
 
+  // Alterar Tipo de Demanda (Squad de Dados) e salvar estado no Supabase
+  changeDemandType(itemId, newType) {
+    let foundItem = null;
+    const squadId = this.activeSquad;
+
+    if (this.state.backlogItems && this.state.backlogItems[squadId]) {
+      foundItem = this.state.backlogItems[squadId].find(i => i.id === itemId || i.jiraKey === itemId || i.gau === itemId);
+    }
+    if (!foundItem && this.state.completedTasks && this.state.completedTasks[squadId]) {
+      foundItem = this.state.completedTasks[squadId].find(i => i.id === itemId || i.jiraKey === itemId || i.gau === itemId);
+    }
+
+    if (foundItem) {
+      foundItem.demandType = newType;
+      this.saveState();
+    }
+  },
+
   // Atualização bidirecional no Jira via API (customfield_11010)
   async updateTeamSolicitanteInJira(jiraKey, teamSolicitante) {
     if (!jiraKey || !teamSolicitante) return;
@@ -4184,10 +4247,28 @@ const app = {
       return matchSearch && matchTeam;
     });
 
+    const compHeadEl = document.getElementById('completed-table-head');
+    if (compHeadEl) {
+      compHeadEl.innerHTML = `
+        <tr>
+          <th style="width: 48px; white-space: nowrap;">ID</th>
+          <th style="width: 85px; white-space: nowrap;">GAU</th>
+          <th style="min-width: 150px;">Demanda</th>
+          <th style="width: 115px; white-space: nowrap;">Responsável</th>
+          ${this.activeSquad === 'dados' ? '<th style="width: 118px; white-space: nowrap;">Tipo de Demanda</th>' : ''}
+          <th style="width: 118px; white-space: nowrap;">Time Solicitante</th>
+          <th style="width: 90px; white-space: nowrap;">Data de criação</th>
+          <th style="width: 90px; white-space: nowrap;">Data de conclusão</th>
+          <th style="min-width: 130px;">Ganhos</th>
+        </tr>
+      `;
+    }
+
     document.getElementById('completed-count-badge').textContent = `${filteredItems.length} entregas`;
 
+    const compColSpan = this.activeSquad === 'dados' ? 9 : 8;
     if (filteredItems.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-500 font-semibold">Nenhuma entrega concluída encontrada.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="${compColSpan}" class="text-center py-8 text-slate-500 font-semibold">Nenhuma entrega concluída encontrada.</td></tr>`;
       return;
     }
 
@@ -4197,6 +4278,7 @@ const app = {
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${this.getItemGau(item)}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title || item.taskTitle}</td>
         <td class="text-slate-300" style="white-space:nowrap; width:130px;">${this.cleanRequesterName(item.requester || item.completedBy || item.requesterName || 'Solicitante Jira')}</td>
+        ${this.activeSquad === 'dados' ? `<td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:118px;">${item.demandType || '—'}</td>` : ''}
         <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:135px;">${item.teamSolicitante || '—'}</td>
         <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
         <td class="text-slate-300 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.completionDate || item.completedAt)}</td>
@@ -4293,6 +4375,7 @@ const app = {
         'Título da Demanda': item.title || '',
         'Descrição Completa do Chamado': item.notes || item.description || item.taskDescription || '',
         'Solicitante': this.cleanRequesterName(item.requester || 'Solicitante Jira'),
+        ...(this.activeSquad === 'dados' ? { 'Tipo de Demanda': item.demandType || '' } : {}),
         'Time Solicitante': item.teamSolicitante || '',
         'Status': item.status || 'Backlog',
         'Data de Criação': this.formatOnlyDate(item.createdDate || item.date || item.createdAt)
@@ -4346,6 +4429,7 @@ const app = {
         'Título da Demanda': item.title || '',
         'Descrição Completa do Chamado': item.notes || item.description || item.taskDescription || '',
         'Solicitante': this.cleanRequesterName(item.requester || 'Solicitante Jira'),
+        ...(this.activeSquad === 'dados' ? { 'Tipo de Demanda': item.demandType || '' } : {}),
         'Time Solicitante': item.teamSolicitante || '',
         'Status': item.status || 'Em Andamento',
         'Data de Criação': this.formatOnlyDate(item.createdDate || item.date || item.createdAt)
@@ -4378,6 +4462,7 @@ const app = {
         'Título da Demanda': item.title || item.taskTitle || '',
         'Descrição Completa do Chamado': item.description || item.notes || item.taskDescription || '',
         'Solicitante': this.cleanRequesterName(item.requester || item.completedBy || item.requesterName || 'Solicitante Jira'),
+        ...(this.activeSquad === 'dados' ? { 'Tipo de Demanda': item.demandType || '' } : {}),
         'Time Solicitante': item.teamSolicitante || '',
         'Data de Criação': this.formatOnlyDate(item.createdDate || item.date || item.createdAt),
         'Data de Conclusão': this.formatOnlyDate(item.completionDate || item.completedAt),

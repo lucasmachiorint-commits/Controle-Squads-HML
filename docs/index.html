@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Controle de Squads - Enterprise Board [HML] v6.88.0-hml</title>
+    <title>Controle de Squads - Enterprise Board [HML] v6.89.0-hml</title>
     
     <script>
       (function() {
@@ -20,11 +20,11 @@
             for (let name of names) { caches.delete(name); }
           });
         }
-        const TARGET_RELEASE = 'v6.88.0-hml';
+        const TARGET_RELEASE = 'v6.89.0-hml';
         const currentLock = localStorage.getItem('cs_deployed_release_lock_hml');
-        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.88.0-hml')) {
+        if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.89.0-hml')) {
           localStorage.setItem('cs_deployed_release_lock_hml', TARGET_RELEASE);
-          window.location.href = window.location.pathname + '?v=6.88.0-hml&t=' + Date.now();
+          window.location.href = window.location.pathname + '?v=6.89.0-hml&t=' + Date.now();
         }
       })();
     </script>
@@ -56,7 +56,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     
     <!-- Custom Theme Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=20261105_v6.88.0-hml">
+    <link rel="stylesheet" href="style.css?v=20261105_v6.89.0-hml">
 </head>
 <body>
 
@@ -659,7 +659,7 @@
 
         <div class="table-responsive">
           <table class="custom-table">
-            <thead>
+            <thead id="board-table-head">
               <tr>
                 <th style="width: 48px; white-space: nowrap;">ID</th>
                 <th style="width: 50px; white-space: nowrap;">Ordem</th>
@@ -799,7 +799,7 @@
 
         <div class="table-responsive">
           <table class="custom-table">
-            <thead>
+            <thead id="completed-table-head">
               <tr>
                 <th style="width: 48px; white-space: nowrap;">ID</th>
                 <th style="width: 85px; white-space: nowrap;">GAU</th>
@@ -1663,12 +1663,12 @@
 </div>
 
 <!-- JIRA ENGINE MODULE & CORE APP LOGIC -->
-<script src="jira-sync.js?v=20261028_v6.86.0-hml"></script>
-<script src="app.js?v=20261028_v6.86.0-hml"></script>
+<script src="jira-sync.js?v=20261105_v6.89.0-hml"></script>
+<script src="app.js?v=20261105_v6.89.0-hml"></script>
 <!-- MÓDULO AUTÔNOMO ISOLADO DA SQUAD RPA -->
-<script src="rpa-pendencies.js?v=20261028_v6.86.0-hml"></script>
+<script src="rpa-pendencies.js?v=20261105_v6.89.0-hml"></script>
 <!-- MÓDULO AUTÔNOMO ISOLADO DE AUTOMAÇÃO -->
-<script src="automacao.js?v=20261028_v6.86.0-hml"></script>
+<script src="automacao.js?v=20261105_v6.89.0-hml"></script>
 
 </body>
 </html>
