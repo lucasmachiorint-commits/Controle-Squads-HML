@@ -1484,6 +1484,40 @@ const app = {
     }
   },
 
+  // Atualização rápida de Data de Conclusão na tabela de Concluídos
+  updateCompletionDate(squadKey, itemId, newDate) {
+    if (this.userRole !== 'admin' && this.userRole !== 'gerencial') {
+      alert('Acesso negado: Perfil ADMIN ou GERENCIAL necessário para editar datas.');
+      return;
+    }
+    if (!squadKey || !itemId) return;
+    
+    // Se for automação
+    if (squadKey === 'automacao') {
+      if (window.AutomacaoModule && window.AutomacaoModule.items) {
+        const item = window.AutomacaoModule.items.find(i => i.id === itemId);
+        if (item) {
+          item.completionDate = newDate ? this.formatOnlyDate(newDate) : '';
+          window.AutomacaoModule.saveLocal();
+          console.log('[updateCompletionDate] Automação atualizada:', itemId, item.completionDate);
+          if (this.activeView === 'dashboard') this.renderDashboardView();
+        }
+      }
+      return;
+    }
+
+    const list = this.state.completedTasks[squadKey] || [];
+    const item = list.find(i => i.id === itemId || i.jiraKey === itemId || i.gau === itemId);
+    if (item) {
+      const formatted = newDate ? this.formatOnlyDate(newDate) : '';
+      item.completionDate = formatted;
+      item.completedAt = formatted;
+      this.saveState();
+      console.log(`[updateCompletionDate] ${squadKey} item ${itemId} data de conclusão: ${formatted}`);
+      if (this.activeView === 'dashboard') this.renderDashboardView();
+    }
+  },
+
   saveUsersState() {
     try {
       localStorage.setItem('cs_users_list', JSON.stringify(this.state.usersList || []));
@@ -2931,637 +2965,355 @@ const app = {
     return allDemands;
   },
 
-  // Limpar todos os filtros do Dashboard
+  // Limpar todos os filtros do Dashboard Executivo
   clearDashboardFilters() {
-    const sSquad = document.getElementById('dash-filter-squad');
-    const sStatus = document.getElementById('dash-filter-status');
-    const sPeriod = document.getElementById('dash-filter-period');
-    const dFrom = document.getElementById('dash-date-from');
-    const dTo = document.getElementById('dash-date-to');
+    const sSquad = document.getElementById('dash-exec-filter-squad');
+    const sMonth = document.getElementById('dash-exec-filter-month');
+    const sStatus = document.getElementById('dash-exec-filter-status');
+    const sTeam = document.getElementById('dash-exec-filter-team');
 
     if (sSquad) sSquad.value = 'all';
+    if (sMonth) sMonth.value = 'all';
     if (sStatus) sStatus.value = 'all';
-    if (sPeriod) sPeriod.value = 'all';
-    if (dFrom) dFrom.value = '';
-    if (dTo) dTo.value = '';
+    if (sTeam) sTeam.value = 'all';
 
     this.renderDashboardView();
   },
 
-  // RENDER: Dashboard Consolidado com Filtros Dinâmicos por Squad, Status e Período
-  renderDashboardView() {
-    const squadFilter = document.getElementById('dash-filter-squad')?.value || 'all';
-    const statusFilter = document.getElementById('dash-filter-status')?.value || 'all';
-    const periodFilter = document.getElementById('dash-filter-period')?.value || 'all';
-
-    // Se seleção customizada, exibir/ocultar contêiner de De/Até
-    const customContainer = document.getElementById('dash-custom-date-container');
-    if (customContainer) {
-      if (periodFilter === 'custom') {
-        customContainer.classList.remove('hidden');
-        customContainer.style.display = 'flex';
-      } else {
-        customContainer.classList.add('hidden');
-        customContainer.style.display = 'none';
-      }
-    }
-
-    const dateFromStr = document.getElementById('dash-date-from')?.value;
-    const dateToStr = document.getElementById('dash-date-to')?.value;
-
-    const dateFrom = dateFromStr ? new Date(dateFromStr + 'T00:00:00') : null;
-    const dateTo = dateToStr ? new Date(dateToStr + 'T23:59:59') : null;
-
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-    const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-
-    const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
-    const weekStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - (dayOfWeek - 1), 0, 0, 0);
-
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
-    const yearStart = new Date(now.getFullYear(), 0, 1, 0, 0, 0);
-
-    let demands = this.getAllDashboardDemands();
-
-    // 1. Filtro por Squad (dados, operacoes, rpa)
-    if (squadFilter !== 'all') {
-      demands = demands.filter(d => d.squadId === squadFilter);
-    }
-
-    // 2. Filtro por Status (Em Andamento, Backlog, Bloqueado, Concluído)
-    if (statusFilter !== 'all') {
-      demands = demands.filter(d => {
-        if (statusFilter === 'Concluído') return d.status === 'Concluído' || d.status === 'Concluido' || d.itemType === 'completed';
-        if (statusFilter === 'Em Andamento') return d.status === 'Em Andamento';
-        if (statusFilter === 'Backlog') return d.status === 'Backlog';
-        if (statusFilter === 'Bloqueado') return d.status === 'Bloqueado';
-        return d.status === statusFilter;
-      });
-    }
-
-    // 3. Filtro por Período (Hoje, Esta Semana, Este Mês, Este Ano, Custom)
-    if (periodFilter !== 'all') {
-      demands = demands.filter(d => {
-        const dateObj = this.parseItemDate(d.createdDate || d.date || d.createdAt || d.completionDate);
-        if (!dateObj) return true;
-
-        if (periodFilter === 'today') {
-          return dateObj >= todayStart && dateObj <= todayEnd;
-        } else if (periodFilter === 'week') {
-          return dateObj >= weekStart;
-        } else if (periodFilter === 'month') {
-          return dateObj >= monthStart;
-        } else if (periodFilter === 'year') {
-          return dateObj >= yearStart;
-        } else if (periodFilter === 'custom') {
-          if (dateFrom && dateObj < dateFrom) return false;
-          if (dateTo && dateObj > dateTo) return false;
-          return true;
-        }
-        return true;
-      });
-    }
-
-    // 2.5. Filtro por Time Solicitante
-    const dashTeamFilter = document.getElementById('dash-filter-team')?.value || '';
-    if (dashTeamFilter) {
-      demands = demands.filter(d => {
-        const teamName = d.teamSolicitante || d.team || '';
-        if (dashTeamFilter === '__vazio__') return !teamName;
-        return teamName.toLowerCase().includes(dashTeamFilter.toLowerCase()) || teamName.startsWith(dashTeamFilter);
-      });
-    }
-
-    // Calcular as 5 Métricas Consolidadas + Taxa de Eficiência
-    const totalDemands = demands.length;
-    const inProgressCount = demands.filter(d => d.status === 'Em Andamento').length;
-    const backlogCount = demands.filter(d => d.status === 'Backlog').length;
-    const blockedCount = demands.filter(d => d.status === 'Bloqueado').length;
-    const completedCount = demands.filter(d => d.status === 'Concluído' || d.status === 'Concluido' || d.itemType === 'completed').length;
-    
-    const completionRate = totalDemands > 0 ? Math.round((completedCount / totalDemands) * 100) : 0;
-
-    // Atualizar os quadros e badges do Dashboard
-    const elInProgress = document.getElementById('dash-total-in-progress');
-    const elBacklog = document.getElementById('dash-total-backlog');
-    const elBlocked = document.getElementById('dash-total-blocked');
-    const elCompleted = document.getElementById('dash-total-completed');
-    const elRate = document.getElementById('dash-completion-rate');
-
-    if (elInProgress) elInProgress.textContent = inProgressCount;
-    if (elBacklog) elBacklog.textContent = backlogCount;
-    if (elBlocked) elBlocked.textContent = blockedCount;
-    if (elCompleted) elCompleted.textContent = completedCount;
-    if (elRate) elRate.textContent = `${completionRate}%`;
-
-    // Atualizar Indicadores Exclusivos da Squad RPA (Pendências RPA)
-    const rpaItems = window.RpaPendenciesModule?.pendencies || this.state?.rpaPendencies || [];
-    const rpaTotal = rpaItems.length;
-    const rpaAberto = rpaItems.filter(p => p.status === 'ABERTO' || p.status === 'EM_ANALISE').length;
-    const rpaValidacao = rpaItems.filter(p => p.status === 'EM_VALIDACAO' || p.status === 'AGUARDANDO_PARCEIRO').length;
-    const rpaCritica = rpaItems.filter(p => p.severity === 'CRITICA').length;
-    const rpaResolvido = rpaItems.filter(p => p.status === 'RESOLVIDO').length;
-
-    const elRpaTotal = document.getElementById('dash-rpa-kpi-total');
-    const elRpaAberto = document.getElementById('dash-rpa-kpi-aberto');
-    const elRpaValidacao = document.getElementById('dash-rpa-kpi-validacao');
-    const elRpaCritica = document.getElementById('dash-rpa-kpi-critica');
-    const elRpaResolvido = document.getElementById('dash-rpa-kpi-resolvido');
-
-    if (elRpaTotal) elRpaTotal.textContent = rpaTotal;
-    if (elRpaAberto) elRpaAberto.textContent = rpaAberto;
-    if (elRpaValidacao) elRpaValidacao.textContent = rpaValidacao;
-    if (elRpaCritica) elRpaCritica.textContent = rpaCritica;
-    if (elRpaResolvido) elRpaResolvido.textContent = rpaResolvido;
-
-    // Renderizar a Matriz de 4 Gráficos & Tabela de Bloqueados
-    this.renderCharts(demands);
-    this.renderDashboardBlockedTable(demands);
-
-    // Renderizar Report Mensal Executivo
-    if (!document.getElementById('monthly-report-month')?.options?.length) {
-      this.populateMonthlyReportMonthSelect();
-    }
-    this.renderMonthlyReportPanel();
+  // Exportar Dashboard Executivo para PDF
+  exportExecutiveDashboardPDF() {
+    this.exportPDF();
   },
 
-  renderCharts(demands) {
-    if (!demands) demands = this.getAllDashboardDemands();
-    const isLight = document.body.classList.contains('light-theme');
-    const labelColor = isLight ? '#475569' : '#94a3b8';
-    const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)';
-    const chartBorder = isLight ? '#ffffff' : '#0f172a';
+  // Popula os meses no seletor de Mês do Dashboard Executivo
+  populateExecDashboardMonths() {
+    const sel = document.getElementById('dash-exec-filter-month');
+    if (!sel || sel.options.length > 1) return;
 
-    // 1. Gráfico: Distribuição por Squad (Doughnut)
-    const ctxSquad = document.getElementById('chart-squad-dist')?.getContext('2d');
-    if (ctxSquad) {
-      if (window.squadChart) window.squadChart.destroy();
+    const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const curYear = 2026;
 
-      const countDados = demands.filter(d => d.squadId === 'dados').length;
-      const countOperac = demands.filter(d => d.squadId === 'operacoes').length;
-      const countRpa = demands.filter(d => d.squadId === 'rpa').length;
-      const countAutomacao = demands.filter(d => d.squadId === 'automacao').length;
-
-      window.squadChart = new Chart(ctxSquad, {
-        type: 'doughnut',
-        data: {
-          labels: ['Squad de Dados', 'Squad de Operações', 'Squad de RPA', 'Automação'],
-          datasets: [{
-            data: [countDados, countOperac, countRpa, countAutomacao],
-            backgroundColor: ['#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'],
-            borderWidth: 3,
-            borderColor: chartBorder,
-            hoverOffset: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          cutout: '70%',
-          plugins: {
-            legend: {
-              position: 'right',
-              labels: {
-                color: labelColor,
-                font: { size: 11, weight: '600' },
-                boxWidth: 10,
-                padding: 12,
-                usePointStyle: true
-              }
-            }
-          }
-        }
-      });
-    }
-
-    // 2. Gráfico: Status das Demandas (Bar Chart)
-    const ctxStatus = document.getElementById('chart-status-dist')?.getContext('2d');
-    if (ctxStatus) {
-      if (window.statusChart) window.statusChart.destroy();
-
-      const countInProgress = demands.filter(d => d.status === 'Em Andamento').length;
-      const countBacklog = demands.filter(d => d.status === 'Backlog').length;
-      const countBlocked = demands.filter(d => d.status === 'Bloqueado').length;
-      const countCompleted = demands.filter(d => d.status === 'Concluído' || d.status === 'Concluido' || d.itemType === 'completed').length;
-
-      window.statusChart = new Chart(ctxStatus, {
-        type: 'bar',
-        data: {
-          labels: ['Em Andamento', 'Backlog', 'Bloqueado', 'Concluído'],
-          datasets: [{
-            label: 'Total de Demandas',
-            data: [countInProgress, countBacklog, countBlocked, countCompleted],
-            backgroundColor: ['#06b6d4', '#f59e0b', '#f43f5e', '#10b981'],
-            borderRadius: 6,
-            maxBarThickness: 28
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { color: labelColor, font: { size: 10, weight: '600' } }, grid: { display: false } },
-            y: { ticks: { color: labelColor, font: { size: 10 }, precision: 0 }, grid: { color: gridColor } }
-          }
-        }
-      });
-    }
-
-    // 3. Gráfico: Evolução de Entregas (Throughput - Line/Area Chart)
-    const ctxTrend = document.getElementById('chart-trend-dist')?.getContext('2d');
-    if (ctxTrend) {
-      if (window.trendChart) window.trendChart.destroy();
-
-      // Agrupar por ultimos 6 meses ou ultimas semanas
-      const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-      const now = new Date();
-      const labels = [];
-      const dataPoints = [];
-
-      for (let i = 4; i >= 0; i--) {
-        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const mLabel = `${months[d.getMonth()]}/${String(d.getFullYear()).slice(2)}`;
-        labels.push(mLabel);
-
-        const countInMonth = demands.filter(item => {
-          const itemDate = this.parseItemDate(item.createdDate || item.date || item.createdAt);
-          return itemDate && itemDate.getMonth() === d.getMonth() && itemDate.getFullYear() === d.getFullYear();
-        }).length;
-
-        dataPoints.push(countInMonth || (i === 0 ? demands.length : Math.floor(Math.random() * 5) + 2));
-      }
-
-      window.trendChart = new Chart(ctxTrend, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Volume de Demandas',
-            data: dataPoints,
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99, 102, 241, 0.15)',
-            borderWidth: 2.5,
-            fill: true,
-            tension: 0.35,
-            pointBackgroundColor: '#818cf8',
-            pointRadius: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { color: labelColor, font: { size: 10, weight: '600' } }, grid: { display: false } },
-            y: { ticks: { color: labelColor, font: { size: 10 }, precision: 0 }, grid: { color: gridColor } }
-          }
-        }
-      });
-    }
-
-    // 4. Gráfico: Top 5 Solicitantes (Horizontal Bar Chart)
-    const ctxTopReq = document.getElementById('chart-top-requesters')?.getContext('2d');
-    if (ctxTopReq) {
-      if (window.topReqChart) window.topReqChart.destroy();
-
-      const requesterCounts = {};
-      demands.forEach(d => {
-        const req = d.requester || d.solicitante || 'Não Informado';
-        requesterCounts[req] = (requesterCounts[req] || 0) + 1;
-      });
-
-      const sortedRequesters = Object.entries(requesterCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-
-      const reqLabels = sortedRequesters.map(r => r[0].length > 15 ? r[0].substring(0, 14) + '...' : r[0]);
-      const reqData = sortedRequesters.map(r => r[1]);
-
-      window.topReqChart = new Chart(ctxTopReq, {
-        type: 'bar',
-        data: {
-          labels: reqLabels.length > 0 ? reqLabels : ['Geral', 'Operações', 'Dados', 'RPA'],
-          datasets: [{
-            label: 'Demandas',
-            data: reqData.length > 0 ? reqData : [12, 8, 5, 3],
-            backgroundColor: ['#f59e0b', '#3b82f6', '#10b981', '#ec4899', '#8b5cf6'],
-            borderRadius: 5,
-            indexAxis: 'y'
-          }]
-        },
-        options: {
-          indexAxis: 'y',
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { ticks: { color: labelColor, font: { size: 10 } }, grid: { color: gridColor } },
-            y: { ticks: { color: labelColor, font: { size: 10, weight: '600' } }, grid: { display: false } }
-          }
-        }
-      });
-    }
-  },
-
-  // Renderizar Tabela Executiva de Demandas Bloqueadas
-  renderDashboardBlockedTable(demands) {
-    const tbody = document.getElementById('tbody-dash-blocked');
-    const badge = document.getElementById('dash-blocked-badge');
-    if (!tbody) return;
-
-    const blocked = (demands || this.getAllDashboardDemands()).filter(d => d.status === 'Bloqueado');
-    if (badge) badge.textContent = `${blocked.length} bloqueada${blocked.length !== 1 ? 's' : ''}`;
-
-    if (blocked.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="7" class="text-center py-6 text-slate-400 text-xs">
-            <i class="fa-solid fa-circle-check text-emerald-400 text-base me-2"></i>
-            Nenhuma demanda bloqueada no momento. Operação rodando com 100% de fluidez!
-          </td>
-        </tr>
-      `;
-      return;
-    }
-
-    tbody.innerHTML = blocked.map((item, idx) => {
-      const squadName = item.squadId === 'dados' ? 'Squad de Dados' : item.squadId === 'operacoes' ? 'Squad de Operações' : item.squadId === 'automacao' ? 'Automação' : 'Squad de RPA';
-      const squadColor = item.squadId === 'dados' ? 'text-emerald-400' : item.squadId === 'operacoes' ? 'text-amber-400' : item.squadId === 'automacao' ? 'text-violet-400' : 'text-rose-400';
-
-      let latestReason = '';
-      const entries = (item.timelineEntries && item.timelineEntries.length) ? item.timelineEntries : (this.state.backlogItems[item.squadId] || []).find(i => i.id === item.id || i.gau === item.gau || i.jiraKey === item.jiraKey)?.timelineEntries || [];
-      if (entries.length > 0 && entries[0].text) {
-        latestReason = entries[0].text;
-      } else {
-        latestReason = item.reason || item.bloqueioMotivo || item.impediment || item.notes || 'Aguardando insumo/dependência externa';
-      }
-
-      return `
-        <tr class="hover:bg-white/5 transition-all">
-          <td class="text-slate-400 text-xs font-mono py-3.5 px-4">${idx + 1}</td>
-          <td class="text-xs font-bold text-slate-200 font-mono py-3.5 px-4">${item.gau || item.key || 'N/A'}</td>
-          <td class="py-3.5 px-4">
-            <span class="font-bold text-white text-xs block">${item.title || item.nome}</span>
-            <span class="text-[10px] text-rose-400 block mt-0.5"><i class="fa-solid fa-triangle-exclamation me-1"></i> ${latestReason}</span>
-          </td>
-          <td class="text-xs font-semibold ${squadColor} py-3.5 px-4">${squadName}</td>
-          <td class="text-xs text-slate-300 py-3.5 px-4">${this.cleanRequesterName(item.requester || item.solicitante || 'N/A')}</td>
-          <td class="text-xs text-sky-300 font-semibold py-3.5 px-4">${item.teamSolicitante || '—'}</td>
-          <td class="py-3.5 px-4">
-            <span class="badge bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[11px] px-2.5 py-1 rounded-full font-bold">
-              🚫 BLOQUEADO
-            </span>
-          </td>
-          <td class="py-3.5 px-4 text-right">
-            <button onclick="app.openDemandDetailsModal('${item.id}', '${item.squadId}')" class="btn btn-secondary text-[11px] py-1 px-2.5">
-              <i class="fa-solid fa-eye me-1"></i> Detalhes
-            </button>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  },
-
-  // Popula o seletor de meses do Report Mensal
-  populateMonthlyReportMonthSelect() {
-    const sel = document.getElementById('monthly-report-month');
-    if (!sel) return;
-    const now = new Date();
-    const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    sel.innerHTML = '';
-    for (let i = 0; i < 12; i++) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const label = `${months[d.getMonth()]} ${d.getFullYear()}`;
-      const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    for (let m = 0; m < 12; m++) {
       const opt = document.createElement('option');
-      opt.value = val;
-      opt.textContent = label;
+      opt.value = `${curYear}-${String(m + 1).padStart(2, '0')}`;
+      opt.textContent = `${months[m]} / ${curYear}`;
+      sel.appendChild(opt);
+    }
+    for (let m = 11; m >= 0; m--) {
+      const opt = document.createElement('option');
+      opt.value = `2025-${String(m + 1).padStart(2, '0')}`;
+      opt.textContent = `${months[m]} / 2025`;
       sel.appendChild(opt);
     }
   },
 
-  // RENDER: Report Mensal Executivo de Status das Squads
-  renderMonthlyReportPanel() {
-    const container = document.getElementById('monthly-report-content');
+  // RENDER: Novo Dashboard Executivo Consolidado em 4 Colunas por Squad
+  renderDashboardView() {
+    const container = document.getElementById('dash-exec-columns-container');
     if (!container) return;
 
-    const selVal = document.getElementById('monthly-report-month')?.value;
-    if (!selVal) { this.populateMonthlyReportMonthSelect(); return; }
+    this.populateExecDashboardMonths();
 
-    const [yearStr, monthStr] = selVal.split('-');
-    const year = parseInt(yearStr);
-    const month = parseInt(monthStr) - 1;
-    const monthStart = new Date(year, month, 1, 0, 0, 0);
-    const monthEnd = new Date(year, month + 1, 0, 23, 59, 59);
+    const squadFilter = document.getElementById('dash-exec-filter-squad')?.value || 'all';
+    const monthFilter = document.getElementById('dash-exec-filter-month')?.value || 'all';
+    const statusFilter = document.getElementById('dash-exec-filter-status')?.value || 'all';
+    const teamFilter = document.getElementById('dash-exec-filter-team')?.value || 'all';
 
-    const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-    const monthLabel = months[month];
+    // 1. Atualizar Título Dinâmico do Dashboard
+    const monthsNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const mainTitleEl = document.getElementById('dash-exec-main-title');
+    if (mainTitleEl) {
+      if (monthFilter !== 'all') {
+        const parts = monthFilter.split('-');
+        const mIdx = parseInt(parts[1], 10) - 1;
+        const yVal = parts[0];
+        mainTitleEl.innerHTML = `Fechamento ${monthsNames[mIdx]} ${yVal !== '2026' ? yVal : ''} <span style="color:#f97316;">—</span> Eficiência Operacional`;
+      } else {
+        mainTitleEl.innerHTML = `Resumo Geral <span style="color:#f97316;">—</span> Eficiência Operacional`;
+      }
+    }
 
     const allDemands = this.getAllDashboardDemands();
 
-    // Filtrar se demanda foi criada no mês
-    const isCreatedInMonth = (d) => {
-      const dateObj = this.parseItemDate(d.createdDate || d.createdAt || d.date);
+    // Helper de checagem de mês estrito pela Data de Conclusão
+    const isCompletedInSelectedMonth = (d) => {
+      if (monthFilter === 'all') return true;
+      const rawDate = d.completionDate || d.completedAt || d.concludedAt || d.dateConcluded;
+      if (!rawDate) return false;
+      const dateObj = this.parseItemDate(rawDate);
       if (!dateObj) return false;
-      return dateObj >= monthStart && dateObj <= monthEnd;
+      const [filterYear, filterMonth] = monthFilter.split('-').map(Number);
+      return dateObj.getFullYear() === filterYear && (dateObj.getMonth() + 1) === filterMonth;
     };
 
-    // Filtrar se demanda foi concluída no mês
-    const isCompletedInMonth = (d) => {
-      const dateObj = this.parseItemDate(d.completionDate || d.completedAt || d.concludedAt || d.dateConcluded || d.updatedAt || d.date || d.createdDate || d.createdAt);
-      if (!dateObj) return false;
-      return dateObj >= monthStart && dateObj <= monthEnd;
+    // Helper de checagem de time solicitante
+    const matchesTeamFilter = (d) => {
+      if (teamFilter === 'all') return true;
+      const t = (d.teamSolicitante || d.team || '').trim();
+      if (teamFilter === '__vazio__') return !t;
+      return t.toLowerCase().includes(teamFilter.toLowerCase()) || t.startsWith(teamFilter);
     };
 
-    const squads = [
+    // Definição das 4 Colunas das Squads
+    const squadsDef = [
       {
         id: 'operacoes',
-        name: 'Squad Operações',
-        shortName: 'Operações',
-        desc: 'Centralização de atividades e Expansão via Zord',
-        barColor: '#38bdf8',
-        badgeBg: 'rgba(56, 189, 248, 0.15)',
-        badgeBorder: 'rgba(56, 189, 248, 0.4)',
-        badgeText: '#38bdf8',
+        num: '1',
+        name: 'OPERAÇÕES',
+        tag: 'Q4 2026',
+        barColor: '#3b82f6',
+        titleColor: '#60a5fa',
         icon: 'fa-solid fa-gears'
       },
       {
+        id: 'dados',
+        num: '2',
+        name: 'DADOS',
+        tag: 'Databricks & BI',
+        barColor: '#10b981',
+        titleColor: '#34d399',
+        icon: 'fa-solid fa-database'
+      },
+      {
         id: 'rpa',
-        name: 'Squad RPA',
-        shortName: 'RPA',
-        desc: 'Automação de processos',
+        num: '3',
+        name: 'RPA',
+        tag: 'Robôs & Fila',
         barColor: '#f97316',
-        badgeBg: 'rgba(249, 115, 22, 0.15)',
-        badgeBorder: 'rgba(249, 115, 22, 0.4)',
-        badgeText: '#fb923c',
+        titleColor: '#fb923c',
         icon: 'fa-solid fa-robot'
       },
       {
-        id: 'dados',
-        name: 'Squad Dados',
-        shortName: 'Dados',
-        desc: 'Ingestão de Dados via Databricks e Criação de Dashboard via Tableau',
-        barColor: '#eab308',
-        badgeBg: 'rgba(234, 179, 8, 0.15)',
-        badgeBorder: 'rgba(234, 179, 8, 0.4)',
-        badgeText: '#facc15',
-        icon: 'fa-solid fa-chart-pie'
-      },
-      {
         id: 'automacao',
-        name: 'Automação (Demandas Internas)',
-        shortName: 'Automação',
-        desc: 'Demandas Internas e Soluções de Automação',
+        num: '4',
+        name: 'AUTOMAÇÃO',
+        tag: 'Soluções Internas',
         barColor: '#a855f7',
-        badgeBg: 'rgba(168, 85, 247, 0.15)',
-        badgeBorder: 'rgba(168, 85, 247, 0.4)',
-        badgeText: '#c084fc',
+        titleColor: '#c084fc',
         icon: 'fa-solid fa-wand-magic-sparkles'
       }
     ];
 
-    let conquistas = [];
-    let bloqueios = [];
-    let cardsHtml = '';
+    const visibleSquads = squadFilter === 'all' ? squadsDef : squadsDef.filter(s => s.id === squadFilter);
 
-    squads.forEach(squad => {
-      const squadDemands = allDemands.filter(d => d.squadId === squad.id);
-      const totalEntradas = squadDemands.filter(isCreatedInMonth).length;
-      const concluidos = squadDemands.filter(d => d.status === 'Concluído' || d.status === 'Concluido' || d.itemType === 'completed' || d.phase === 'concluido');
-      const concluidosMes = concluidos.filter(isCompletedInMonth);
-      const emDesenvolvimento = squadDemands.filter(d => d.status === 'Em Andamento');
-      const bloqueados = squadDemands.filter(d => d.status === 'Bloqueado');
+    // Dados de Suporte RPA
+    const rpaItems = window.RpaPendenciesModule?.pendencies || this.state?.rpaPendencies || [];
+    const rpaResolvidos = rpaItems.filter(p => p.status === 'RESOLVIDO').length;
+    const rpaAndamento = rpaItems.filter(p => p.status === 'ABERTO' || p.status === 'EM_ANALISE' || p.status === 'EM_VALIDACAO' || p.status === 'AGUARDANDO_PARCEIRO').length;
 
-      concluidosMes.forEach(d => {
-        let finalGains = d.gains || d.ganhos || d.beneficios || d.businessValue || d.impact || d.results || '';
-        if (!finalGains && squad.id !== 'automacao') {
-          const ctMatch = (this.state.completedTasks[squad.id] || []).find(ct => (ct.id && ct.id === d.id) || (ct.gau && d.gau && ct.gau === d.gau) || (ct.jiraKey && d.jiraKey && ct.jiraKey === d.jiraKey));
-          if (ctMatch && (ctMatch.gains || ctMatch.ganhos)) {
-            finalGains = ctMatch.gains || ctMatch.ganhos;
-          }
-        }
-        conquistas.push({
-          squad: squad,
-          gau: d.gau || d.jiraKey || d.key || '',
-          title: d.title || d.taskTitle || d.nome || '',
-          gains: finalGains
-        });
+    let columnsHtml = '';
+
+    visibleSquads.forEach(squad => {
+      // Filtrar todas as demandas da squad
+      let squadDemands = allDemands.filter(d => d.squadId === squad.id);
+      if (teamFilter !== 'all') {
+        squadDemands = squadDemands.filter(matchesTeamFilter);
+      }
+
+      // Concluídos (filtrados rigorosamente pela Data de Conclusão se mês selecionado)
+      const concluidos = squadDemands.filter(d => {
+        const isConcl = d.status === 'Concluído' || d.status === 'Concluido' || d.itemType === 'completed' || d.phase === 'concluido';
+        return isConcl && isCompletedInSelectedMonth(d);
       });
 
-      bloqueados.forEach(d => {
-        let latestReason = '';
-        const entries = (d.timelineEntries && d.timelineEntries.length) ? d.timelineEntries : (this.state.backlogItems[squad.id] || []).find(i => i.id === d.id || i.gau === d.gau || i.jiraKey === d.jiraKey)?.timelineEntries || [];
-        if (entries.length > 0 && entries[0].text) {
-          latestReason = entries[0].text;
+      // Em Andamento
+      const emAndamento = squadDemands.filter(d => d.status === 'Em Andamento' || (d.status === 'Bloqueado' && (d.phase === 'em-andamento' || !d.phase)));
+
+      // Backlog
+      const backlog = squadDemands.filter(d => d.status === 'Backlog' || (d.status === 'Bloqueado' && d.phase === 'backlog'));
+
+      // Demandas de Sustentação específicas da Squad de Dados
+      let concluidosPrincipais = concluidos;
+      let sustentacoesDados = [];
+      if (squad.id === 'dados') {
+        const isSustentacao = (d) => {
+          const type = (d.demandType || '').toLowerCase();
+          const title = (d.title || d.taskTitle || '').toLowerCase();
+          return type === 'bug' || type === 'incidente' || title.includes('[bug]') || title.includes('bug') || title.includes('[incidente]') || title.includes('incidente') || title.includes('sustentação') || title.includes('sustenta');
+        };
+        sustentacoesDados = concluidos.filter(isSustentacao);
+        concluidosPrincipais = concluidos.filter(d => !isSustentacao(d));
+      }
+
+      // Helper para renderizar item individual da lista
+      const renderDemandCard = (d, isConcl = false) => {
+        let gauText = '';
+        if (squad.id === 'automacao') {
+          gauText = d.seqId ? '#' + d.seqId : '#ID';
         } else {
-          latestReason = d.reason || d.bloqueioMotivo || d.impediment || d.notes || 'Aguardando insumo/dependência externa';
+          gauText = this.getItemGau(d) || d.gau || d.jiraKey || 'GAU-000';
         }
 
-        bloqueios.push({
-          squad: squad,
-          gau: d.gau || d.jiraKey || d.key || '',
-          title: d.title || d.taskTitle || d.nome || '',
-          reason: latestReason
-        });
-      });
+        const titleText = d.title || d.taskTitle || 'Sem título';
+        const teamText = d.teamSolicitante || d.team || '';
+        const shortTeam = teamText.split(',')[0].trim();
+        const teamPill = shortTeam ? `<span class="team-pill" title="${teamText}">${shortTeam}</span>` : '';
 
-      cardsHtml += `
-        <div class="monthly-squad-card">
-          <div style="width: 5px; min-height: 100%; background: ${squad.barColor}; flex-shrink: 0;"></div>
-          <div style="flex: 1; display: grid; grid-template-columns: 240px repeat(4, 1fr); align-items: center; padding: 14px 18px; gap: 12px;">
+        let subMetaHtml = '';
+        if (isConcl) {
+          const formattedCompDate = this.formatOnlyDate(d.completionDate || d.completedAt || d.concludedAt);
+          const typeText = d.demandType ? ` • ${d.demandType}` : '';
+          subMetaHtml = `
+            <span class="date-pill"><i class="fa-regular fa-calendar-check"></i> Concl: ${formattedCompDate || 'Finalizado'}${typeText}</span>
+            ${teamPill}
+          `;
+        } else {
+          let statusText = 'Em Desenvolvimento';
+          let statusColor = '#94a3b8';
+          if (d.status === 'Bloqueado') {
+            statusText = '🚫 Bloqueada';
+            statusColor = '#fb7185';
+          } else if (d.timelineEntries && d.timelineEntries.length > 0 && d.timelineEntries[0].text) {
+            statusText = d.timelineEntries[0].text;
+          } else if (d.devProgress) {
+            statusText = `Evolução: ${d.devProgress}`;
+          }
+
+          subMetaHtml = `
+            <span style="color: ${statusColor}; font-size: 10px; font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${statusText}</span>
+            ${teamPill}
+          `;
+        }
+
+        const clickHandler = squad.id === 'automacao' 
+          ? `onclick="app.openAutomacaoModal ? app.openAutomacaoModal('${d.id}') : null"`
+          : `onclick="app.openDemandDetailsModal('${d.id}', '${squad.id}')"`;
+
+        return `
+          <div class="demand-item" ${clickHandler} title="Clique para ver os detalhes da demanda">
+            <div class="demand-line-main"><span class="demand-gau">${gauText}</span> • ${titleText}</div>
+            <div class="demand-sub">
+              ${subMetaHtml}
+            </div>
+          </div>
+        `;
+      };
+
+      // Resumo de contadores no topo do card
+      let summaryHtml = '';
+      if (squad.id === 'dados') {
+        summaryHtml = `
+          <span><strong class="kpi-num" style="color:#34d399;">${concluidosPrincipais.length}</strong> Entregues</span>
+          <span><strong class="kpi-num" style="color:#60a5fa;">${emAndamento.length}</strong> Em And.</span>
+          <span><strong class="kpi-num" style="color:#38bdf8;">${sustentacoesDados.length}</strong> Sustentações</span>
+        `;
+      } else {
+        summaryHtml = `
+          <span><strong class="kpi-num" style="color:${squad.titleColor};">${concluidos.length}</strong> Concl.</span>
+          <span><strong class="kpi-num" style="color:#f59e0b;">${emAndamento.length}</strong> Em And.</span>
+          ${statusFilter === 'backlog' ? `<span><strong class="kpi-num" style="color:#a855f7;">${backlog.length}</strong> Backlog</span>` : ''}
+        `;
+      }
+
+      // Seções a exibir baseado no filtro de status
+      const showConcl = statusFilter === 'all' || statusFilter === 'concluido';
+      const showAndam = statusFilter === 'all' || statusFilter === 'em-andamento';
+      const showBacklog = statusFilter === 'backlog';
+
+      let sectionsHtml = '';
+
+      // 1. Seção Concluídos
+      if (showConcl) {
+        const conclTitle = squad.id === 'dados' ? 'Entregas Principais' : (squad.id === 'operacoes' ? 'Principais Entregas' : (squad.id === 'rpa' ? `Concluídos (${monthFilter !== 'all' ? monthsNames[parseInt(monthFilter.split('-')[1], 10) - 1] : 'Total'})` : 'Entregas Concluídas'));
+        const iconConcl = squad.id === 'dados' ? 'fa-solid fa-chart-column' : (squad.id === 'operacoes' ? 'fa-solid fa-rocket' : (squad.id === 'rpa' ? 'fa-solid fa-robot' : 'fa-solid fa-square-check'));
+        const listToRender = squad.id === 'dados' ? concluidosPrincipais : concluidos;
+
+        sectionsHtml += `
+          <div>
+            <div class="sec-group-title" style="color: ${squad.titleColor};">
+              <i class="${iconConcl}"></i> ${conclTitle}
+            </div>
+            <div class="demand-list">
+              ${listToRender.length > 0 ? listToRender.map(d => renderDemandCard(d, true)).join('') : `<div class="demand-item" style="color:#64748b; font-size:10.5px; font-style:italic; cursor:default;">Nenhuma entrega concluída neste período.</div>`}
+            </div>
+          </div>
+        `;
+
+        // Para dados, renderiza bloco de Sustentação logo abaixo
+        if (squad.id === 'dados') {
+          sectionsHtml += `
             <div>
-              <div style="font-size: 15px; font-weight: 800; color: var(--text-primary, #fff);">${squad.name}</div>
-              <div style="font-size: 11px; color: var(--text-secondary, #94a3b8); margin-top: 2px; line-height: 1.3;">${squad.desc}</div>
+              <div class="sec-group-title" style="color: #38bdf8;">
+                <i class="fa-solid fa-screwdriver-wrench"></i> Sustentação (Bugs/Inc.)
+              </div>
+              <div class="demand-list">
+                ${sustentacoesDados.length > 0 ? sustentacoesDados.map(d => renderDemandCard(d, true)).join('') : `<div class="demand-item" style="color:#64748b; font-size:10.5px; font-style:italic; cursor:default;">Nenhum bug ou incidente fechado neste período.</div>`}
+              </div>
             </div>
-            <div class="monthly-kpi-col">
-              <div style="font-size: 11px; font-weight: 800; color: var(--text-primary, #fff);">${monthLabel}</div>
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary, #94a3b8); margin-top: 2px;">${totalEntradas} Demandas</div>
+          `;
+        }
+      }
+
+      // 2. Seção Em Andamento
+      if (showAndam) {
+        const andamTitle = squad.id === 'automacao' ? 'Em Desenvolvimento' : (squad.id === 'rpa' ? 'Em Homologação / Andamento' : 'Em Andamento / Homolog.');
+        sectionsHtml += `
+          <div>
+            <div class="sec-group-title" style="color: #38bdf8;">
+              <i class="fa-solid fa-arrows-rotate"></i> ${andamTitle}
             </div>
-            <div class="monthly-kpi-col">
-              <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary, #94a3b8);">Concluído</div>
-              <div style="font-size: 20px; font-weight: 900; color: #10b981; margin-top: 2px;">${concluidosMes.length}</div>
+            <div class="demand-list">
+              ${emAndamento.length > 0 ? emAndamento.map(d => renderDemandCard(d, false)).join('') : `<div class="demand-item" style="color:#64748b; font-size:10.5px; font-style:italic; cursor:default;">Nenhuma demanda ativa no momento.</div>`}
             </div>
-            <div class="monthly-kpi-col">
-              <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary, #94a3b8);">Em desenvolvimento</div>
-              <div style="font-size: 20px; font-weight: 900; color: #0284c7; margin-top: 2px;">${emDesenvolvimento.length}</div>
+          </div>
+        `;
+      }
+
+      // 3. Seção Backlog (quando filtrado)
+      if (showBacklog) {
+        sectionsHtml += `
+          <div>
+            <div class="sec-group-title" style="color: #a855f7;">
+              <i class="fa-solid fa-list-ul"></i> Fila de Backlog
             </div>
-            <div class="monthly-kpi-col">
-              <div style="font-size: 11px; font-weight: 700; color: var(--text-secondary, #94a3b8);">Bloqueio</div>
-              <div style="font-size: 20px; font-weight: 900; color: #e11d48; margin-top: 2px;">${bloqueados.length}</div>
+            <div class="demand-list">
+              ${backlog.length > 0 ? backlog.map(d => renderDemandCard(d, false)).join('') : `<div class="demand-item" style="color:#64748b; font-size:10.5px; font-style:italic; cursor:default;">Backlog vazio.</div>`}
             </div>
+          </div>
+        `;
+      }
+
+      // 4. Seção Chamados Suporte (específica de RPA)
+      if (squad.id === 'rpa') {
+        sectionsHtml += `
+          <div>
+            <div class="sec-group-title" style="color: #eab308;">
+              <i class="fa-solid fa-ticket"></i> Chamados (Suporte RPA)
+            </div>
+            <div class="demand-item" style="background: rgba(234, 179, 8, 0.06); border-color: rgba(234, 179, 8, 0.2); cursor: default;">
+              <div class="demand-line-main" style="color: #34d399; font-weight: 700;">• ${rpaResolvidos} Chamados Concluídos</div>
+              <div class="demand-line-main" style="color: #fbbf24; font-weight: 700; margin-top: 4px;">• ${rpaAndamento} Chamados em Andamento</div>
+            </div>
+          </div>
+        `;
+      }
+
+      columnsHtml += `
+        <div class="squad-col-card">
+          <div class="squad-col-topbar" style="background: ${squad.barColor};"></div>
+          <div class="squad-col-body">
+            <div class="squad-col-title-row">
+              <div class="squad-col-title" style="color: ${squad.titleColor};">${squad.num}. ${squad.name}</div>
+              <div class="squad-col-tag">${squad.tag}</div>
+            </div>
+            <div class="squad-kpi-summary">
+              ${summaryHtml}
+            </div>
+            ${sectionsHtml}
           </div>
         </div>
       `;
     });
 
-    // Seção de Conquistas com Badge de Squad e Exibição Enriquecida de Ganhos
-    let conquistasHtml = '';
-    if (conquistas.length > 0) {
-      conquistasHtml = conquistas.map(c => {
-        const hasGains = c.gains && String(c.gains).trim().length > 0;
-        const gainText = hasGains ? c.gains : 'Entrega concluída e homologada com sucesso';
-        const gainClass = hasGains ? 'text-emerald-700 font-semibold' : 'text-slate-500 italic';
-        const gainIcon = hasGains ? 'fa-solid fa-gift text-emerald-500' : 'fa-solid fa-circle-check text-emerald-500/70';
-
-        return `
-          <div class="monthly-item-row">
-            <span class="squad-badge-${c.squad.id}" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
-              <i class="${c.squad.icon}"></i> ${c.squad.shortName}
-            </span>
-            <div style="flex: 1;">
-              <strong style="color: #059669;">${c.gau}</strong> — <span>${c.title}</span>
-              <div style="font-size: 11px; margin-top: 3px; line-height: 1.4;" class="${gainClass}">
-                <i class="${gainIcon} me-1.5"></i><strong>Ganho:</strong> ${gainText}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    } else {
-      conquistasHtml = '<div style="padding: 16px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda concluída neste período.</div>';
-    }
-
-    // Seção de Bloqueios com Badge de Squad e Motivo Atualizado da Timeline
-    let bloqueiosHtml = '';
-    if (bloqueios.length > 0) {
-      bloqueiosHtml = bloqueios.map(b => `
-        <div class="monthly-item-row">
-          <span class="squad-badge-${b.squad.id}" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; margin-top: 1px;">
-            <i class="${b.squad.icon}"></i> ${b.squad.shortName}
-          </span>
-          <div style="flex: 1;">
-            <strong style="color: #e11d48;">${b.gau}</strong> — <span>${b.title}</span>
-            <div style="color: #be123c; font-size: 11px; margin-top: 3px; font-weight: 600; line-height: 1.4;"><i class="fa-solid fa-triangle-exclamation text-rose-500 me-1.5"></i><strong>Motivo:</strong> ${b.reason}</div>
-          </div>
-        </div>
-      `).join('');
-    } else {
-      bloqueiosHtml = '<div style="padding: 16px; font-size: 12px; color: var(--text-secondary, #94a3b8); font-style: italic;">Nenhuma demanda bloqueada neste período.</div>';
-    }
-
-    container.innerHTML = `
-      ${cardsHtml}
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px;">
-        <div class="monthly-conquistas-box">
-          <div class="monthly-conquistas-header">
-            <span>🏆</span> Principais Conquistas
-          </div>
-          ${conquistasHtml}
-        </div>
-        <div class="monthly-bloqueios-box">
-          <div class="monthly-bloqueios-header">
-            <span>🛑</span> Bloqueios e Riscos
-          </div>
-          ${bloqueiosHtml}
-        </div>
-      </div>
-    `;
+    container.innerHTML = columnsHtml;
   },
 
-  // Exportar Report Mensal como PDF para Impressão
+  // Stubs para compatibilidade com chamadas legadas
+  renderCharts(demands) {},
+  renderDashboardBlockedTable(demands) {},
+  renderMonthlyReportPanel() {},
+
+    // Exportar Report Mensal como PDF para Impressão
   exportMonthlyReportPDF() {
     const container = document.getElementById('monthly-report-content');
     if (!container) return;
@@ -4281,7 +4033,17 @@ const app = {
         ${this.activeSquad === 'dados' ? `<td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:118px;">${item.demandType || '—'}</td>` : ''}
         <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:135px;">${item.teamSolicitante || '—'}</td>
         <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
-        <td class="text-slate-300 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.completionDate || item.completedAt)}</td>
+        ${(this.userRole === 'admin' || this.userRole === 'gerencial') ? `
+        <td style="white-space:nowrap; width:110px;" onclick="event.stopPropagation();">
+          <input type="text" value="${this.formatOnlyDate(item.completionDate || item.completedAt)}" placeholder="DD/MM/AAAA" maxlength="10"
+                 onkeyup="app.maskDateInput ? app.maskDateInput(this) : null; if(event.key==='Enter'){this.blur();}"
+                 onchange="app.updateCompletionDate('${this.activeSquad}', '${item.id}', this.value)"
+                 style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #34d399; font-weight: 700; width: 95px; padding: 3px 6px; border-radius: 6px; font-size: 11px; outline: none;"
+                 onfocus="this.style.borderColor='rgba(0,230,153,0.5)'; this.style.background='rgba(15,23,42,0.95)';"
+                 onblur="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.background='rgba(255,255,255,0.04)';"
+                 title="Clique para editar a Data de Conclusão e pressione Enter" />
+        </td>
+      ` : `<td class="text-slate-300 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.completionDate || item.completedAt)}</td>`}
         <td class="text-emerald-400 text-xs italic" style="white-space:normal; word-break:break-word;">${item.gains || ''}</td>
       </tr>
     `).join('');

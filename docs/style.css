@@ -3281,3 +3281,381 @@ body[data-squad="rpa"] .rpa-only-tab-btn,
 
 
 
+
+
+/* ==========================================================================
+   NOVO DASHBOARD CONSOLIDADO EXECUTIVO (4 COLUNAS)
+   Design Harmonizado Impeccable com suporte Dark/Light/Print
+   ========================================================================== */
+
+.dash-exec-header-panel {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.78));
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 22px 26px;
+  margin-bottom: 24px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.dash-exec-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.dash-exec-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.dash-exec-subtitle {
+  font-size: 12.5px;
+  color: #94a3b8;
+  margin-top: 4px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.dash-exec-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dash-exec-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+@media (max-width: 1024px) {
+  .dash-exec-filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-exec-filters-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dash-exec-filter-box label {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.dash-exec-select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(9, 14, 28, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #f8fafc;
+  border-radius: 9px;
+  outline: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.dash-exec-select:focus {
+  border-color: rgba(0, 230, 153, 0.5);
+  box-shadow: 0 0 0 2px rgba(0, 230, 153, 0.15);
+}
+
+/* Grid de 4 Colunas das Squads */
+.squads-columns-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+}
+
+@media (max-width: 1280px) {
+  .squads-columns-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .squads-columns-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.squad-col-card {
+  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.squad-col-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+}
+
+.squad-col-topbar {
+  height: 5px;
+  width: 100%;
+}
+
+.squad-col-body {
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.squad-col-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.squad-col-title {
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+}
+
+.squad-col-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.squad-kpi-summary {
+  font-size: 12px;
+  font-weight: 700;
+  color: #cbd5e1;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.kpi-num {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.sec-group-title {
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.demand-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.demand-item {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.demand-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+.demand-line-main {
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: #e2e8f0;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.demand-gau {
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.demand-sub {
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.team-pill {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  white-space: nowrap;
+  max-width: 125px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date-pill {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #34d399;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   SUPORTE AO MODO LIGHT (body.light-theme)
+   ========================================================================== */
+
+body.light-theme .dash-exec-header-panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+body.light-theme .dash-exec-title {
+  color: #0f172a;
+}
+
+body.light-theme .dash-exec-subtitle {
+  color: #64748b;
+}
+
+body.light-theme .dash-exec-filters-grid {
+  border-top-color: #f1f5f9;
+}
+
+body.light-theme .dash-exec-filter-box label {
+  color: #64748b;
+}
+
+body.light-theme .dash-exec-select {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+body.light-theme .dash-exec-select:focus {
+  border-color: #059669;
+  box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.15);
+}
+
+body.light-theme .squad-col-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .squad-col-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .squad-col-title {
+  color: #0f172a;
+}
+
+body.light-theme .squad-kpi-summary {
+  color: #334155;
+  border-bottom-color: #f1f5f9;
+}
+
+body.light-theme .demand-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+body.light-theme .demand-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+body.light-theme .demand-line-main {
+  color: #1e293b;
+}
+
+body.light-theme .demand-gau {
+  color: #0f172a;
+}
+
+body.light-theme .demand-sub {
+  color: #64748b;
+}
+
+body.light-theme .team-pill {
+  background: rgba(14, 165, 233, 0.1);
+  color: #0284c7;
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+body.light-theme .date-pill {
+  color: #059669;
+}
+
+/* ==========================================================================
+   IMPRESSÃO DO NOVO DASHBOARD EXECUTIVO (@media print)
+   ========================================================================== */
+
+@media print {
+  .dash-exec-actions,
+  .dash-exec-filters-grid {
+    display: none !important;
+  }
+  .dash-exec-header-panel {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    padding: 12px 16px !important;
+    margin-bottom: 12px !important;
+  }
+  .squads-columns-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+  }
+  .squad-col-card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .demand-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border-color: #e5e7eb !important;
+  }
+}

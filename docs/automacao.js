@@ -30,6 +30,7 @@ var AutomacaoModule = window.AutomacaoModule = {
     window.app.renderAutomacaoView = function() { self.renderView(); };
     window.app.maskDateInput = function(el) { self.maskDateInput(el); };
     window.app.syncAutomacaoPickerToDate = function(val) { self.syncPickerToDate(val); };
+    window.app.syncAutomacaoPickerToCompletionDate = function(val) { self.syncPickerToCompletionDate(val); };
   },
 
   maskDateInput: function(el) {
@@ -49,6 +50,13 @@ var AutomacaoModule = window.AutomacaoModule = {
     if (!pickerValue) return;
     var formatted = this.formatDatePtBr(pickerValue);
     var dateEl = document.getElementById('auto-edit-created-date');
+    if (dateEl) dateEl.value = formatted;
+  },
+
+  syncPickerToCompletionDate: function(pickerValue) {
+    if (!pickerValue) return;
+    var formatted = this.formatDatePtBr(pickerValue);
+    var dateEl = document.getElementById('auto-edit-completion-date');
     if (dateEl) dateEl.value = formatted;
   },
 
@@ -335,6 +343,9 @@ var AutomacaoModule = window.AutomacaoModule = {
       html += '          <th style="width: 125px; white-space: nowrap; padding: 10px 8px;">STATUS</th>';
     }
     html += '          <th style="width: 95px; white-space: nowrap; padding: 10px 8px;">DATA DE CRIAÇÃO</th>';
+    if (this.activeTab === 'concluido') {
+      html += '          <th style="width: 105px; white-space: nowrap; padding: 10px 8px; color:#34d399;">DATA DE CONCLUSÃO</th>';
+    }
     html += '          <th style="width: 85px; white-space: nowrap; padding: 10px 8px;">CRITICIDADE</th>';
     html += '          <th style="width: 65px; text-align: right; white-space: nowrap; padding: 10px 8px;">AÇÕES</th>';
     html += '        </tr>';
@@ -344,6 +355,7 @@ var AutomacaoModule = window.AutomacaoModule = {
     if (filteredItems.length === 0) {
       var colSpan = 8;
       if (this.activeTab === 'backlog') colSpan += 1;
+      if (this.activeTab === 'concluido') colSpan += 1;
       if (!showStatusCol) colSpan -= 1;
       html += '        <tr>';
       html += '          <td colspan="' + colSpan + '" style="padding: 40px 16px; text-align: center;">';
@@ -403,6 +415,12 @@ var AutomacaoModule = window.AutomacaoModule = {
         // 7. DATA DE CRIAÇÃO
         html += '          <td style="padding: 10px 8px;" class="text-xs text-slate-400 font-semibold">' + formattedDate + '</td>';
 
+        // 7.1 DATA DE CONCLUSÃO (apenas se Concluído)
+        if (AutomacaoModule.activeTab === 'concluido') {
+          var formattedCompDate = AutomacaoModule.formatDatePtBr(item.completionDate || item.completedAt || item.concludedAt);
+          html += '          <td style="padding: 10px 8px;" class="text-xs text-emerald-400 font-extrabold">' + (formattedCompDate || '-') + '</td>';
+        }
+
         // 8. CRITICIDADE
         html += '          <td style="padding: 10px 8px;">';
         html += '            <span class="badge text-[10px] px-2 py-0.5 border font-bold ' + critBadge + '">' + (item.criticality || 'Média') + '</span>';
@@ -453,6 +471,8 @@ var AutomacaoModule = window.AutomacaoModule = {
     var teamEl = document.getElementById('auto-edit-team');
     var dateEl = document.getElementById('auto-edit-created-date');
     var pickerEl = document.getElementById('auto-edit-created-date-picker');
+    var compDateEl = document.getElementById('auto-edit-completion-date');
+    var compPickerEl = document.getElementById('auto-edit-completion-date-picker');
     var appEl = document.getElementById('auto-edit-application');
     var critEl = document.getElementById('auto-edit-criticality');
     var titleInput = document.getElementById('auto-edit-title');
@@ -473,6 +493,10 @@ var AutomacaoModule = window.AutomacaoModule = {
         if (dateEl) dateEl.value = formattedDate;
         if (pickerEl) pickerEl.value = this.formatDateIsoForPicker(formattedDate);
 
+        var formattedComp = item.completionDate ? this.formatDatePtBr(item.completionDate) : '';
+        if (compDateEl) compDateEl.value = formattedComp;
+        if (compPickerEl) compPickerEl.value = formattedComp ? this.formatDateIsoForPicker(formattedComp) : '';
+
         if (appEl) appEl.value = item.application || 'Controle de Squads';
         if (critEl) critEl.value = item.criticality || 'Média';
         if (titleInput) titleInput.value = item.title || '';
@@ -485,6 +509,8 @@ var AutomacaoModule = window.AutomacaoModule = {
       if (teamEl) teamEl.value = 'Conciliação, Parâmetros, Processamento e Adquirência';
       if (dateEl) dateEl.value = todayPtBr;
       if (pickerEl) pickerEl.value = todayIso;
+      if (compDateEl) compDateEl.value = '';
+      if (compPickerEl) compPickerEl.value = '';
       if (appEl) appEl.value = 'Controle de Squads';
       if (critEl) critEl.value = 'Média';
       if (titleInput) titleInput.value = '';
@@ -511,6 +537,7 @@ var AutomacaoModule = window.AutomacaoModule = {
     var requester = document.getElementById('auto-edit-requester')?.value.trim();
     var team = document.getElementById('auto-edit-team')?.value;
     var createdDateInput = document.getElementById('auto-edit-created-date')?.value;
+    var completionDateInput = document.getElementById('auto-edit-completion-date')?.value;
     var application = document.getElementById('auto-edit-application')?.value;
     var criticality = document.getElementById('auto-edit-criticality')?.value;
     var title = document.getElementById('auto-edit-title')?.value.trim();
@@ -537,6 +564,11 @@ var AutomacaoModule = window.AutomacaoModule = {
         item.criticality = criticality;
         item.updatedAt = nowIso;
         if (createdDateInput) item.createdDate = createdFormatted;
+        if (completionDateInput && completionDateInput.trim()) {
+          item.completionDate = this.formatDatePtBr(completionDateInput.trim());
+        } else if (item.status === 'concluido' && !item.completionDate) {
+          item.completionDate = new Date().toLocaleDateString('pt-BR');
+        }
       }
     } else {
       var nextOrder = 1;
@@ -563,6 +595,7 @@ var AutomacaoModule = window.AutomacaoModule = {
         treatmentOrder: nextOrder,
         createdBy: window.app && window.app.userEmail ? window.app.userEmail : '',
         createdDate: createdFormatted,
+        completionDate: completionDateInput ? this.formatDatePtBr(completionDateInput) : '',
         createdAt: nowIso,
         updatedAt: nowIso
       };
@@ -602,6 +635,10 @@ var AutomacaoModule = window.AutomacaoModule = {
 
     item.status = newStatus;
     item.updatedAt = new Date().toISOString();
+
+    if (newStatus === 'concluido' && !item.completionDate) {
+      item.completionDate = this.formatDatePtBr(new Date().toISOString());
+    }
 
     if (newStatus === 'backlog') {
       var backlogItems = this.items.filter(i => i.status === 'backlog' && i.id !== id);
