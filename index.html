@@ -299,296 +299,73 @@
     <!-- VIEW 2: DASHBOARD CONSOLIDADO -->
     <div class="view-container" id="view-dashboard">
       
-      <!-- BANNER EXECUTIVO DO DASHBOARD -->
-      <div class="triage-banner-panel mb-6" style="margin-bottom: 28px !important;">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- HEADER EXECUTIVO DO DASHBOARD + BARRA DE FILTROS -->
+      <div class="dash-exec-header-panel">
+        <div class="dash-exec-top-row">
           <div>
-            <div class="badge badge-medium mb-3">
-              <i class="fa-solid fa-chart-line text-emerald-400 me-1.5"></i> Analytics & Métricas Consolidadas
-            </div>
-            <h2 class="text-xl md:text-2xl font-extrabold text-white tracking-tight">Dashboard Consolidado 3 Squads</h2>
-            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
-              Visão geral e executiva de throughput, capacidade operacional e demandas em alerta nas Squads de Dados, Operações e RPA.
-            </p>
+            <h2 class="dash-exec-title" id="dash-exec-main-title">Resumo Geral <span style="color:#f97316;">—</span> Eficiência Operacional</h2>
+            <p class="dash-exec-subtitle" id="dash-exec-subtitle">Resumo de entregas concluídas (por Data de Conclusão), projetos em andamento e sustentação das squads de Operações, Dados, RPA e Automação</p>
           </div>
-          <div class="flex items-center gap-2">
-            <button type="button" class="btn btn-secondary btn-export" onclick="app.exportPDF()">
-              <i class="fa-solid fa-print" style="color:#6366f1; margin-right:6px;"></i> Imprimir / PDF
+          <div class="dash-exec-actions">
+            <button type="button" class="btn btn-secondary text-xs py-2 px-3.5" onclick="app.clearDashboardFilters()">
+              <i class="fa-solid fa-filter-circle-xmark me-1.5"></i> Limpar Filtros
+            </button>
+            <button type="button" class="btn btn-secondary text-xs py-2 px-3.5" style="border-color: rgba(0, 230, 153, 0.4); color: #00e699;" onclick="app.exportExecutiveDashboardPDF()">
+              <i class="fa-solid fa-print me-1.5"></i> Imprimir / PDF
             </button>
           </div>
         </div>
-      </div>
 
-      <!-- PAINEL 1: FILTROS AVANÇADOS DO DASHBOARD -->
-      <div class="glass-panel" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; padding: 24px !important; margin-bottom: 28px !important;">
-        <!-- Cabeçalho dos Filtros -->
-        <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;">
-          <h3 style="font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; margin: 0; padding-top: 2px;">
-            <i class="fa-solid fa-filter text-emerald-400 me-2"></i> Filtros do Dashboard Consolidado
-          </h3>
-          <button type="button" class="btn btn-secondary text-xs py-2 px-3.5" onclick="app.clearDashboardFilters()">
-            <i class="fa-solid fa-rotate-left me-1.5"></i> Limpar Filtros
-          </button>
-        </div>
-
-        <!-- Linha de Controles de Seleção -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end;">
-          <!-- 1. Filtro por Squad -->
-          <div>
-            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Filtrar por Squad / Módulo:</label>
-            <select id="dash-filter-squad" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
-              <option value="all">Todas as Squads / Módulos</option>
-              <option value="dados">Squad de Dados</option>
-              <option value="operacoes">Squad de Operações</option>
-              <option value="rpa">Squad de RPA</option>
-              <option value="automacao">Automação (Demandas Internas)</option>
+        <!-- OS 4 FILTROS PRINCIPAIS -->
+        <div class="dash-exec-filters-grid">
+          <!-- 1. Por Squad -->
+          <div class="dash-exec-filter-box">
+            <label><i class="fa-solid fa-layer-group text-sky-400 me-1.5"></i> 1. Por Squad</label>
+            <select id="dash-exec-filter-squad" class="dash-exec-select" onchange="app.renderDashboardView()">
+              <option value="all">Todas as Squads (Resumo Geral)</option>
+              <option value="operacoes">1. Squad de Operações</option>
+              <option value="dados">2. Squad de Dados</option>
+              <option value="rpa">3. Squad de RPA</option>
+              <option value="automacao">4. Automação</option>
             </select>
           </div>
 
-          <!-- 2. Filtro por Status -->
-          <div>
-            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Filtrar por Status:</label>
-            <select id="dash-filter-status" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
-              <option value="all">Todos os Status</option>
-              <option value="Em Andamento">Em Andamento</option>
-              <option value="Backlog">Backlog</option>
-              <option value="Bloqueado">Bloqueado</option>
-              <option value="Concluído">Concluído</option>
+          <!-- 2. Por Mês (Data de Conclusão) -->
+          <div class="dash-exec-filter-box">
+            <label><i class="fa-solid fa-calendar-check text-emerald-400 me-1.5"></i> 2. Por Mês (Data de Conclusão)</label>
+            <select id="dash-exec-filter-month" class="dash-exec-select" onchange="app.renderDashboardView()">
+              <option value="all">Todos os Meses (Resumo Geral)</option>
             </select>
           </div>
 
-          <!-- 3. Filtro por Time Solicitante -->
-          <div>
-            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Time Solicitante:</label>
-            <select id="dash-filter-team" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
-              <option value="">🏢 Todos os Times</option>
+          <!-- 3. Por Status -->
+          <div class="dash-exec-filter-box">
+            <label><i class="fa-solid fa-list-check text-amber-400 me-1.5"></i> 3. Por Status</label>
+            <select id="dash-exec-filter-status" class="dash-exec-select" onchange="app.renderDashboardView()">
+              <option value="all">Resumo Geral (Concluído + Em Andamento)</option>
+              <option value="concluido">Somente Concluído</option>
+              <option value="em-andamento">Somente Em Andamento</option>
+              <option value="backlog">Somente Backlog</option>
+            </select>
+          </div>
+
+          <!-- 4. Time Solicitante -->
+          <div class="dash-exec-filter-box">
+            <label><i class="fa-solid fa-users text-purple-400 me-1.5"></i> 4. Time Solicitante</label>
+            <select id="dash-exec-filter-team" class="dash-exec-select" onchange="app.renderDashboardView()">
+              <option value="all">Todos os Times</option>
               <option value="Atendimento">Atendimento</option>
               <option value="Conciliação">Conciliação, Parâmetros, Processamento e Adquirência</option>
               <option value="Suporte Operacional">Suporte Operacional</option>
-              <option value="__vazio__">⚠️ Sem Time Definido</option>
+              <option value="__vazio__">Sem Time Definido</option>
             </select>
           </div>
-
-          <!-- 3. Período Customizável -->
-          <div>
-            <label style="color: #94a3b8; display: block; font-size: 11px; margin-bottom: 8px; font-weight: 700;">Período Temporal:</label>
-            <select id="dash-filter-period" style="width: 100%; padding: 10px 12px; font-size: 12px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()">
-              <option value="all">Todo o Período</option>
-              <option value="today">Hoje (Dia)</option>
-              <option value="week">Esta Semana</option>
-              <option value="month">Este Mês</option>
-              <option value="year">Este Ano</option>
-              <option value="custom">De xxxx Até xxxx (Personalizado)</option>
-            </select>
-          </div>
-
-          <!-- 4. Seleção Customizada de Data (De / Até) -->
-          <div id="dash-custom-date-container" class="hidden" style="display: flex; gap: 8px; width: 100%;">
-            <div style="flex: 1;">
-              <label style="color: #94a3b8; display: block; font-size: 10px; margin-bottom: 8px; font-weight: 700;">De (Data Inicial):</label>
-              <input type="date" name="dash_date_from_filter" id="dash-date-from" style="width: 100%; padding: 9px 10px; font-size: 11px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #34d399; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" />
-            </div>
-            <div style="flex: 1;">
-              <label style="color: #94a3b8; display: block; font-size: 10px; margin-bottom: 8px; font-weight: 700;">Até (Data Final):</label>
-              <input type="date" name="dash_date_to_filter" id="dash-date-to" style="width: 100%; padding: 9px 10px; font-size: 11px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #34d399; border-radius: 8px; outline: none;" onchange="app.renderDashboardView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" />
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- PAINEL 2: AS 5 MÉTRICAS PRINCIPAIS (+ LEAD TIME MÉDIO) -->
-      <div class="grid-metrics" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 28px !important; gap: 18px !important;">
-        <!-- 1. Em Andamento -->
-        <div class="glass-panel metric-card" style="margin-bottom: 0 !important;">
-          <div>
-            <div class="metric-val text-cyan-400" id="dash-total-in-progress">0</div>
-            <div class="metric-lbl">Total Em Andamento</div>
-          </div>
-          <div class="metric-icon bg-cyan-500/20 text-cyan-400"><i class="fa-solid fa-arrows-rotate"></i></div>
-        </div>
-
-        <!-- 2. Em Backlog -->
-        <div class="glass-panel metric-card" style="margin-bottom: 0 !important;">
-          <div>
-            <div class="metric-val text-amber-400" id="dash-total-backlog">0</div>
-            <div class="metric-lbl">Total em Backlog</div>
-          </div>
-          <div class="metric-icon bg-amber-500/20 text-amber-400"><i class="fa-solid fa-list-check"></i></div>
-        </div>
-
-        <!-- 3. Com Bloqueio -->
-        <div class="glass-panel metric-card" style="margin-bottom: 0 !important;">
-          <div>
-            <div class="metric-val text-rose-400" id="dash-total-blocked">0</div>
-            <div class="metric-lbl">Total com Bloqueio</div>
-          </div>
-          <div class="metric-icon bg-rose-500/20 text-rose-400"><i class="fa-solid fa-ban"></i></div>
-        </div>
-
-        <!-- 4. Total Concluídos -->
-        <div class="glass-panel metric-card" style="margin-bottom: 0 !important;">
-          <div>
-            <div class="metric-val text-emerald-400" id="dash-total-completed">0</div>
-            <div class="metric-lbl">Total Concluídos</div>
-          </div>
-          <div class="metric-icon bg-emerald-500/20 text-emerald-400"><i class="fa-solid fa-circle-check"></i></div>
-        </div>
-
-      </div>
-
-      <!-- PAINEL 3: MATRIZ DE 4 GRÁFICOS INTERATIVOS (GRID 2x2) -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="margin-bottom: 28px !important; gap: 24px !important;">
-        <!-- Gráfico 1: Distribuição por Squad -->
-        <div class="glass-panel" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 24px !important; margin-bottom: 0 !important;">
-          <h3 style="font-size: 13px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; margin-top: 0; padding-top: 2px;">
-            <i class="fa-solid fa-chart-pie me-2 text-emerald-400"></i> Distribuição por Squad
-          </h3>
-          <div style="position: relative; height: 185px; width: 100%; display: flex; align-items: center; justify-content: center;">
-            <canvas id="chart-squad-dist"></canvas>
-          </div>
-        </div>
-
-        <!-- Gráfico 2: Composição por Status -->
-        <div class="glass-panel" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 24px !important; margin-bottom: 0 !important;">
-          <h3 style="font-size: 13px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; margin-top: 0; padding-top: 2px;">
-            <i class="fa-solid fa-chart-bar me-2 text-cyan-400"></i> Status das Demandas
-          </h3>
-          <div style="position: relative; height: 185px; width: 100%;">
-            <canvas id="chart-status-dist"></canvas>
-          </div>
-        </div>
-
-        <!-- Gráfico 3: Evolução de Entregas (Throughput) -->
-        <div class="glass-panel" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 24px !important; margin-bottom: 0 !important;">
-          <h3 style="font-size: 13px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; margin-top: 0; padding-top: 2px;">
-            <i class="fa-solid fa-chart-line me-2 text-indigo-400"></i> Evolução de Entregas (Throughput)
-          </h3>
-          <div style="position: relative; height: 185px; width: 100%;">
-            <canvas id="chart-trend-dist"></canvas>
-          </div>
-        </div>
-
-        <!-- Gráfico 4: Top 5 Solicitantes por Volume -->
-        <div class="glass-panel" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 24px !important; margin-bottom: 0 !important;">
-          <h3 style="font-size: 13px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; margin-top: 0; padding-top: 2px;">
-            <i class="fa-solid fa-users-gear me-2 text-amber-400"></i> Top 5 Solicitantes
-          </h3>
-          <div style="position: relative; height: 185px; width: 100%;">
-            <canvas id="chart-top-requesters"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAINEL 4: TABELA EXECUTIVA DE DEMANDAS BLOQUEADAS & ALERTAS -->
-      <div class="glass-card" style="padding: 24px !important; margin-bottom: 28px !important;">
-        <div class="flex items-center justify-between gap-4 mb-5 border-b border-white/10 pb-4">
-          <h3 class="text-sm md:text-base font-bold text-white tracking-tight flex items-center gap-2.5 margin-0">
-            <i class="fa-solid fa-triangle-exclamation text-amber-400 text-lg"></i>
-            <span>Demandas em Alerta / Bloqueadas</span>
-          </h3>
-          <span class="badge bg-amber-500/15 text-amber-400 border border-amber-500/30 text-xs px-2.5 py-1" id="dash-blocked-badge">
-            0 bloqueadas
-          </span>
-        </div>
-
-        <div class="table-responsive">
-          <table class="custom-table w-full text-left">
-            <thead>
-              <tr>
-                <th style="width: 35px;">#</th>
-                <th style="width: 90px;">GAU / CHAVE</th>
-                <th style="min-width: 160px;">TÍTULO DA DEMANDA</th>
-                <th style="width: 110px;">SQUAD</th>
-                <th style="width: 120px;">SOLICITANTE</th>
-                <th style="width: 125px;">TIME SOLICITANTE</th>
-                <th style="width: 110px;">STATUS</th>
-                <th style="width: 90px; text-align: right;">AÇÃO</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-dash-blocked">
-              <!-- Renderizado via app.js -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- PAINEL 5: INDICADORES EXECUTIVOS DA SQUAD RPA (PENDÊNCIAS RPA - ÚLTIMA INFORMAÇÃO) -->
-      <div class="glass-panel mb-6" style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 14px; padding: 20px !important; margin-bottom: 28px !important;">
-        <div class="flex items-center justify-between mb-4">
-          <h3 style="font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; margin: 0; padding-top: 2px;" class="flex items-center gap-2">
-            <i class="fa-solid fa-robot text-emerald-400"></i> Indicadores da Squad RPA (Pendências RPA)
-          </h3>
-          <span class="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-bold px-2.5 py-0.5">Módulo RPA</span>
-        </div>
-        
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <!-- 1. Total Ocorrências -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-white" id="dash-rpa-kpi-total">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Total Ocorrências</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-list-ul"></i></div>
-          </div>
-
-          <!-- 2. Em Aberto -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-rose-400" id="dash-rpa-kpi-aberto">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Em Aberto</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-triangle-exclamation"></i></div>
-          </div>
-
-          <!-- 3. Em Validação -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-cyan-400" id="dash-rpa-kpi-validacao">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Em Validação</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-magnifying-glass"></i></div>
-          </div>
-
-          <!-- 4. Severidade Crítica -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-amber-400" id="dash-rpa-kpi-critica">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Severidade Crítica</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-fire-flame-curved"></i></div>
-          </div>
-
-          <!-- 5. Resolvidos -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-            <div>
-              <div class="text-xl font-extrabold text-emerald-400" id="dash-rpa-kpi-resolvido">0</div>
-              <div class="text-[11px] text-slate-400 font-semibold mt-0.5">Resolvidos</div>
-            </div>
-            <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-circle-check"></i></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- PAINEL 6: REPORT MENSAL EXECUTIVO DE STATUS DAS SQUADS -->
-      <div class="glass-card" style="padding: 24px !important; margin-bottom: 28px !important;" id="monthly-report-panel">
-        <div class="flex items-center justify-between gap-4 mb-5 border-b border-white/10 pb-4">
-          <h3 class="text-sm md:text-base font-bold text-white tracking-tight flex items-center gap-2.5 margin-0">
-            <i class="fa-solid fa-chart-column text-indigo-400 text-lg"></i>
-            <span>Report Mensal — Status das Squads</span>
-          </h3>
-          <div class="flex items-center gap-2">
-            <select id="monthly-report-month" class="team-filter-select" style="min-width: 140px; font-size: 11px; padding: 6px 10px;" onchange="app.renderMonthlyReportPanel()">
-              <!-- Populado dinamicamente via JS -->
-            </select>
-            <button type="button" class="btn btn-secondary btn-export text-xs px-3 py-1.5 flex items-center gap-1.5" onclick="app.exportMonthlyReportPDF()">
-              <i class="fa-solid fa-print" style="color:#6366f1;"></i> Imprimir / PDF
-            </button>
-          </div>
-        </div>
-
-        <div id="monthly-report-content">
-          <!-- Renderizado dinamicamente via app.js -->
-        </div>
+      <!-- GRID DAS 4 COLUNAS EXECUTIVAS -->
+      <div id="dash-exec-columns-container" class="squads-columns-grid">
+        <!-- Renderizado dinamicamente via app.renderDashboardView() -->
       </div>
 
     </div>
@@ -1634,10 +1411,30 @@
         </div>
 
         <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Data de Conclusão</label>
+          <div class="relative flex items-center">
+            <input type="text" id="auto-edit-completion-date" class="app-custom-input pr-10" placeholder="DD/MM/AAAA" maxlength="10" onkeyup="app.maskDateInput(this)" />
+            <input type="date" id="auto-edit-completion-date-picker" class="absolute right-0 top-0 bottom-0 opacity-0 w-10 cursor-pointer z-10" onchange="app.syncAutomacaoPickerToCompletionDate(this.value)" />
+            <i class="fa-solid fa-calendar-check text-emerald-400 absolute right-3 pointer-events-none text-sm"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1.5">Aplicação <span class="text-violet-400">*</span></label>
           <select id="auto-edit-application" class="app-custom-select" required>
             <option value="Controle de Squads">Controle de Squads</option>
             <option value="Sistema de Governança Operacional">Sistema de Governança Operacional</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1.5">Criticidade</label>
+          <select id="auto-edit-criticality" class="app-custom-select">
+            <option value="Alta">Alta</option>
+            <option value="Média" selected>Média</option>
+            <option value="Baixa">Baixa</option>
           </select>
         </div>
       </div>
