@@ -1492,6 +1492,14 @@ const app = {
     }
     if (!squadKey || !itemId) return;
     
+    // Se for pendência / chamado RPA
+    if (squadKey === 'rpa-pendencies' || squadKey === 'rpa-pendency' || squadKey === 'rpa-chamados') {
+      if (window.RpaPendenciesModule && window.RpaPendenciesModule.updateCompletionDate) {
+        window.RpaPendenciesModule.updateCompletionDate(itemId, newDate);
+      }
+      return;
+    }
+
     // Se for automação
     if (squadKey === 'automacao') {
       if (window.AutomacaoModule && window.AutomacaoModule.items) {
@@ -3273,19 +3281,99 @@ const app = {
         `;
       }
 
-      // 4. Seção Chamados Suporte (específica de RPA)
+      // 4. Seção Chamados Suporte (específica de RPA) — Filtrada e com Cards Individuais
       if (squad.id === 'rpa') {
-        sectionsHtml += `
-          <div>
-            <div class="sec-group-title" style="color: #eab308;">
-              <i class="fa-solid fa-ticket"></i> Chamados (Suporte RPA)
+        const rawRpaItems = window.RpaPendenciesModule?.pendencies || this.state?.rpaPendencies || [];
+
+        // Filtro por time (se selecionado)
+        let filteredRpaItems = rawRpaItems;
+        if (teamFilter !== 'all') {
+          filteredRpaItems = filteredRpaItems.filter(p => {
+            const t = ((p.responsible || '') + ' ' + (p.team || '')).toLowerCase();
+            return t.includes(teamFilter.toLowerCase());
+          });
+        }
+
+        // Chamados Concluídos filtrados estritamente pela Data de Conclusão no mês selecionado
+        const rpaConcluidos = filteredRpaItems.filter(p => {
+          if (p.status !== 'RESOLVIDO') return false;
+          const compDate = p.completionDate || this.formatOnlyDate(p.resolved_at || p.updated_at || p.created_at);
+          return isCompletedInSelectedMonth({ completionDate: compDate });
+        });
+
+        // Chamados em Andamento
+        const rpaEmAndamento = filteredRpaItems.filter(p => p.status === 'ABERTO' || p.status === 'EM_VALIDACAO' || p.status === 'EM_ANALISE' || p.status === 'AGUARDANDO_PARCEIRO');
+
+        // Itens a exibir conforme filtro de status
+        let rpaItemsToDisplay = [];
+        if (statusFilter === 'all') {
+          rpaItemsToDisplay = [...rpaConcluidos, ...rpaEmAndamento];
+        } else if (statusFilter === 'concluido') {
+          rpaItemsToDisplay = rpaConcluidos;
+        } else if (statusFilter === 'em-andamento') {
+          rpaItemsToDisplay = rpaEmAndamento;
+        }
+
+        const renderRpaChamadoCard = (p) => {
+          const isItemConcl = p.status === 'RESOLVIDO';
+          const matchEma = (p.title || '').match(/(?:EMA|EM|EC)[-\s]?\d+/i);
+          const gauKey = matchEma ? matchEma[0].toUpperCase().replace(/\s+/, '-') : (p.robo_name ? p.robo_name.split(' - ')[0] : 'RPA');
+          
+          let displayTitle = p.title || 'Sem título';
+          if (p.robo_name && !displayTitle.toLowerCase().includes(p.robo_name.toLowerCase())) {
+            displayTitle = `${p.robo_name}: ${displayTitle}`;
+          }
+
+          const respText = p.responsible || 'RPA';
+          const shortResp = respText.split(';')[0].split(',')[0].trim();
+          const respPill = shortResp ? `<span class="team-pill" title="Responsável: ${respText}">${shortResp}</span>` : '';
+
+          let subMetaHtml = '';
+          if (isItemConcl) {
+            const compDateStr = p.completionDate || this.formatOnlyDate(p.resolved_at || p.updated_at || p.created_at);
+            subMetaHtml = `
+              <span class="date-pill"><i class="fa-regular fa-calendar-check"></i> Concl: ${compDateStr || 'Finalizado'}</span>
+              ${respPill}
+            `;
+          } else {
+            let statusText = p.status === 'EM_VALIDACAO' ? '🔍 Em Validação' : '🚨 Em Aberto';
+            let statusColor = p.status === 'EM_VALIDACAO' ? '#38bdf8' : '#fbbf24';
+            if (p.history_notes && p.history_notes.length > 0 && p.history_notes[0].text) {
+              statusText = p.history_notes[0].text;
+            }
+            subMetaHtml = `
+              <span style="color: ${statusColor}; font-size: 10px; font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${statusText}</span>
+              ${respPill}
+            `;
+          }
+
+          return `
+            <div class="demand-item" onclick="app.openNewRpaPendencyModal('${p.id}')" title="Clique para ver/editar a ocorrência de RPA">
+              <div class="demand-line-main"><span class="demand-gau" style="color:#eab308; background:rgba(234,179,8,0.15); border-color:rgba(234,179,8,0.35);">${gauKey}</span> • ${displayTitle}</div>
+              <div class="demand-sub">
+                ${subMetaHtml}
+              </div>
             </div>
-            <div class="demand-item" style="background: rgba(234, 179, 8, 0.06); border-color: rgba(234, 179, 8, 0.2); cursor: default;">
-              <div class="demand-line-main" style="color: #34d399; font-weight: 700;">• ${rpaResolvidos} Chamados Concluídos</div>
-              <div class="demand-line-main" style="color: #fbbf24; font-weight: 700; margin-top: 4px;">• ${rpaAndamento} Chamados em Andamento</div>
+          `;
+        };
+
+        if (statusFilter !== 'backlog') {
+          sectionsHtml += `
+            <div>
+              <div class="sec-group-title" style="color: #eab308; display:flex; align-items:center; justify-content:space-between;">
+                <span><i class="fa-solid fa-ticket"></i> Chamados (Suporte RPA)</span>
+                <span style="font-size:10px; font-weight:700;">
+                  <span style="color:#34d399;">${rpaConcluidos.length} Concl.</span>
+                  •
+                  <span style="color:#fbbf24;">${rpaEmAndamento.length} Em And.</span>
+                </span>
+              </div>
+              <div class="demand-list">
+                ${rpaItemsToDisplay.length > 0 ? rpaItemsToDisplay.map(renderRpaChamadoCard).join('') : `<div class="demand-item" style="color:#64748b; font-size:10.5px; font-style:italic; cursor:default;">Nenhum chamado neste período.</div>`}
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        }
       }
 
       columnsHtml += `

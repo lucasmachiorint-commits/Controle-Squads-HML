@@ -438,6 +438,10 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
           if (item.status === 'EM_ANALISE') item.status = 'ABERTO';
           if (item.status === 'AGUARDANDO_PARCEIRO') item.status = 'EM_VALIDACAO';
           item.responsible = this.normalizeResponsible(item.responsible);
+          if (item.status === 'RESOLVIDO' && !item.completionDate) {
+            const rawDate = item.resolved_at || item.updated_at || item.created_at;
+            item.completionDate = window.app?.formatOnlyDate ? window.app.formatOnlyDate(rawDate) : (rawDate ? new Date(rawDate).toLocaleDateString('pt-BR') : '');
+          }
           return item;
         });
     },
@@ -1213,8 +1217,19 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
               <!-- DATAS DE CRIAÇÃO E CONCLUSÃO EXPLICITAS -->
               <div class="flex flex-wrap items-center gap-3 text-[10px] text-slate-400 my-1 font-mono">
                 <span><i class="fa-solid fa-calendar-plus text-amber-400 me-1"></i>Criado: <strong class="text-slate-200">${formatDate(item.created_at)}</strong></span>
-                ${(item.status === 'RESOLVIDO' || item.resolved_at) ? `
-                  <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-calendar-check text-emerald-400 me-1"></i>Concluído: <strong>${formatDate(item.resolved_at || item.updated_at)}</strong></span>
+                ${(item.status === 'RESOLVIDO' || item.resolved_at || item.completionDate) ? `
+                  <span class="text-emerald-400 font-semibold flex items-center gap-1">
+                    <i class="fa-solid fa-calendar-check text-emerald-400 me-0.5"></i>Concl:
+                    ${canEditOrDelete ? `
+                      <input type="text" value="${item.completionDate || formatDate(item.resolved_at || item.updated_at)}" placeholder="DD/MM/AAAA" maxlength="10"
+                             onkeyup="app.maskDateInput ? app.maskDateInput(this) : null; if(event.key==='Enter'){this.blur();}"
+                             onchange="app.updateCompletionDate('rpa-pendencies', '${item.id}', this.value)"
+                             style="background: rgba(255,255,255,0.04); border: 1px solid rgba(16,185,129,0.3); color: #34d399; font-weight: 700; width: 85px; padding: 2px 4px; border-radius: 4px; font-size: 10px; outline: none; text-align: center;"
+                             onfocus="this.style.borderColor='rgba(0,230,153,0.8)'; this.style.background='rgba(15,23,42,0.95)';"
+                             onblur="this.style.borderColor='rgba(16,185,129,0.3)'; this.style.background='rgba(255,255,255,0.04)';"
+                             title="Clique para editar a Data de Conclusão e pressione Enter" />
+                    ` : `<strong>${item.completionDate || formatDate(item.resolved_at || item.updated_at)}</strong>`}
+                  </span>
                 ` : ''}
               </div>
 
@@ -1336,6 +1351,10 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
           if (titleInput) titleInput.value = item.title;
           if (sevEl) sevEl.value = item.severity;
           if (statusEl) statusEl.value = item.status;
+          const compDateEl = document.getElementById('rpa-edit-completion-date');
+          if (compDateEl) {
+            compDateEl.value = item.completionDate || (item.status === 'RESOLVIDO' ? (window.app?.formatOnlyDate ? window.app.formatOnlyDate(item.resolved_at || item.updated_at) : '') : '');
+          }
         }
       } else {
         if (titleEl) titleEl.textContent = 'Nova Pendência de Robô RPA';
@@ -1346,6 +1365,8 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         if (titleInput) titleInput.value = '';
         if (sevEl) sevEl.value = 'MEDIA';
         if (statusEl) statusEl.value = 'ABERTO';
+        const compDateElNew = document.getElementById('rpa-edit-completion-date');
+        if (compDateElNew) compDateElNew.value = '';
       }
 
       this.renderRobotPills();
@@ -1376,6 +1397,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       const title = document.getElementById('rpa-edit-title')?.value.trim();
       const severity = document.getElementById('rpa-edit-severity')?.value;
       const status = document.getElementById('rpa-edit-status')?.value;
+      const completionDateInput = document.getElementById('rpa-edit-completion-date')?.value?.trim();
 
       if (!robo_name) {
         alert('Por favor, selecione ao menos um Robô Afetado.');
@@ -1414,6 +1436,11 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
         target.responsible = responsible;
         target.severity = severity;
         target.status = status;
+        if (status === 'RESOLVIDO') {
+          target.completionDate = completionDateInput ? (window.app?.formatOnlyDate ? window.app.formatOnlyDate(completionDateInput) : completionDateInput) : (target.completionDate || new Date().toLocaleDateString('pt-BR'));
+        } else {
+          target.completionDate = '';
+        }
         target.description = latestSummary;
         target.history_notes = [...this.selectedTimelineUpdates];
         target.updated_at = nowIso;
@@ -1425,6 +1452,7 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
           responsible,
           severity,
           status,
+          completionDate: status === 'RESOLVIDO' ? (completionDateInput ? (window.app?.formatOnlyDate ? window.app.formatOnlyDate(completionDateInput) : completionDateInput) : new Date().toLocaleDateString('pt-BR')) : '',
           description: latestSummary,
           history_notes: [...this.selectedTimelineUpdates],
           createdBy: window.app?.userEmail || '',
@@ -1652,6 +1680,11 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
       if (oldStatus === newStatus) return;
 
       item.status = newStatus;
+      if (newStatus === 'RESOLVIDO' && !item.completionDate) {
+        item.completionDate = new Date().toLocaleDateString('pt-BR');
+      } else if (newStatus !== 'RESOLVIDO') {
+        item.completionDate = '';
+      }
       const nowIso = new Date().toISOString();
       item.updated_at = nowIso;
 
@@ -1700,6 +1733,32 @@ var RpaPendenciesModule = window.RpaPendenciesModule = {
 
       this.saveLocal();
       this.renderView();
+    },
+
+    updateCompletionDate(id, newDate) {
+      if (!id) return;
+      const item = this.pendencies.find(i => i.id === id);
+      if (!item) return;
+      const formatted = newDate ? (window.app?.formatOnlyDate ? window.app.formatOnlyDate(newDate) : newDate) : '';
+      item.completionDate = formatted;
+      if (formatted && item.status !== 'RESOLVIDO') {
+        item.status = 'RESOLVIDO';
+      } else if (!formatted && item.status === 'RESOLVIDO') {
+        // manteve status resolvido mas sem data
+      }
+      item.updated_at = new Date().toISOString();
+      this.saveLocal();
+      if (window.supabaseClient) {
+        window.supabaseClient.from('rpa_pendencies').update({
+          completionDate: formatted,
+          status: item.status,
+          updated_at: item.updated_at
+        }).eq('id', id).catch?.(() => {});
+      }
+      this.renderView();
+      if (window.app && window.app.activeView === 'dashboard') {
+        window.app.renderDashboardView();
+      }
     },
 
     printReport(targetId = null) {
