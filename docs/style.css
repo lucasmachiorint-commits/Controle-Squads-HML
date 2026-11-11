@@ -3636,26 +3636,93 @@ body.light-theme .date-pill {
   .dash-exec-filters-grid {
     display: none !important;
   }
+  .dash-exec-top-row {
+    margin-bottom: 0 !important;
+  }
   .dash-exec-header-panel {
+    background: #ffffff !important;
     box-shadow: none !important;
-    border: 1px solid #ccc !important;
-    padding: 12px 16px !important;
-    margin-bottom: 12px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 10px 14px !important;
+    margin-top: 0 !important;
+    margin-bottom: 10px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+  .dash-exec-title {
+    color: #0f172a !important;
+    font-size: 16pt !important;
+  }
+  .dash-exec-subtitle {
+    color: #475569 !important;
+    font-size: 9pt !important;
   }
   .squads-columns-grid {
     display: grid !important;
-    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
     gap: 10px !important;
+    align-items: start !important;
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
   }
   .squad-col-card {
+    display: block !important;
+    overflow: visible !important;
+    background: #ffffff !important;
     box-shadow: none !important;
-    border: 1px solid #ddd !important;
-    break-inside: avoid;
-    page-break-inside: avoid;
+    border: 1px solid #cbd5e1 !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    height: auto !important;
+  }
+  .squad-col-body {
+    display: block !important;
+    padding: 12px 10px !important;
+    background: #ffffff !important;
+  }
+  .squad-col-body > div {
+    margin-bottom: 10px !important;
+  }
+  .squad-kpi-summary {
+    color: #1e293b !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+  .squad-kpi-summary span {
+    color: #1e293b !important;
+  }
+  .demand-list {
+    display: block !important;
   }
   .demand-item {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    border-color: #e5e7eb !important;
+    display: block !important;
+    margin-bottom: 6px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    border: 1px solid #cbd5e1 !important;
+    background: #f8fafc !important;
+  }
+  .demand-line-main {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+  }
+  .demand-gau {
+    color: #0f172a !important;
+    font-weight: 900 !important;
+  }
+  .demand-sub {
+    color: #334155 !important;
+  }
+  .date-pill {
+    color: #047857 !important;
+    font-weight: 700 !important;
+  }
+  .team-pill {
+    background: #e0f2fe !important;
+    color: #0369a1 !important;
+    border: 1px solid #7dd3fc !important;
   }
 }
