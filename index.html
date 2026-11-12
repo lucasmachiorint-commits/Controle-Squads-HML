@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Controle de Squads - Enterprise Board [HML] v6.92.0-hml</title>
+    <title>Controle de Squads - Enterprise Board [HML] v6.93.0-hml</title>
     
     <script>
       (function() {
@@ -20,7 +20,7 @@
             for (let name of names) { caches.delete(name); }
           });
         }
-        const TARGET_RELEASE = 'v6.92.0-hml';
+        const TARGET_RELEASE = 'v6.93.0-hml';
         const currentLock = localStorage.getItem('cs_deployed_release_lock_hml');
         if (currentLock !== TARGET_RELEASE || !window.location.search.includes('v=6.89.0-hml')) {
           localStorage.setItem('cs_deployed_release_lock_hml', TARGET_RELEASE);
@@ -56,7 +56,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
     
     <!-- Custom Theme Stylesheet -->
-    <link rel="stylesheet" href="style.css?v=20261111_v6.92.0-hml">
+    <link rel="stylesheet" href="style.css?v=20261111_v6.93.0-hml">
 </head>
 <body>
 
@@ -316,49 +316,56 @@
           </div>
         </div>
 
-        <!-- OS 4 FILTROS PRINCIPAIS -->
-        <div class="dash-exec-filters-grid">
+        <!-- OS 5 FILTROS MULTI-SELEÇÃO DO DASHBOARD -->
+        <div class="dash-exec-filters-grid dash-exec-filters-grid-5">
           <!-- 1. Por Squad -->
-          <div class="dash-exec-filter-box">
+          <div class="dash-exec-filter-box dash-ms-container" id="dash-ms-box-squad">
             <label><i class="fa-solid fa-layer-group text-sky-400 me-1.5"></i> 1. Por Squad</label>
-            <select id="dash-exec-filter-squad" class="dash-exec-select" onchange="app.renderDashboardView()">
-              <option value="all">Todas as Squads (Resumo Geral)</option>
-              <option value="operacoes">1. Squad de Operações</option>
-              <option value="dados">2. Squad de Dados</option>
-              <option value="rpa">3. Squad de RPA</option>
-              <option value="automacao">4. Automação</option>
-            </select>
+            <button type="button" class="dash-exec-select dash-ms-trigger" id="dash-ms-btn-squad" onclick="app.toggleDashMultiSelect('squad', event)">
+              <span class="dash-ms-text" id="dash-ms-text-squad">Todas as Squads (Resumo Geral)</span>
+              <i class="fa-solid fa-chevron-down dash-ms-icon"></i>
+            </button>
+            <div class="dash-ms-dropdown hidden" id="dash-ms-menu-squad" onclick="event.stopPropagation()"></div>
           </div>
 
           <!-- 2. Por Mês (Data de Conclusão) -->
-          <div class="dash-exec-filter-box">
+          <div class="dash-exec-filter-box dash-ms-container" id="dash-ms-box-month">
             <label><i class="fa-solid fa-calendar-check text-emerald-400 me-1.5"></i> 2. Por Mês (Data de Conclusão)</label>
-            <select id="dash-exec-filter-month" class="dash-exec-select" onchange="app.renderDashboardView()">
-              <option value="all">Todos os Meses (Resumo Geral)</option>
-            </select>
+            <button type="button" class="dash-exec-select dash-ms-trigger" id="dash-ms-btn-month" onclick="app.toggleDashMultiSelect('month', event)">
+              <span class="dash-ms-text" id="dash-ms-text-month">Todos os Meses (Resumo Geral)</span>
+              <i class="fa-solid fa-chevron-down dash-ms-icon"></i>
+            </button>
+            <div class="dash-ms-dropdown hidden" id="dash-ms-menu-month" onclick="event.stopPropagation()"></div>
           </div>
 
           <!-- 3. Por Status -->
-          <div class="dash-exec-filter-box">
+          <div class="dash-exec-filter-box dash-ms-container" id="dash-ms-box-status">
             <label><i class="fa-solid fa-list-check text-amber-400 me-1.5"></i> 3. Por Status</label>
-            <select id="dash-exec-filter-status" class="dash-exec-select" onchange="app.renderDashboardView()">
-              <option value="all">Resumo Geral (Concluído + Em Andamento)</option>
-              <option value="concluido">Somente Concluído</option>
-              <option value="em-andamento">Somente Em Andamento</option>
-              <option value="backlog">Somente Backlog</option>
-            </select>
+            <button type="button" class="dash-exec-select dash-ms-trigger" id="dash-ms-btn-status" onclick="app.toggleDashMultiSelect('status', event)">
+              <span class="dash-ms-text" id="dash-ms-text-status">Resumo Geral (Concl. + Em And.)</span>
+              <i class="fa-solid fa-chevron-down dash-ms-icon"></i>
+            </button>
+            <div class="dash-ms-dropdown hidden" id="dash-ms-menu-status" onclick="event.stopPropagation()"></div>
           </div>
 
           <!-- 4. Time Solicitante -->
-          <div class="dash-exec-filter-box">
+          <div class="dash-exec-filter-box dash-ms-container" id="dash-ms-box-team">
             <label><i class="fa-solid fa-users text-purple-400 me-1.5"></i> 4. Time Solicitante</label>
-            <select id="dash-exec-filter-team" class="dash-exec-select" onchange="app.renderDashboardView()">
-              <option value="all">Todos os Times</option>
-              <option value="Atendimento">Atendimento</option>
-              <option value="Conciliação">Conciliação, Parâmetros, Processamento e Adquirência</option>
-              <option value="Suporte Operacional">Suporte Operacional</option>
-              <option value="__vazio__">Sem Time Definido</option>
-            </select>
+            <button type="button" class="dash-exec-select dash-ms-trigger" id="dash-ms-btn-team" onclick="app.toggleDashMultiSelect('team', event)">
+              <span class="dash-ms-text" id="dash-ms-text-team">Todos os Times</span>
+              <i class="fa-solid fa-chevron-down dash-ms-icon"></i>
+            </button>
+            <div class="dash-ms-dropdown hidden" id="dash-ms-menu-team" onclick="event.stopPropagation()"></div>
+          </div>
+
+          <!-- 5. Tipo de Demanda -->
+          <div class="dash-exec-filter-box dash-ms-container" id="dash-ms-box-type">
+            <label><i class="fa-solid fa-tags text-cyan-400 me-1.5"></i> 5. Tipo de Demanda (Dados)</label>
+            <button type="button" class="dash-exec-select dash-ms-trigger" id="dash-ms-btn-type" onclick="app.toggleDashMultiSelect('type', event)">
+              <span class="dash-ms-text" id="dash-ms-text-type">Todos os Tipos</span>
+              <i class="fa-solid fa-chevron-down dash-ms-icon"></i>
+            </button>
+            <div class="dash-ms-dropdown hidden" id="dash-ms-menu-type" onclick="event.stopPropagation()"></div>
           </div>
         </div>
       </div>
@@ -422,6 +429,17 @@
           <div class="search-box flex-1 w-full" style="margin-bottom: 0;">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-board" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderBoardView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+          </div>
+          <div class="w-full md:w-56 dados-only-type-filter" id="filter-type-board-wrap">
+            <select id="filter-type-board" class="team-filter-select" onchange="app.renderBoardView()">
+              <option value="">🏷️ Todos os Tipos</option>
+              <option value="Ingestão">Ingestão</option>
+              <option value="Dashboard">Dashboard</option>
+              <option value="Incidente">Incidente</option>
+              <option value="Bug">Bug</option>
+              <option value="Atualização">Atualização</option>
+              <option value="__vazio__">⚠️ Sem Tipo Definido</option>
+            </select>
           </div>
           <div class="w-full md:w-64">
             <select id="filter-team-board" class="team-filter-select" onchange="app.renderBoardView()">
@@ -493,6 +511,17 @@
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-backlog" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderBacklogView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
           </div>
+          <div class="w-full md:w-56 dados-only-type-filter" id="filter-type-backlog-wrap">
+            <select id="filter-type-backlog" class="team-filter-select" onchange="app.renderBacklogView()">
+              <option value="">🏷️ Todos os Tipos</option>
+              <option value="Ingestão">Ingestão</option>
+              <option value="Dashboard">Dashboard</option>
+              <option value="Incidente">Incidente</option>
+              <option value="Bug">Bug</option>
+              <option value="Atualização">Atualização</option>
+              <option value="__vazio__">⚠️ Sem Tipo Definido</option>
+            </select>
+          </div>
           <div class="w-full md:w-64">
             <select id="filter-team-backlog" class="team-filter-select" onchange="app.renderBacklogView()">
               <option value="">🏢 Todos os Times</option>
@@ -562,6 +591,17 @@
           <div class="search-box flex-1 w-full" style="margin-bottom: 0;">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
             <input type="search" name="search_query_filter_no_autocomplete" class="input-field" style="padding:12px 14px 12px 44px; font-size:12px;" id="search-concluidos" placeholder="Buscar por título, GAU ou solicitante..." onkeyup="app.renderCompletedView()" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other">
+          </div>
+          <div class="w-full md:w-56 dados-only-type-filter" id="filter-type-concluidos-wrap">
+            <select id="filter-type-concluidos" class="team-filter-select" onchange="app.renderCompletedView()">
+              <option value="">🏷️ Todos os Tipos</option>
+              <option value="Ingestão">Ingestão</option>
+              <option value="Dashboard">Dashboard</option>
+              <option value="Incidente">Incidente</option>
+              <option value="Bug">Bug</option>
+              <option value="Atualização">Atualização</option>
+              <option value="__vazio__">⚠️ Sem Tipo Definido</option>
+            </select>
           </div>
           <div class="w-full md:w-64">
             <select id="filter-team-concluidos" class="team-filter-select" onchange="app.renderCompletedView()">
@@ -1470,12 +1510,12 @@
 </div>
 
 <!-- JIRA ENGINE MODULE & CORE APP LOGIC -->
-<script src="jira-sync.js?v=20261111_v6.92.0-hml"></script>
-<script src="app.js?v=20261111_v6.92.0-hml"></script>
+<script src="jira-sync.js?v=20261111_v6.93.0-hml"></script>
+<script src="app.js?v=20261111_v6.93.0-hml"></script>
 <!-- MÓDULO AUTÔNOMO ISOLADO DA SQUAD RPA -->
-<script src="rpa-pendencies.js?v=20261111_v6.92.0-hml"></script>
+<script src="rpa-pendencies.js?v=20261111_v6.93.0-hml"></script>
 <!-- MÓDULO AUTÔNOMO ISOLADO DE AUTOMAÇÃO -->
-<script src="automacao.js?v=20261111_v6.92.0-hml"></script>
+<script src="automacao.js?v=20261111_v6.93.0-hml"></script>
 
 </body>
 </html>

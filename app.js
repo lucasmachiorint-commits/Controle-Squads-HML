@@ -1233,6 +1233,15 @@ const app = {
       squadBadge.innerHTML = `<i class="fa-solid ${icons[squadId]}"></i> ${names[squadId]}`;
     }
 
+    document.querySelectorAll('.dados-only-type-filter').forEach(el => {
+      el.style.display = (squadId === 'dados') ? 'block' : 'none';
+    });
+    if (squadId !== 'dados') {
+      ['filter-type-board', 'filter-type-backlog', 'filter-type-concluidos'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (sel) sel.value = '';
+      });
+    }
     this.render();
   },
 
@@ -2973,18 +2982,180 @@ const app = {
     return allDemands;
   },
 
+  // Estado dos Filtros Multi-Seleção do Dashboard Executivo
+  dashFilters: {
+    squad: [],
+    month: [],
+    status: [],
+    team: [],
+    type: []
+  },
+
+  getDashFilterOptions() {
+    const monthsNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const monthOpts = [];
+    for (let m = 0; m < 12; m++) {
+      monthOpts.push({ value: `2026-${String(m + 1).padStart(2, '0')}`, label: `${monthsNames[m]} / 2026` });
+    }
+    for (let m = 11; m >= 0; m--) {
+      monthOpts.push({ value: `2025-${String(m + 1).padStart(2, '0')}`, label: `${monthsNames[m]} / 2025` });
+    }
+
+    return {
+      squad: {
+        allLabel: 'Todas as Squads (Resumo Geral)',
+        shortAll: 'Todas as Squads (Resumo Geral)',
+        items: [
+          { value: 'operacoes', label: '1. Squad de Operações', short: 'Operações' },
+          { value: 'dados', label: '2. Squad de Dados', short: 'Dados' },
+          { value: 'rpa', label: '3. Squad de RPA', short: 'RPA' },
+          { value: 'automacao', label: '4. Automação', short: 'Automação' }
+        ]
+      },
+      month: {
+        allLabel: 'Todos os Meses (Resumo Geral)',
+        shortAll: 'Todos os Meses (Resumo Geral)',
+        items: monthOpts.map(o => ({ ...o, short: o.label.replace(' / 2026', '') }))
+      },
+      status: {
+        allLabel: 'Resumo Geral (Concluído + Em Andamento)',
+        shortAll: 'Resumo Geral (Concl. + Em And.)',
+        items: [
+          { value: 'concluido', label: 'Concluído', short: 'Concluído' },
+          { value: 'em-andamento', label: 'Em Andamento', short: 'Em Andamento' },
+          { value: 'backlog', label: 'Backlog', short: 'Backlog' }
+        ]
+      },
+      team: {
+        allLabel: 'Todos os Times',
+        shortAll: 'Todos os Times',
+        items: [
+          { value: 'Atendimento', label: 'Atendimento', short: 'Atendimento' },
+          { value: 'Conciliação', label: 'Conciliação, Parâmetros, Processamento e Adquirência', short: 'Conciliação' },
+          { value: 'Suporte Operacional', label: 'Suporte Operacional', short: 'Suporte Operacional' },
+          { value: '__vazio__', label: 'Sem Time Definido', short: 'Sem Time' }
+        ]
+      },
+      type: {
+        allLabel: 'Todos os Tipos',
+        shortAll: 'Todos os Tipos',
+        items: [
+          { value: 'Ingestão', label: 'Ingestão', short: 'Ingestão' },
+          { value: 'Dashboard', label: 'Dashboard', short: 'Dashboard' },
+          { value: 'Incidente', label: 'Incidente', short: 'Incidente' },
+          { value: 'Bug', label: 'Bug', short: 'Bug' },
+          { value: 'Atualização', label: 'Atualização', short: 'Atualização' },
+          { value: '__vazio__', label: 'Sem Tipo Definido', short: 'Sem Tipo' }
+        ]
+      }
+    };
+  },
+
+  initDashMultiSelects() {
+    if (!this._dashMsOutsideBound) {
+      this._dashMsOutsideBound = true;
+      document.addEventListener('click', () => {
+        document.querySelectorAll('.dash-ms-dropdown').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.dash-ms-trigger').forEach(btn => btn.classList.remove('active'));
+      });
+    }
+    ['squad', 'month', 'status', 'team', 'type'].forEach(cat => this.renderDashMultiSelectMenu(cat));
+  },
+
+  toggleDashMultiSelect(category, event) {
+    if (event) event.stopPropagation();
+    const menu = document.getElementById(`dash-ms-menu-${category}`);
+    const btn = document.getElementById(`dash-ms-btn-${category}`);
+    if (!menu) return;
+
+    const isHidden = menu.classList.contains('hidden');
+    document.querySelectorAll('.dash-ms-dropdown').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.dash-ms-trigger').forEach(b => b.classList.remove('active'));
+
+    if (isHidden) {
+      this.renderDashMultiSelectMenu(category);
+      menu.classList.remove('hidden');
+      if (btn) btn.classList.add('active');
+    }
+  },
+
+  toggleDashFilterValue(category, value, event) {
+    if (event) event.stopPropagation();
+    if (!this.dashFilters) this.dashFilters = { squad: [], month: [], status: [], team: [], type: [] };
+
+    if (value === '__ALL__') {
+      this.dashFilters[category] = [];
+    } else {
+      const arr = this.dashFilters[category] || [];
+      const idx = arr.indexOf(value);
+      if (idx >= 0) {
+        arr.splice(idx, 1);
+      } else {
+        arr.push(value);
+      }
+      this.dashFilters[category] = arr;
+    }
+
+    this.renderDashMultiSelectMenu(category);
+    this.renderDashboardView();
+  },
+
+  renderDashMultiSelectMenu(category) {
+    const defs = this.getDashFilterOptions()[category];
+    if (!defs) return;
+    const selected = (this.dashFilters && this.dashFilters[category]) || [];
+    const isAll = selected.length === 0;
+
+    // Atualizar texto do botão gatilho
+    const textEl = document.getElementById(`dash-ms-text-${category}`);
+    if (textEl) {
+      if (isAll) {
+        textEl.innerHTML = defs.shortAll;
+      } else {
+        const labels = selected.map(val => {
+          const found = defs.items.find(i => i.value === val);
+          return found ? (found.short || found.label) : val;
+        });
+        textEl.innerHTML = `<span class="dash-ms-badge">${selected.length}</span> ${labels.join(', ')}`;
+      }
+    }
+
+    // Renderizar opções com checkboxes no menu
+    const menuEl = document.getElementById(`dash-ms-menu-${category}`);
+    if (!menuEl) return;
+
+    let html = `
+      <div class="dash-ms-option dash-ms-option-all ${isAll ? 'selected' : ''}" onclick="app.toggleDashFilterValue('${category}', '__ALL__', event)">
+        <span class="dash-ms-checkbox">${isAll ? '<i class="fa-solid fa-check"></i>' : ''}</span>
+        <span class="dash-ms-opt-label">${defs.allLabel}</span>
+      </div>
+      <div class="dash-ms-divider"></div>
+    `;
+
+    defs.items.forEach(item => {
+      const checked = selected.includes(item.value);
+      const safeVal = item.value.replace(/'/g, "\\'");
+      html += `
+        <div class="dash-ms-option ${checked ? 'selected' : ''}" onclick="app.toggleDashFilterValue('${category}', '${safeVal}', event)">
+          <span class="dash-ms-checkbox">${checked ? '<i class="fa-solid fa-check"></i>' : ''}</span>
+          <span class="dash-ms-opt-label">${item.label}</span>
+        </div>
+      `;
+    });
+
+    menuEl.innerHTML = html;
+  },
+
   // Limpar todos os filtros do Dashboard Executivo
   clearDashboardFilters() {
-    const sSquad = document.getElementById('dash-exec-filter-squad');
-    const sMonth = document.getElementById('dash-exec-filter-month');
-    const sStatus = document.getElementById('dash-exec-filter-status');
-    const sTeam = document.getElementById('dash-exec-filter-team');
-
-    if (sSquad) sSquad.value = 'all';
-    if (sMonth) sMonth.value = 'all';
-    if (sStatus) sStatus.value = 'all';
-    if (sTeam) sTeam.value = 'all';
-
+    this.dashFilters = {
+      squad: [],
+      month: [],
+      status: [],
+      team: [],
+      type: []
+    };
+    this.initDashMultiSelects();
     this.renderDashboardView();
   },
 
@@ -2993,49 +3164,36 @@ const app = {
     this.exportPDF();
   },
 
-  // Popula os meses no seletor de Mês do Dashboard Executivo
+  // Popula os menus multi-select do Dashboard Executivo
   populateExecDashboardMonths() {
-    const sel = document.getElementById('dash-exec-filter-month');
-    if (!sel || sel.options.length > 1) return;
-
-    const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    const curYear = 2026;
-
-    for (let m = 0; m < 12; m++) {
-      const opt = document.createElement('option');
-      opt.value = `${curYear}-${String(m + 1).padStart(2, '0')}`;
-      opt.textContent = `${months[m]} / ${curYear}`;
-      sel.appendChild(opt);
-    }
-    for (let m = 11; m >= 0; m--) {
-      const opt = document.createElement('option');
-      opt.value = `2025-${String(m + 1).padStart(2, '0')}`;
-      opt.textContent = `${months[m]} / 2025`;
-      sel.appendChild(opt);
-    }
+    this.initDashMultiSelects();
   },
 
-  // RENDER: Novo Dashboard Executivo Consolidado em 4 Colunas por Squad
+  // RENDER: Novo Dashboard Executivo Consolidado em 4 Colunas por Squad (com Filtros Multi-Seleção)
   renderDashboardView() {
     const container = document.getElementById('dash-exec-columns-container');
     if (!container) return;
 
     this.populateExecDashboardMonths();
 
-    const squadFilter = document.getElementById('dash-exec-filter-squad')?.value || 'all';
-    const monthFilter = document.getElementById('dash-exec-filter-month')?.value || 'all';
-    const statusFilter = document.getElementById('dash-exec-filter-status')?.value || 'all';
-    const teamFilter = document.getElementById('dash-exec-filter-team')?.value || 'all';
+    const selSquads = (this.dashFilters && this.dashFilters.squad) || [];
+    const selMonths = (this.dashFilters && this.dashFilters.month) || [];
+    const selStatuses = (this.dashFilters && this.dashFilters.status) || [];
+    const selTeams = (this.dashFilters && this.dashFilters.team) || [];
+    const selTypes = (this.dashFilters && this.dashFilters.type) || [];
 
     // 1. Atualizar Título Dinâmico do Dashboard
     const monthsNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const mainTitleEl = document.getElementById('dash-exec-main-title');
     if (mainTitleEl) {
-      if (monthFilter !== 'all') {
-        const parts = monthFilter.split('-');
-        const mIdx = parseInt(parts[1], 10) - 1;
-        const yVal = parts[0];
-        mainTitleEl.innerHTML = `Fechamento ${monthsNames[mIdx]} ${yVal !== '2026' ? yVal : ''} <span style="color:#f97316;">—</span> Eficiência Operacional`;
+      if (selMonths.length > 0) {
+        const formattedMonths = selMonths.map(mStr => {
+          const parts = mStr.split('-');
+          const mIdx = parseInt(parts[1], 10) - 1;
+          const yVal = parts[0];
+          return `${monthsNames[mIdx]}${yVal !== '2026' ? ' ' + yVal : ''}`;
+        });
+        mainTitleEl.innerHTML = `Fechamento ${formattedMonths.join(', ')} <span style="color:#f97316;">—</span> Eficiência Operacional`;
       } else {
         mainTitleEl.innerHTML = `Resumo Geral <span style="color:#f97316;">—</span> Eficiência Operacional`;
       }
@@ -3043,23 +3201,39 @@ const app = {
 
     const allDemands = this.getAllDashboardDemands();
 
-    // Helper de checagem de mês estrito pela Data de Conclusão
+    // Helper de checagem de mês estrito pela Data de Conclusão (suporta múltiplos meses selecionados)
     const isCompletedInSelectedMonth = (d) => {
-      if (monthFilter === 'all') return true;
+      if (selMonths.length === 0) return true;
       const rawDate = d.completionDate || d.completedAt || d.concludedAt || d.dateConcluded;
       if (!rawDate) return false;
       const dateObj = this.parseItemDate(rawDate);
       if (!dateObj) return false;
-      const [filterYear, filterMonth] = monthFilter.split('-').map(Number);
-      return dateObj.getFullYear() === filterYear && (dateObj.getMonth() + 1) === filterMonth;
+      const itemYear = dateObj.getFullYear();
+      const itemMonth = dateObj.getMonth() + 1;
+      return selMonths.some(mStr => {
+        const [filterYear, filterMonth] = mStr.split('-').map(Number);
+        return itemYear === filterYear && itemMonth === filterMonth;
+      });
     };
 
-    // Helper de checagem de time solicitante
+    // Helper de checagem de time solicitante (suporta múltiplos times selecionados)
     const matchesTeamFilter = (d) => {
-      if (teamFilter === 'all') return true;
+      if (selTeams.length === 0) return true;
       const t = (d.teamSolicitante || d.team || '').trim();
-      if (teamFilter === '__vazio__') return !t;
-      return t.toLowerCase().includes(teamFilter.toLowerCase()) || t.startsWith(teamFilter);
+      return selTeams.some(tf => {
+        if (tf === '__vazio__') return !t;
+        return t.toLowerCase().includes(tf.toLowerCase()) || t.startsWith(tf);
+      });
+    };
+
+    // Helper de checagem de Tipo de Demanda (suporta múltiplos tipos selecionados)
+    const matchesTypeFilter = (d) => {
+      if (selTypes.length === 0) return true;
+      const tp = (d.demandType || '').trim();
+      return selTypes.some(typeVal => {
+        if (typeVal === '__vazio__') return !tp;
+        return tp.toLowerCase() === typeVal.toLowerCase();
+      });
     };
 
     // Definição das 4 Colunas das Squads
@@ -3102,20 +3276,18 @@ const app = {
       }
     ];
 
-    const visibleSquads = squadFilter === 'all' ? squadsDef : squadsDef.filter(s => s.id === squadFilter);
-
-    // Dados de Suporte RPA
-    const rpaItems = window.RpaPendenciesModule?.pendencies || this.state?.rpaPendencies || [];
-    const rpaResolvidos = rpaItems.filter(p => p.status === 'RESOLVIDO').length;
-    const rpaAndamento = rpaItems.filter(p => p.status === 'ABERTO' || p.status === 'EM_ANALISE' || p.status === 'EM_VALIDACAO' || p.status === 'AGUARDANDO_PARCEIRO').length;
+    const visibleSquads = selSquads.length === 0 ? squadsDef : squadsDef.filter(s => selSquads.includes(s.id));
 
     let columnsHtml = '';
 
     visibleSquads.forEach(squad => {
       // Filtrar todas as demandas da squad
       let squadDemands = allDemands.filter(d => d.squadId === squad.id);
-      if (teamFilter !== 'all') {
+      if (selTeams.length > 0) {
         squadDemands = squadDemands.filter(matchesTeamFilter);
+      }
+      if (selTypes.length > 0 && squad.id === 'dados') {
+        squadDemands = squadDemands.filter(matchesTypeFilter);
       }
 
       // Concluídos (filtrados rigorosamente pela Data de Conclusão se mês selecionado)
@@ -3156,11 +3328,11 @@ const app = {
         const teamText = d.teamSolicitante || d.team || '';
         const shortTeam = teamText.split(',')[0].trim();
         const teamPill = shortTeam ? `<span class="team-pill" title="${teamText}">${shortTeam}</span>` : '';
+        const typeText = d.demandType ? ` • ${d.demandType}` : '';
 
         let subMetaHtml = '';
         if (isConcl) {
           const formattedCompDate = this.formatOnlyDate(d.completionDate || d.completedAt || d.concludedAt);
-          const typeText = d.demandType ? ` • ${d.demandType}` : '';
           subMetaHtml = `
             <span class="date-pill"><i class="fa-regular fa-calendar-check"></i> Concl: ${formattedCompDate || 'Finalizado'}${typeText}</span>
             ${teamPill}
@@ -3178,7 +3350,7 @@ const app = {
           }
 
           subMetaHtml = `
-            <span style="color: ${statusColor}; font-size: 10px; font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${statusText}</span>
+            <span style="color: ${statusColor}; font-size: 10px; font-weight: 600; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${statusText}${typeText}</span>
             ${teamPill}
           `;
         }
@@ -3197,6 +3369,11 @@ const app = {
         `;
       };
 
+      // Seções a exibir baseado no filtro de status (multi-select)
+      const showConcl = selStatuses.length === 0 || selStatuses.includes('concluido');
+      const showAndam = selStatuses.length === 0 || selStatuses.includes('em-andamento');
+      const showBacklog = selStatuses.includes('backlog');
+
       // Resumo de contadores no topo do card
       let summaryHtml = '';
       if (squad.id === 'dados') {
@@ -3204,25 +3381,22 @@ const app = {
           <span><strong class="kpi-num" style="color:#34d399;">${concluidosPrincipais.length}</strong> Entregues</span>
           <span><strong class="kpi-num" style="color:#60a5fa;">${emAndamento.length}</strong> Em And.</span>
           <span><strong class="kpi-num" style="color:#38bdf8;">${sustentacoesDados.length}</strong> Sustentações</span>
+          ${showBacklog ? `<span><strong class="kpi-num" style="color:#a855f7;">${backlog.length}</strong> Backlog</span>` : ''}
         `;
       } else {
         summaryHtml = `
           <span><strong class="kpi-num" style="color:${squad.titleColor};">${concluidos.length}</strong> Concl.</span>
           <span><strong class="kpi-num" style="color:#f59e0b;">${emAndamento.length}</strong> Em And.</span>
-          ${statusFilter === 'backlog' ? `<span><strong class="kpi-num" style="color:#a855f7;">${backlog.length}</strong> Backlog</span>` : ''}
+          ${showBacklog ? `<span><strong class="kpi-num" style="color:#a855f7;">${backlog.length}</strong> Backlog</span>` : ''}
         `;
       }
-
-      // Seções a exibir baseado no filtro de status
-      const showConcl = statusFilter === 'all' || statusFilter === 'concluido';
-      const showAndam = statusFilter === 'all' || statusFilter === 'em-andamento';
-      const showBacklog = statusFilter === 'backlog';
 
       let sectionsHtml = '';
 
       // 1. Seção Concluídos
       if (showConcl) {
-        const conclTitle = squad.id === 'dados' ? 'Entregas Principais' : (squad.id === 'operacoes' ? 'Principais Entregas' : (squad.id === 'rpa' ? `Concluídos (${monthFilter !== 'all' ? monthsNames[parseInt(monthFilter.split('-')[1], 10) - 1] : 'Total'})` : 'Entregas Concluídas'));
+        const monthLabelRpa = selMonths.length === 1 ? monthsNames[parseInt(selMonths[0].split('-')[1], 10) - 1] : (selMonths.length > 1 ? `${selMonths.length} Meses` : 'Total');
+        const conclTitle = squad.id === 'dados' ? 'Entregas Principais' : (squad.id === 'operacoes' ? 'Principais Entregas' : (squad.id === 'rpa' ? `Concluídos (${monthLabelRpa})` : 'Entregas Concluídas'));
         const iconConcl = squad.id === 'dados' ? 'fa-solid fa-chart-column' : (squad.id === 'operacoes' ? 'fa-solid fa-rocket' : (squad.id === 'rpa' ? 'fa-solid fa-robot' : 'fa-solid fa-square-check'));
         const listToRender = squad.id === 'dados' ? concluidosPrincipais : concluidos;
 
@@ -3267,7 +3441,7 @@ const app = {
         `;
       }
 
-      // 3. Seção Backlog (quando filtrado)
+      // 3. Seção Backlog (quando selecionado no filtro de Status)
       if (showBacklog) {
         sectionsHtml += `
           <div>
@@ -3287,14 +3461,14 @@ const app = {
 
         // Filtro por time (se selecionado)
         let filteredRpaItems = rawRpaItems;
-        if (teamFilter !== 'all') {
+        if (selTeams.length > 0) {
           filteredRpaItems = filteredRpaItems.filter(p => {
-            const t = ((p.responsible || '') + ' ' + (p.team || '')).toLowerCase();
-            return t.includes(teamFilter.toLowerCase());
+            const t = ((p.responsible || '') + ' ' + (p.team || '')).toLowerCase().trim();
+            return selTeams.some(tf => tf === '__vazio__' ? !t : t.includes(tf.toLowerCase()));
           });
         }
 
-        // Chamados Concluídos filtrados estritamente pela Data de Conclusão no mês selecionado
+        // Chamados Concluídos filtrados estritamente pela Data de Conclusão nos meses selecionados
         const rpaConcluidos = filteredRpaItems.filter(p => {
           if (p.status !== 'RESOLVIDO') return false;
           const compDate = p.completionDate || this.formatOnlyDate(p.resolved_at || p.updated_at || p.created_at);
@@ -3304,15 +3478,10 @@ const app = {
         // Chamados em Andamento
         const rpaEmAndamento = filteredRpaItems.filter(p => p.status === 'ABERTO' || p.status === 'EM_VALIDACAO' || p.status === 'EM_ANALISE' || p.status === 'AGUARDANDO_PARCEIRO');
 
-        // Itens a exibir conforme filtro de status
+        // Itens a exibir conforme filtro de status (multi-select)
         let rpaItemsToDisplay = [];
-        if (statusFilter === 'all') {
-          rpaItemsToDisplay = [...rpaConcluidos, ...rpaEmAndamento];
-        } else if (statusFilter === 'concluido') {
-          rpaItemsToDisplay = rpaConcluidos;
-        } else if (statusFilter === 'em-andamento') {
-          rpaItemsToDisplay = rpaEmAndamento;
-        }
+        if (showConcl) rpaItemsToDisplay.push(...rpaConcluidos);
+        if (showAndam) rpaItemsToDisplay.push(...rpaEmAndamento);
 
         const renderRpaChamadoCard = (p) => {
           const isItemConcl = p.status === 'RESOLVIDO';
@@ -3357,7 +3526,7 @@ const app = {
           `;
         };
 
-        if (statusFilter !== 'backlog') {
+        if (showConcl || showAndam) {
           sectionsHtml += `
             <div>
               <div class="sec-group-title" style="color: #eab308; display:flex; align-items:center; justify-content:space-between;">
@@ -3614,8 +3783,12 @@ const app = {
     // Garantir resequenciamento estrito e sequencial (1, 2, 3...)
     this.resequenceOrders(inProgressItems);
 
+    const typeWrapBoard = document.getElementById('filter-type-board-wrap');
+    if (typeWrapBoard) typeWrapBoard.style.display = (this.activeSquad === 'dados') ? 'block' : 'none';
+
     const searchTerm = (document.getElementById('search-board')?.value || '').toLowerCase();
     const teamFilter = document.getElementById('filter-team-board')?.value || '';
+    const typeFilter = (this.activeSquad === 'dados') ? (document.getElementById('filter-type-board')?.value || '') : '';
 
     const filteredItems = inProgressItems.filter(item => {
       const matchSearch = !searchTerm ||
@@ -3629,7 +3802,14 @@ const app = {
       } else if (teamFilter) {
         matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
       }
-      return matchSearch && matchTeam;
+
+      let matchType = true;
+      if (typeFilter === '__vazio__') {
+        matchType = !item.demandType;
+      } else if (typeFilter) {
+        matchType = (item.demandType || '') === typeFilter;
+      }
+      return matchSearch && matchTeam && matchType;
     });
 
     const boardHeadEl = document.getElementById('board-table-head');
@@ -3794,8 +3974,12 @@ const app = {
     // Garantir resequenciamento estrito e sequencial (1, 2, 3...)
     this.resequenceOrders(backlogItems);
 
+    const typeWrapBacklog = document.getElementById('filter-type-backlog-wrap');
+    if (typeWrapBacklog) typeWrapBacklog.style.display = (this.activeSquad === 'dados') ? 'block' : 'none';
+
     const searchTerm = (document.getElementById('search-backlog')?.value || '').toLowerCase();
     const teamFilter = document.getElementById('filter-team-backlog')?.value || '';
+    const typeFilter = (this.activeSquad === 'dados') ? (document.getElementById('filter-type-backlog')?.value || '') : '';
 
     const filteredItems = backlogItems.filter(item => {
       const matchSearch = !searchTerm ||
@@ -3809,7 +3993,14 @@ const app = {
       } else if (teamFilter) {
         matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
       }
-      return matchSearch && matchTeam;
+
+      let matchType = true;
+      if (typeFilter === '__vazio__') {
+        matchType = !item.demandType;
+      } else if (typeFilter) {
+        matchType = (item.demandType || '') === typeFilter;
+      }
+      return matchSearch && matchTeam && matchType;
     });
 
     const backlogBadge = document.getElementById('backlog-count-badge');
@@ -4068,15 +4259,19 @@ const app = {
     const titleEl = document.getElementById('concluidos-squad-title');
     if (titleEl) titleEl.textContent = `Concluídos - ${squadNames[this.activeSquad]}`;
 
+    const typeWrapComp = document.getElementById('filter-type-concluidos-wrap');
+    if (typeWrapComp) typeWrapComp.style.display = (this.activeSquad === 'dados') ? 'block' : 'none';
+
     const items = this.state.completedTasks[this.activeSquad] || [];
     const searchTerm = (document.getElementById('search-concluidos')?.value || '').toLowerCase();
     const teamFilter = document.getElementById('filter-team-concluidos')?.value || '';
+    const typeFilter = (this.activeSquad === 'dados') ? (document.getElementById('filter-type-concluidos')?.value || '') : '';
 
     const filteredItems = items.filter(item => {
       const matchSearch = !searchTerm ||
-        (item.taskTitle || '').toLowerCase().includes(searchTerm) ||
-        (item.completedBy || '').toLowerCase().includes(searchTerm) ||
-        (item.jiraKey || '').toLowerCase().includes(searchTerm);
+        (item.title || item.taskTitle || '').toLowerCase().includes(searchTerm) ||
+        (item.completedBy || item.requester || '').toLowerCase().includes(searchTerm) ||
+        (item.gau || item.jiraKey || '').toLowerCase().includes(searchTerm);
 
       let matchTeam = true;
       if (teamFilter === '__vazio__') {
@@ -4084,7 +4279,14 @@ const app = {
       } else if (teamFilter) {
         matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
       }
-      return matchSearch && matchTeam;
+
+      let matchType = true;
+      if (typeFilter === '__vazio__') {
+        matchType = !item.demandType;
+      } else if (typeFilter) {
+        matchType = (item.demandType || '') === typeFilter;
+      }
+      return matchSearch && matchTeam && matchType;
     });
 
     const compHeadEl = document.getElementById('completed-table-head');
@@ -4118,7 +4320,18 @@ const app = {
         <td class="font-extrabold text-emerald-400" style="white-space:nowrap; width:95px;">${this.getItemGau(item)}</td>
         <td class="font-semibold text-white" style="white-space:normal; word-break:break-word; line-height:1.4;">${item.title || item.taskTitle}</td>
         <td class="text-slate-300" style="white-space:nowrap; width:130px;">${this.cleanRequesterName(item.requester || item.completedBy || item.requesterName || 'Solicitante Jira')}</td>
-        ${this.activeSquad === 'dados' ? `<td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:118px;">${item.demandType || '—'}</td>` : ''}
+        ${this.activeSquad === 'dados' ? `
+          <td onclick="event.stopPropagation();" style="white-space:nowrap; width:118px;">
+            <select class="team-solicitante-select demand-type-select" onchange="app.changeDemandType('${item.id}', this.value)" ${(this.userRole === 'admin' || this.userRole === 'gerencial') ? '' : 'disabled="true" style="pointer-events:none; opacity:0.75;"'}>
+              <option value="">— Selecione —</option>
+              <option value="Ingestão" ${item.demandType === 'Ingestão' ? 'selected' : ''}>Ingestão</option>
+              <option value="Dashboard" ${item.demandType === 'Dashboard' ? 'selected' : ''}>Dashboard</option>
+              <option value="Incidente" ${item.demandType === 'Incidente' ? 'selected' : ''}>Incidente</option>
+              <option value="Bug" ${item.demandType === 'Bug' ? 'selected' : ''}>Bug</option>
+              <option value="Atualização" ${item.demandType === 'Atualização' ? 'selected' : ''}>Atualização</option>
+            </select>
+          </td>
+        ` : ''}
         <td class="text-sky-300 font-semibold text-xs" style="white-space:nowrap; width:135px;">${item.teamSolicitante || '—'}</td>
         <td class="text-amber-400 font-semibold text-xs" style="white-space:nowrap; width:100px;">${this.formatOnlyDate(item.createdDate || item.date || item.createdAt)}</td>
         ${(this.userRole === 'admin' || this.userRole === 'gerencial') ? `
@@ -4203,8 +4416,10 @@ const app = {
       // Aplicar filtro de busca ativo em tela (se houver)
       const searchTerm = (document.getElementById('search-backlog')?.value || '').toLowerCase();
       const teamFilter = document.getElementById('filter-team-backlog')?.value || '';
+      const typeFilter = (this.activeSquad === 'dados') ? (document.getElementById('filter-type-backlog')?.value || '') : '';
 
       const filtered = items.filter(item => {
+        const matchType = !typeFilter || (typeFilter === '__vazio__' ? !item.demandType : item.demandType === typeFilter);
         const matchSearch = !searchTerm ||
           (item.title || '').toLowerCase().includes(searchTerm) ||
           (item.gau || item.jiraKey || '').toLowerCase().includes(searchTerm) ||
@@ -4215,7 +4430,7 @@ const app = {
         } else if (teamFilter) {
           matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
         }
-        return matchSearch && matchTeam;
+        return matchSearch && matchTeam && matchType;
       });
 
       exportData = filtered.map((item) => ({
@@ -4257,8 +4472,10 @@ const app = {
 
       const searchTerm = (document.getElementById('search-board')?.value || '').toLowerCase();
       const teamFilter = document.getElementById('filter-team-board')?.value || '';
+      const typeFilter = (this.activeSquad === 'dados') ? (document.getElementById('filter-type-board')?.value || '') : '';
 
       const filtered = items.filter(item => {
+        const matchType = !typeFilter || (typeFilter === '__vazio__' ? !item.demandType : item.demandType === typeFilter);
         const matchSearch = !searchTerm ||
           (item.title || '').toLowerCase().includes(searchTerm) ||
           (item.gau || item.jiraKey || '').toLowerCase().includes(searchTerm) ||
@@ -4269,7 +4486,7 @@ const app = {
         } else if (teamFilter) {
           matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
         }
-        return matchSearch && matchTeam;
+        return matchSearch && matchTeam && matchType;
       });
 
       exportData = filtered.map((item) => ({
@@ -4291,8 +4508,10 @@ const app = {
 
       const searchTerm = (document.getElementById('search-concluidos')?.value || '').toLowerCase();
       const teamFilter = document.getElementById('filter-team-concluidos')?.value || '';
+      const typeFilter = (this.activeSquad === 'dados') ? (document.getElementById('filter-type-concluidos')?.value || '') : '';
 
       const filtered = items.filter(item => {
+        const matchType = !typeFilter || (typeFilter === '__vazio__' ? !item.demandType : item.demandType === typeFilter);
         const matchSearch = !searchTerm ||
           (item.taskTitle || '').toLowerCase().includes(searchTerm) ||
           (item.completedBy || '').toLowerCase().includes(searchTerm) ||
@@ -4303,7 +4522,7 @@ const app = {
         } else if (teamFilter) {
           matchTeam = (item.teamSolicitante || '').startsWith(teamFilter);
         }
-        return matchSearch && matchTeam;
+        return matchSearch && matchTeam && matchType;
       });
 
       exportData = filtered.map((item) => ({
